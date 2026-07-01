@@ -303,6 +303,12 @@ function blank(){return{
   regimen:[],              // {id,name,dose,freq,time,day,remind}  patient-entered
   reminders:[],            // {id,kind,label,time,days,enabled}
   protein:[],              // {date, g}
+  water:[],                // {date, ml}
+  journal:[],              // {date, hunger, mood, note}
+  measures:[],             // {date, type, cm}  type: hip|neck|chest|thigh|arm
+  wins:[],                 // {id, t, text}
+  checklists:{},           // {itemId:true}
+  photos:[],               // {date, data}
   procedure:{type:'',date:'',phase:''}, // endoscopic/surgical journey
   vits:{},                 // {date: [ids taken]}
   seenDays:[]
@@ -404,9 +410,15 @@ route('today',(n)=>{markDay();const ar=isAr();const st=streak();const recentLogs
    </div>
    ${gp!=null?`<div class="card"><div class="between"><div><b style="font-size:15px">${t('goal')}</b><div class="muted" style="font-size:12.5px;margin-top:3px">${ar?'من '+S.user.startWeight+' نحو '+S.user.targetWeight+' كجم':'from '+S.user.startWeight+' toward '+S.user.targetWeight+' kg'}</div></div><div style="width:96px;text-align:center">${ring(gp,'var(--accent)',Math.round(gp)+'%','')}</div></div></div>`:''}
    ${my?`<div class="pathcard tap" onclick="openPathway('${my.id}')" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="between"><div><small style="color:var(--accent);font-weight:700">${t('myPlan')}</small><b style="margin-top:2px">${my.icon} ${L(my.n)}</b><small>${L(my.d)}</small></div><div class="chev" style="align-self:center">${ar?'‹':'›'}</div></div></div>`:''}
+   <div class="card tap" onclick="openTip()" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="row" style="gap:12px"><span style="font-size:24px">💡</span><div style="flex:1"><b style="font-size:14px">${ar?'نصيحة اليوم':'Tip of the day'}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${L(TIPS[tipIndex()])}</div></div></div></div>
+   <div class="card"><div class="between"><div class="row" style="gap:12px"><div style="width:52px">${ring(Math.min(100,Math.round(waterToday()/waterGoal()*100)),'var(--accent2)',Math.round(waterToday()/250)+'','')}</div><div><b style="font-size:14.5px">${ar?'الماء':'Hydration'}</b><div class="muted" style="font-size:12px;margin-top:2px">${waterToday()} / ${waterGoal()} ml</div></div></div><div class="row" style="gap:6px"><button class="btn-sm btn-ghost" style="padding:9px 12px;border-radius:11px;border:1px solid var(--line);background:var(--card2);font-weight:700;cursor:pointer" onclick="addWater(250)">＋${ar?'كوب':'cup'}</button><button class="iconbtn" onclick="go('water')">›</button></div></div></div>
    <div class="grid2">
      <div class="pathcard" onclick="go('tools')" style="background:linear-gradient(150deg,#0EA5E922,transparent)"><div class="pi">🧰</div><b>${t('toolsT')}</b><small>${ar?'حاسبات وأدوية':'Calculators & meds'}</small></div>
+     <div class="pathcard" onclick="go('wellness')" style="background:linear-gradient(150deg,#8B5CF622,transparent)"><div class="pi">🧘</div><b>${ar?'العافية والعادات':'Wellness'}</b><small>${ar?'ماء، يوميات، صور':'Water, journal, photos'}</small></div>
+   </div>
+   <div class="grid2">
      <div class="pathcard" onclick="go('reminders')" style="background:linear-gradient(150deg,#10B98122,transparent)"><div class="pi">🔔</div><b>${ar?'التذكيرات':'Reminders'}</b><small>${ar?'لا تفوّت جرعة':'Never miss a dose'}</small></div>
+     <div class="pathcard" onclick="go('journal')" style="background:linear-gradient(150deg,#F59E0B22,transparent)"><div class="pi">📔</div><b>${ar?'اليوميات':'Journal'}</b><small>${ar?'الجوع والمزاج':'Hunger & mood'}</small></div>
    </div>
    <div class="section-title">${t('quickLog')}</div>
    <div class="chips" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
@@ -421,7 +433,7 @@ function quickBtns(){const items=[['weight','⚖️','logWeight'],['meal','🍽�
 /* ---- unified event feed ---- */
 const TYPE_META={weight:['⚖️',['Weight','الوزن']],waist:['📏',['Waist','الخصر']],meal:['🍽️',['Meal','وجبة']],activity:['🏃',['Activity','نشاط']],med:['💊',['Medication','دواء']],symptom:['🩹',['Symptom','عَرَض']],lab:['🧪',['Lab result','نتيجة تحليل']],vits:['💊',['Vitamins','فيتامينات']]};
 function allEvents(){const ev=[];S.weights.forEach(w=>ev.push({type:'weight',t:w.date+'T09:00',kg:w.kg}));S.waists.forEach(w=>ev.push({type:'waist',t:w.date+'T09:00',cm:w.cm}));S.labs.forEach(l=>ev.push({type:'lab',t:l.date+'T09:00',key:l.key,val:l.val}));S.logs.forEach(l=>ev.push(l));return ev.sort((a,b)=>new Date(b.t)-new Date(a.t));}
-function liRow(l){const m=TYPE_META[l.type]||['•',['Log','سجل']];let sub='';if(l.type==='weight')sub=l.kg+' kg';else if(l.type==='waist')sub=l.cm+' cm';else if(l.type==='lab')sub=L(LABKEYS[l.key]||['',''])+': '+l.val;else if(l.type==='meal'&&l.tags)sub=l.tags.map(i=>L(MEALTAGS[i])).join(', ');else if(l.type==='activity')sub=(l.act!=null?L(ACTS[l.act]):'')+(l.mins?' · '+l.mins+(isAr()?' د':' min'):'')+(l.steps?' · '+l.steps+(isAr()?' خطوة':' steps'):'');else if(l.type==='med'&&l.med)sub=L((MEDS.find(x=>x.id===l.med)||{n:['','']}).n);else if(l.type==='symptom'&&l.sym!=null)sub=L(SYMPTOMS[l.sym])+(l.sev!=null?' · '+[t('mild'),t('moderate'),t('severe')][l.sev]:'');if(l.notes)sub=(sub?sub+' · ':'')+esc(l.notes.slice(0,32));return `<div class="li"><div class="ic">${m[0]}</div><div class="tx"><b>${L(m[1])}</b><small>${sub||fmtDate(l.t)}</small></div><small class="muted">${fmtDate(l.t)}</small></div>`;}
+function liRow(l){const m=TYPE_META[l.type]||['•',['Log','سجل']];let sub='';if(l.type==='weight')sub=l.kg+' kg';else if(l.type==='waist')sub=l.cm+' cm';else if(l.type==='lab')sub=L(LABKEYS[l.key]||['',''])+': '+l.val;else if(l.type==='meal'){const dot=l.q?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${mealQuality(l.tags).c};margin-inline-end:5px;vertical-align:middle"></span>`:'';sub=dot+((l.tags||[]).map(i=>L(MEALTAGS[i])).join(', ')||L(['Meal','وجبة']));}else if(l.type==='activity')sub=(l.act!=null?L(ACTS[l.act]):'')+(l.mins?' · '+l.mins+(isAr()?' د':' min'):'')+(l.steps?' · '+l.steps+(isAr()?' خطوة':' steps'):'');else if(l.type==='med'&&l.med)sub=L((MEDS.find(x=>x.id===l.med)||{n:['','']}).n);else if(l.type==='symptom'&&l.sym!=null)sub=L(SYMPTOMS[l.sym])+(l.sev!=null?' · '+[t('mild'),t('moderate'),t('severe')][l.sev]:'');if(l.notes)sub=(sub?sub+' · ':'')+esc(l.notes.slice(0,32));return `<div class="li"><div class="ic">${m[0]}</div><div class="tx"><b>${L(m[1])}</b><small>${sub||fmtDate(l.t)}</small></div><small class="muted">${fmtDate(l.t)}</small></div>`;}
 function addLog(o){o.id=rid();o.t=o.t||new Date().toISOString();S.logs.push(o);save();}
 
 /* ---- loggers ---- */
@@ -460,7 +472,8 @@ window.openLog=function(ty){const ar=isAr();
 };
 window.saveWeight=()=>{const k=parseFloat($('#wk').value);if(isNaN(k))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wd').value||todayKey();S.weights=S.weights.filter(w=>w.date!==d);S.weights.push({date:d,kg:k});S.weights.sort((a,b)=>a.date<b.date?-1:1);if(!S.user.startWeight)S.user.startWeight=k;save();closeSheet();toast(t('saved'));render();};
 window.saveWaist=()=>{const c=parseFloat($('#wc').value);if(isNaN(c))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wcd').value||todayKey();S.waists=S.waists.filter(w=>w.date!==d);S.waists.push({date:d,cm:c});S.waists.sort((a,b)=>a.date<b.date?-1:1);save();closeSheet();toast(t('saved'));render();};
-window.saveMeal=()=>{addLog({type:'meal',desc:($('#desc').value||'').trim(),tags:getMulti('mtag')});closeSheet();toast(t('loggedOk'));render();};
+function mealQuality(tags){tags=tags||[];const green=tags.some(i=>[0,1,2].includes(i));const red=tags.some(i=>[3,4,5,6].includes(i));if(green&&!red)return{q:'green',c:'var(--good)',l:['Balanced choice','خيار متوازن']};if(red&&!green)return{q:'red',c:'var(--bad)',l:['Occasional treat','لمرّة أحيانًا']};if(green&&red)return{q:'yellow',c:'var(--warn)',l:['Mixed','متنوّع']};return{q:'gray',c:'var(--faint)',l:['Logged','مسجّل']};}
+window.saveMeal=()=>{const tags=getMulti('mtag');const mq=mealQuality(tags);addLog({type:'meal',desc:($('#desc').value||'').trim(),tags,q:mq.q});closeSheet();toast(isAr()?('تم · '+L(mq.l)):('Logged · '+L(mq.l)));render();};
 window.saveActivity=()=>{const a=$('#act'),mins=parseInt($('#amin').value,10),steps=parseInt($('#astep').value,10);addLog({type:'activity',act:a.dataset.val!=null?+a.dataset.val:null,mins:isNaN(mins)?null:mins,steps:isNaN(steps)?null:steps});closeSheet();toast(t('loggedOk'));render();};
 window.saveMed=()=>{const m=$('#md');if(!m.dataset.val)return toast(isAr()?'اختر دواء':'Pick a medication');addLog({type:'med',med:m.dataset.val});closeSheet();toast(t('loggedOk'));render();};
 window.saveSymptom=()=>{const s=$('#sym');if(!s.dataset.val)return toast(isAr()?'اختر عرضًا':'Pick a symptom');const sv=$('#ssev');addLog({type:'symptom',sym:+s.dataset.val,sev:sv.dataset.val!=null?+sv.dataset.val:null});closeSheet();toast(t('loggedOk'));render();};
@@ -501,6 +514,8 @@ route('progress',(n)=>{const ar=isAr();const b=bmiVal();const bc=bmiCat(b);const
    ${wv.length>1?`<div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'اتجاه الوزن (كجم)':'Weight trend (kg)'}</b><small class="muted">${wv[0].kg} → ${wv[wv.length-1].kg}</small></div>${sparkline(wv.map(w=>w.kg),'var(--accent)')}</div>`:''}
    ${cv.length>1?`<div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'اتجاه الخصر (سم)':'Waist trend (cm)'}</b><small class="muted">${cv[0].cm} → ${cv[cv.length-1].cm}</small></div>${sparkline(cv.map(w=>w.cm),'var(--accent2)')}</div>`:''}
    <div class="card"><div class="between"><div><b>${ar?'النشاط هذا الأسبوع':'Activity this week'}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'هدف شائع: ١٥٠ د/أسبوع':'a common target: 150 min/week'}</div></div><b style="font-size:22px;color:var(--accent)">${wkMins}<span style="font-size:12px"> ${ar?'د':'min'}</span></b></div><div class="pbar" style="margin-top:10px"><i style="width:${Math.min(100,wkMins/150*100)}%"></i></div></div>
+   <div class="card"><div class="between"><div class="row" style="gap:12px"><div style="width:56px">${ring(Math.min(100,Math.round(waterToday()/waterGoal()*100)),'var(--accent2)',Math.round(waterToday()/250)+'','')}</div><div><b>${ar?'الماء اليوم':'Water today'}</b><div class="muted" style="font-size:12px;margin-top:2px">${waterToday()} / ${waterGoal()} ml</div></div></div><button class="iconbtn" onclick="go('water')">›</button></div></div>
+   ${MTYPES.filter(mt=>S.measures.some(x=>x.type===mt[0])).length?`<div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'قياسات الجسم':'Body measurements'}</div>${MTYPES.filter(mt=>S.measures.some(x=>x.type===mt[0])).map(mt=>{const rows=S.measures.filter(x=>x.type===mt[0]).sort((a,b)=>a.date<b.date?-1:1);const last=rows[rows.length-1];const first=rows[0];const d=(last.cm-first.cm);return `<div class="li"><div class="tx"><b style="font-weight:600">${L([mt[1],mt[2]])}</b></div><span class="muted" style="font-size:12px">${first.cm}→</span><b>${last.cm} cm</b>${rows.length>1?`<span style="font-size:11px;color:${d<0?'var(--good)':'var(--muted)'}">${d>0?'+':''}${d.toFixed(1)}</span>`:''}</div>`;}).join('')}<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="go('measures')">${ar?'إدارة القياسات':'Manage measurements'}</button></div>`:`<button class="btn btn-ghost" onclick="go('measures')">📐 ${ar?'أضف قياسات الجسم':'Add body measurements'}</button>`}
    <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'نشاط التسجيل (٥ أسابيع)':'Logging activity (5 weeks)'}</div>${heatmap()}</div>
   </div>`;});
 
@@ -540,6 +555,7 @@ window.setMyPathway=(id)=>{S.user.pathway=id;if((id==='endoscopic'||id==='surger
 route('journey',(n)=>{const ar=isAr();const today=todayKey();const takenToday=S.vits[today]||[];
   n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'الغذاء والفيتامينات':'Diet phases & vitamins'})}<div class="content">
    <div class="disc-note">${ar?'المدد الزمنية تقريبية ويحدّدها فريقك. تقدّم للمرحلة التالية فقط بموافقتهم.':'Timings are approximate and set by your team. Move to the next stage only with their approval.'}</div>
+   <button class="btn btn-ghost" onclick="go('checklists')">✅ ${ar?'قوائم ما قبل وبعد الإجراء':'Pre &amp; post-op checklists'}</button>
    <div class="section-title">${ar?'مرحلتي الحالية':'My current stage'}</div>
    <div class="card"><div class="chips">${DIETPHASES.map(d=>`<button class="chip ${S.procedure.phase===d.k?'on':''}" onclick="setPhase('${d.k}')">${L(d.n)}</button>`).join('')}</div>
      ${S.procedure.phase?`<p class="muted" style="font-size:13px;margin:12px 2px 0">${L((DIETPHASES.find(d=>d.k===S.procedure.phase)||{d:['','']}).d)}</p>`:''}</div>
@@ -557,6 +573,7 @@ route('more',(n)=>{const ar=isAr();n.innerHTML=`${topbar('moreT')}<div class="co
    <div class="card" style="text-align:center;padding:22px"><div class="logo-mark" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px">ق</div><b style="font-size:16px">${S.user.name?esc(S.user.name):'Qawam'}</b><div class="muted" style="font-size:12.5px">${t('tagline')}</div></div>
    <div class="card">
      ${mLi('🧰',t('toolsT'),'go(\'tools\')')}
+     ${mLi('🧘',ar?'العافية والعادات':'Wellness & habits','go(\'wellness\')')}
      ${mLi('🔔',ar?'التذكيرات':'Reminders','go(\'reminders\')')}
      ${mLi('🧭',t('pathwaysT'),'go(\'pathways\')')}
      ${mLi('💊',ar?'علاجي':'My treatment','go(\'treatment\')')}
@@ -760,6 +777,145 @@ window.icsReminder=(id)=>{const r=S.reminders.find(x=>x.id===id);if(!r)return;co
 let _rtick=null,_fired={};
 function startReminderTick(){if(_rtick||typeof Notification==='undefined')return;_rtick=setInterval(()=>{if(Notification.permission!=='granted')return;const now=new Date();const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');const dow=now.getDay();const key=todayKey()+hm;
    S.reminders.forEach(r=>{if(!r.enabled||r.time!==hm)return;if(r.days==='weekdays'&&(dow===5||dow===6))return;if(_fired[r.id]===key)return;_fired[r.id]=key;try{new Notification('Qawam · قوام',{body:r.label,icon:'qawam-192.png'});}catch(e){}});},30000);}
+
+/* ============================================================ WELLNESS & HABITS ============================================================ */
+/* ---- Daily habit tips (Noom-style micro-lessons) ---- */
+const TIPS=[
+ ['Protein first at every meal keeps you full for longer.','ابدأ كل وجبة بالبروتين ليطول شبعك.'],
+ ['Swap one sugary drink for water today.','استبدل مشروبًا محلّى بالماء اليوم.'],
+ ['Fill half your plate with vegetables.','املأ نصف طبقك خضارًا.'],
+ ['Eat slowly — put your fork down between bites.','كُل ببطء — ضع الشوكة بين اللقمات.'],
+ ['A 10-minute walk after meals helps blood sugar.','مشي ١٠ دقائق بعد الأكل يساعد سكّر الدم.'],
+ ['Aim for 7–9 hours of sleep; short sleep raises appetite.','استهدف ٧–٩ ساعات نوم؛ قلة النوم ترفع الشهية.'],
+ ['Plan tomorrow’s meals tonight to avoid impulse eating.','خطّط وجبات الغد الليلة لتتجنّب الأكل الاندفاعي.'],
+ ['Keep tempting snacks out of sight and reach.','أبعِد الوجبات المغرية عن النظر والمتناول.'],
+ ['Weigh weekly, not daily — trends matter more than one morning.','قِس أسبوعيًا لا يوميًا — الاتجاه أهم من صباح واحد.'],
+ ['Stand up and stretch every hour of sitting.','قِف وتمدّد كل ساعة جلوس.'],
+ ['Add beans, lentils or yogurt for filling protein.','أضِف الفاصولياء أو العدس أو الزبادي كبروتين مُشبع.'],
+ ['Hunger or thirst? Drink water first, then decide.','جوع أم عطش؟ اشرب ماءً أولًا ثم قرّر.'],
+ ['Progress isn’t linear — a plateau is normal, not failure.','التقدّم غير خطّي — الثبات طبيعي لا فشل.'],
+ ['Celebrate non-scale wins: energy, sleep, looser clothes.','احتفِ بمكاسب غير الميزان: طاقة، نوم، ملابس أوسع.'],
+ ['Batch-cook protein so the good choice is the easy choice.','اطبخ البروتين بكميات ليكون الخيار الصحي أسهل.'],
+ ['Be kind to yourself — one meal doesn’t define your week.','كن لطيفًا مع نفسك — وجبة واحدة لا تحدّد أسبوعك.']
+];
+function tipIndex(){const d=new Date();const day=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);return day%TIPS.length;}
+window.openTip=()=>{const ar=isAr();openTipN(tipIndex());};
+window.openTipN=(i)=>{const ar=isAr();openSheet(`<div style="text-align:center;font-size:38px">💡</div><h2 style="text-align:center;margin:6px 0 4px">${ar?'نصيحة اليوم':'Tip of the day'}</h2>
+  <p style="text-align:center;font-size:16px;line-height:1.7;color:var(--txt);margin:10px 6px 16px">${L(TIPS[i])}</p>
+  <button class="btn btn-ghost" onclick="openTipN(${(i+1)%TIPS.length})">${ar?'نصيحة أخرى':'Another tip'} →</button>`);};
+
+/* ---- Hydration ---- */
+function waterGoal(){const w=latestWeight();let g=w?Math.round(w*30/50)*50:2000;return Math.max(1500,Math.min(3500,g));}
+function waterToday(){const k=todayKey();return S.water.filter(x=>x.date===k).reduce((a,b)=>a+b.ml,0);}
+window.addWater=(ml)=>{S.water.push({date:todayKey(),ml});save();render();};
+window.undoWater=()=>{const k=todayKey();for(let i=S.water.length-1;i>=0;i--){if(S.water[i].date===k){S.water.splice(i,1);break;}}save();render();};
+route('water',(n)=>{const ar=isAr();const g=waterGoal(),c=waterToday();const pct=Math.min(100,Math.round(c/g*100));const cups=Math.round(c/250);const days=lastNDays(7);const vals=days.map(d=>S.water.filter(x=>x.date===d).reduce((a,b)=>a+b.ml,0));
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'الماء':'Hydration'})}<div class="content">
+   <div class="card center">${ring(pct,'var(--accent2)',pct+'%',c+' / '+g+' ml')}<div class="muted" style="font-size:13px;margin-top:4px">${cups} ${ar?'كوب اليوم (٢٥٠مل)':'cups today (250ml)'}</div></div>
+   <div class="grid3">
+     <button class="btn btn-ghost" onclick="addWater(250)">＋ ${ar?'كوب':'Cup'}</button>
+     <button class="btn btn-ghost" onclick="addWater(500)">＋ ${ar?'٥٠٠مل':'500ml'}</button>
+     <button class="btn btn-ghost" onclick="undoWater()">↺ ${ar?'تراجع':'Undo'}</button>
+   </div>
+   <div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'آخر ٧ أيام':'Last 7 days'}</b><small class="muted">${ar?'الهدف':'goal'} ${g} ml</small></div>${barChart(vals,days.map(d=>fmtDate(d+'T00:00')),'var(--accent2)',g)}</div>
+   <div class="disc-note">${ar?'هدف تقريبي (~٣٠ مل/كجم). تختلف الاحتياجات؛ بعد جراحة السمنة ارتشف باستمرار وتجنّب الشرب أثناء الأكل.':'An approximate goal (~30 ml/kg). Needs vary; after bariatric surgery sip steadily and avoid drinking during meals.'}</div>
+  </div>`;});
+
+/* ---- Mindful-eating / bite timer ---- */
+let _mealTimer=null,_mealLeft=0;
+route('mindful',(n)=>{const ar=isAr();n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'الأكل الواعي':'Mindful eating'})}<div class="content">
+   <div class="disc-note">${ar?'استهدف نحو ٢٠ دقيقة لكل وجبة. عند كل نبضة: خذ لقمة صغيرة، وامضغ جيدًا، وضع الأدوات، وتنفّس.':'Aim for about 20 minutes per meal. On each pulse: take a small bite, chew well, put utensils down, and breathe.'}</div>
+   <div class="card center"><div id="mmDisp" style="font-size:52px;font-weight:800;letter-spacing:-2px;color:var(--accent)">20:00</div>
+     <div id="mmCue" style="font-size:14px;color:var(--muted);margin-top:4px;min-height:20px">${ar?'اضغط ابدأ':'Press start'}</div>
+     <div class="grid2" style="margin-top:14px"><button class="btn btn-primary" id="mmBtn" onclick="mealTimer()">${ar?'ابدأ':'Start'}</button><button class="btn btn-ghost" onclick="mealReset()">${ar?'إعادة':'Reset'}</button></div>
+   </div>
+   <div class="card"><div class="section-title" style="margin:0 0 6px">${ar?'لماذا يهم':'Why it helps'}</div><p class="muted" style="font-size:13.5px;line-height:1.7;margin:0">${ar?'يستغرق الشعور بالشبع نحو ٢٠ دقيقة. الأكل البطيء والمضغ الجيّد يقلّلان الكمية ويحسّنان الهضم — وهو أساسي بعد إجراءات المعدة.':'Fullness signals take about 20 minutes to arrive. Eating slowly and chewing well reduce how much you eat and improve digestion — essential after stomach procedures.'}</p></div>
+  </div>`;
+  updateMeal();});
+function fmtMMSS(s){const m=Math.floor(s/60),ss=s%60;return m+':'+String(ss).padStart(2,'0');}
+function updateMeal(){const d=$('#mmDisp');if(d)d.textContent=fmtMMSS(_mealLeft||1200);}
+window.mealTimer=()=>{const ar=isAr();if(_mealTimer){clearInterval(_mealTimer);_mealTimer=null;const b=$('#mmBtn');if(b)b.textContent=ar?'متابعة':'Resume';return;}
+  if(!_mealLeft)_mealLeft=1200;const b=$('#mmBtn');if(b)b.textContent=ar?'إيقاف':'Pause';
+  _mealTimer=setInterval(()=>{_mealLeft--;const d=$('#mmDisp');if(d)d.textContent=fmtMMSS(Math.max(0,_mealLeft));
+    const cue=$('#mmCue');if(cue&&_mealLeft%30===0&&_mealLeft>0){cue.textContent=ar?'🍽️ لقمة صغيرة · امضغ · تنفّس':'🍽️ Small bite · chew · breathe';cue.style.color='var(--accent)';setTimeout(()=>{if(cue)cue.style.color='var(--muted)';},1200);}
+    if(_mealLeft<=0){clearInterval(_mealTimer);_mealTimer=null;if(d)d.textContent='✓';if(cue){cue.textContent=ar?'أحسنت — وجبة واعية':'Well done — a mindful meal';}}
+  },1000);};
+window.mealReset=()=>{if(_mealTimer){clearInterval(_mealTimer);_mealTimer=null;}_mealLeft=1200;const b=$('#mmBtn');if(b)b.textContent=isAr()?'ابدأ':'Start';const c=$('#mmCue');if(c)c.textContent=isAr()?'اضغط ابدأ':'Press start';updateMeal();};
+
+/* ---- Journal (hunger + mood) ---- */
+const HUNGER=[['Starving','جائع جدًا'],['Hungry','جائع'],['Neutral','محايد'],['Satisfied','شبعان'],['Stuffed','ممتلئ']];
+const MOODS=['😞','🙁','😐','🙂','😄'];
+route('journal',(n)=>{const ar=isAr();const today=S.journal.find(j=>j.date===todayKey());const hist=S.journal.slice().sort((a,b)=>a.date<b.date?1:-1);
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'يومياتي':'My journal'})}<div class="content">
+   <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'تسجيل اليوم':"Today's check-in"}</div>
+     <div class="field"><label>${ar?'مستوى الجوع':'Hunger level'}</label><div class="scale" id="jHun">${HUNGER.map((h,i)=>`<button data-v="${i}" onclick="pickScale('jHun',this)" class="${today&&today.hunger===i?'on':''}" style="font-size:11px">${L(h)}</button>`).join('')}</div></div>
+     <div class="field"><label>${ar?'المزاج':'Mood'}</label><div class="scale" id="jMood">${MOODS.map((m,i)=>`<button data-v="${i}" onclick="pickScale('jMood',this)" class="${today&&today.mood===i?'on':''}" style="font-size:20px">${m}</button>`).join('')}</div></div>
+     <div class="field"><label>${ar?'ملاحظة (اختياري)':'Note (optional)'}</label><textarea class="input" id="jNote" placeholder="${ar?'كيف كان يومك مع الطعام؟':'How was your day with food?'}">${today?esc(today.note||''):''}</textarea></div>
+     <button class="btn btn-primary" onclick="saveJournal()">${t('save')}</button>
+   </div>
+   <div class="card tap" onclick="go('wins')"><div class="between"><div><b>🏆 ${ar?'انتصارات غير الميزان':'Non-scale victories'}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${S.wins.length} ${ar?'مسجّلة':'logged'}</div></div><div class="chev">${ar?'‹':'›'}</div></div></div>
+   ${hist.length?`<div class="section-title">${ar?'السجل':'History'}</div><div class="card">${hist.slice(0,14).map(j=>`<div class="li"><div class="ic">${MOODS[j.mood!=null?j.mood:2]}</div><div class="tx"><b>${L(HUNGER[j.hunger!=null?j.hunger:2])}</b><small>${j.note?esc(j.note.slice(0,44)):fmtDate(j.date+'T00:00')}</small></div><small class="muted">${fmtDate(j.date+'T00:00')}</small></div>`).join('')}</div>`:''}
+  </div>`;});
+window.saveJournal=()=>{const h=$('#jHun'),m=$('#jMood');const k=todayKey();S.journal=S.journal.filter(j=>j.date!==k);S.journal.push({date:k,hunger:h.dataset.val!=null?+h.dataset.val:null,mood:m.dataset.val!=null?+m.dataset.val:null,note:($('#jNote').value||'').trim()});save();toast(t('saved'));render();};
+
+const WINSUG=[['Walked 30 minutes','مشيت ٣٠ دقيقة'],['Clothes fit better','ملابسي أصبحت أوسع'],['More energy today','طاقة أكثر اليوم'],['Slept better','نمت أفضل'],['Chose water over soda','اخترت الماء بدل الغازي'],['Cooked at home','طبخت في المنزل'],['Took the stairs','صعدت الدرج'],['Said no to seconds','رفضت طبقًا ثانيًا']];
+route('wins',(n)=>{const ar=isAr();const list=S.wins.slice().sort((a,b)=>new Date(b.t)-new Date(a.t));
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'انتصارات غير الميزان':'Non-scale victories'})}<div class="content">
+   <div class="disc-note">${ar?'النجاح أكثر من رقم الميزان. احتفِ بكل خطوة.':'Success is more than a number on the scale. Celebrate every step.'}</div>
+   <button class="btn btn-primary" onclick="openWin()">＋ ${ar?'أضف انتصارًا':'Add a win'}</button>
+   ${list.length?`<div class="card">${list.map(w=>`<div class="li"><div class="ic">🏆</div><div class="tx"><b>${esc(w.text)}</b><small>${fmtDate(w.t)}</small></div><button class="chip" onclick="delWin('${w.id}')">✕</button></div>`).join('')}</div>`:`<div class="card center" style="padding:26px"><div style="font-size:34px">🏆</div><p class="muted" style="margin-top:6px">${ar?'أضف أول انتصار لك.':'Add your first win.'}</p></div>`}
+  </div>`;});
+window.openWin=()=>{const ar=isAr();openSheet(`<h2 style="margin:4px 0 12px">🏆 ${ar?'انتصار جديد':'A new win'}</h2>
+  <div class="field"><label>${ar?'ماذا حقّقت؟':'What did you achieve?'}</label><input class="input" id="winTx" placeholder="${ar?'مثال: مشيت ٣٠ دقيقة':'e.g. Walked 30 minutes'}"></div>
+  <div class="chips">${WINSUG.map(s=>`<button class="chip" onclick="document.getElementById('winTx').value='${esc(L(s))}'">${L(s)}</button>`).join('')}</div>
+  <button class="btn btn-primary" style="margin-top:14px" onclick="saveWin()">${t('save')}</button>`);};
+window.saveWin=()=>{const tx=($('#winTx').value||'').trim();if(!tx)return toast(isAr()?'اكتب شيئًا':'Type something');S.wins.push({id:rid(),t:new Date().toISOString(),text:tx});save();closeSheet();toast(isAr()?'🎉 أحسنت':'🎉 Nice!');render();};
+window.delWin=(id)=>{S.wins=S.wins.filter(w=>w.id!==id);save();render();};
+
+/* ---- Body measurements ---- */
+const MTYPES=[['hip','Hip','الورك'],['neck','Neck','الرقبة'],['chest','Chest','الصدر'],['thigh','Thigh','الفخذ'],['arm','Arm','الذراع']];
+route('measures',(n)=>{const ar=isAr();
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'قياسات الجسم':'Body measurements'})}<div class="content">
+   <div class="disc-note">${ar?'قياسات محيطية تكمّل الوزن — أحيانًا تتحسّن حتى عندما يثبت الميزان.':'Circumference measurements complement weight — sometimes they improve even when the scale is stuck.'}</div>
+   <button class="btn btn-primary" onclick="openMeasure()">＋ ${ar?'إضافة قياس':'Add a measurement'}</button>
+   ${MTYPES.map(mt=>{const rows=S.measures.filter(x=>x.type===mt[0]).sort((a,b)=>a.date<b.date?-1:1);if(!rows.length)return '';const vals=rows.slice(-10).map(r=>r.cm);const last=rows[rows.length-1];return `<div class="card"><div class="between" style="margin-bottom:4px"><b>${L([mt[1],mt[2]])}</b><b style="color:var(--accent)">${last.cm} cm</b></div>${vals.length>1?sparkline(vals,'var(--accent)'):''}</div>`;}).join('')||''}
+  </div>`;});
+window.openMeasure=()=>{const ar=isAr();openSheet(`<h2 style="margin:4px 0 12px">📐 ${ar?'إضافة قياس':'Add a measurement'}</h2>
+  <div class="field"><label>${ar?'المكان':'Area'}</label><div class="chips" id="msT">${MTYPES.map(mt=>`<button class="chip" data-v="${mt[0]}" onclick="pick('msT',this)">${L([mt[1],mt[2]])}</button>`).join('')}</div></div>
+  <div class="grid2"><div class="field"><label>${ar?'المحيط (سم)':'Circumference (cm)'}</label><input class="input" id="msV" inputmode="decimal" placeholder="e.g. 100"></div>
+  <div class="field"><label>${ar?'التاريخ':'Date'}</label><input class="input" id="msD" type="date" value="${todayKey()}"></div></div>
+  <button class="btn btn-primary" onclick="saveMeasure()">${t('save')}</button>`);};
+window.saveMeasure=()=>{const ty=$('#msT');if(!ty.dataset.val)return toast(isAr()?'اختر المكان':'Pick an area');const v=parseFloat($('#msV').value);if(isNaN(v))return toast(isAr()?'أدخل رقمًا':'Enter a number');S.measures.push({date:$('#msD').value||todayKey(),type:ty.dataset.val,cm:v});save();closeSheet();toast(t('saved'));render();};
+
+/* ---- Progress photos (on-device only) ---- */
+route('photos',(n)=>{const ar=isAr();const list=S.photos.slice().sort((a,b)=>a.date<b.date?1:-1);
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'صور التقدّم':'Progress photos'})}<div class="content">
+   <div class="disc-note">${ar?'تُحفظ الصور على جهازك فقط ولا تُرفع لأي خادم. تُصغَّر تلقائيًا لتوفير المساحة.':'Photos are stored only on your device and never uploaded. They are auto-shrunk to save space.'}</div>
+   <label class="btn btn-primary" style="cursor:pointer">📷 ${ar?'إضافة صورة':'Add a photo'}<input type="file" accept="image/*" style="display:none" onchange="addPhoto(this)"></label>
+   ${list.length?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${list.map(p=>`<div style="position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line)"><img src="${p.data}" style="width:100%;display:block;aspect-ratio:3/4;object-fit:cover"><span style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent);color:#fff;font-size:11px;padding:14px 8px 6px">${fmtDate(p.date+'T00:00')}</span><button onclick="delPhoto('${p.date}',${JSON.stringify(p.data.slice(-12))})" style="position:absolute;top:6px;inset-inline-end:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:8px;width:26px;height:26px;cursor:pointer">✕</button></div>`).join('')}</div>`:`<div class="card center" style="padding:30px"><div style="font-size:34px">📷</div><p class="muted" style="margin-top:6px">${ar?'لا صور بعد.':'No photos yet.'}</p></div>`}
+  </div>`;});
+window.addPhoto=(input)=>{const f=input.files&&input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const max=480;let w=img.width,h=img.height;const s=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);let data;try{data=c.toDataURL('image/jpeg',0.6);}catch(err){data=e.target.result;}S.photos.push({date:todayKey(),data});try{save();toast(t('saved'));}catch(err){S.photos.pop();toast(isAr()?'المساحة ممتلئة':'Storage full');}render();};img.src=e.target.result;};r.readAsDataURL(f);};
+window.delPhoto=(date,tail)=>{S.photos=S.photos.filter(p=>!(p.date===date&&JSON.stringify(p.data.slice(-12))===JSON.stringify(tail)));save();render();};
+
+/* ---- Pre/post-op checklists ---- */
+const PREOP=[['p1','Complete required labs, scans & assessments','أكمل التحاليل والأشعة والتقييمات المطلوبة'],['p2','Start the liver-shrink (pre-op) diet as advised','ابدأ حمية تصغير الكبد حسب التوجيه'],['p3','Stop smoking well before surgery','أوقف التدخين قبل الجراحة بوقت كافٍ'],['p4','Arrange time off work & help at home','رتّب إجازة ومساعدة في المنزل'],['p5','Stock protein drinks & bariatric vitamins','جهّز مشروبات البروتين وفيتامينات السمنة'],['p6','Confirm which medications to adjust with your team','أكّد مع فريقك الأدوية التي ستُعدّل']];
+const POSTOP=[['q1','Sip fluids often to stay hydrated','ارتشف السوائل كثيرًا للترطيب'],['q2','Protein first at every meal','البروتين أولًا في كل وجبة'],['q3','Take your daily vitamins','تناول فيتاميناتك اليومية'],['q4','Walk a little, several times a day','امشِ قليلًا عدة مرات يوميًا'],['q5','Advance diet stage only when your team says','تقدّم لمرحلة الغذاء التالية بموافقة فريقك فقط'],['q6','Attend follow-up visits & lab checks','احضر زيارات المتابعة والتحاليل']];
+route('checklists',(n)=>{const ar=isAr();function sec(title,items){const done=items.filter(it=>S.checklists[it[0]]).length;return `<div class="between" style="margin:8px 2px 2px"><div class="section-title" style="margin:0">${title}</div><small class="muted">${done}/${items.length}</small></div><div class="pbar" style="margin:0 2px 8px"><i style="width:${Math.round(done/items.length*100)}%"></i></div><div class="card">${items.map(it=>`<div class="li" style="cursor:pointer" onclick="toggleCheck('${it[0]}')"><div class="ic" style="background:${S.checklists[it[0]]?'var(--accent)':'var(--card2)'};color:${S.checklists[it[0]]?'#fff':'var(--muted)'}">${S.checklists[it[0]]?'✓':'○'}</div><div class="tx"><b style="font-weight:600;${S.checklists[it[0]]?'opacity:.6;text-decoration:line-through':''}">${L([it[1],it[2]])}</b></div></div>`).join('')}</div>`;}
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'قوائم التحقّق':'Checklists'})}<div class="content">
+   <div class="disc-note">${ar?'قوائم عامة للتحضير والتعافي — اتبع تعليمات فريقك الخاصة بك.':'General prep & recovery lists — follow your own team’s specific instructions.'}</div>
+   ${sec(ar?'قبل الإجراء':'Before the procedure',PREOP)}
+   ${sec(ar?'بعد الإجراء':'After the procedure',POSTOP)}
+  </div>`;});
+window.toggleCheck=(id)=>{S.checklists[id]=!S.checklists[id];save();render();};
+
+/* ---- Wellness hub ---- */
+route('wellness',(n)=>{const ar=isAr();const surg=S.user.pathway==='surgery'||S.user.pathway==='endoscopic';const items=[
+   ['water','💧',['Hydration','الماء']],['mindful','🧘',['Mindful eating','الأكل الواعي']],['journal','📔',['Journal','اليوميات']],['wins','🏆',['Non-scale wins','انتصارات غير الميزان']],['measures','📐',['Body measurements','قياسات الجسم']],['photos','📷',['Progress photos','صور التقدّم']]];
+  if(surg)items.push(['checklists','✅',['Checklists','قوائم التحقّق']]);
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'العافية والعادات':'Wellness & habits'})}<div class="content">
+   <div class="card tap" onclick="openTip()" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="row" style="gap:12px"><span style="font-size:26px">💡</span><div><b style="font-size:14.5px">${ar?'نصيحة اليوم':'Tip of the day'}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${L(TIPS[tipIndex()])}</div></div></div></div>
+   <div class="grid2">${items.map(([r,ic,nm])=>`<div class="pathcard" onclick="go('${r}')"><div class="pi">${ic}</div><b>${L(nm)}</b></div>`).join('')}</div>
+  </div>`;});
 
 /* ---------- boot ---------- */
 window.navTab=navTab;window.go=go;window.goBack=goBack;window.closeSheet=closeSheet;
