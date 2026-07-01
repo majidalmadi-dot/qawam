@@ -1,0 +1,22 @@
+{
+  "name": "Qawam — your weight & health companion",
+  "short_name": "Qawam",
+  "description": "Qawam (قوام) — a bilingual, non-medical companion for weight management across dietary, medical, endoscopic and surgical pathways. By the Saudi Gastroenterology Association.",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/Qawam/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0B0F14",
+  "theme_color": "#0B0F14",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    { "src": "qawam-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "qawam-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "qawam-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "qawam-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

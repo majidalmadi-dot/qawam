@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0F14">
+<title>Qawam · قوام — your weight & health companion</title>
+<meta name="description" content="Qawam (قوام) — a bilingual, non-medical companion for weight management. Explore dietary, medical, endoscopic and surgical pathways; track weight, BMI, waist, activity, medications, post-op diet phases and vitamins; and learn. By the Saudi Gastroenterology Association.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="qawam-180.png">
+<link rel="icon" type="image/png" href="qawam-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Qawam">
+<meta name="application-name" content="Qawam">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Qawam · قوام — your weight & health companion">
+<meta property="og:description" content="A free, bilingual non-medical companion for weight management across dietary, medical, endoscopic and surgical pathways. By the Saudi Gastroenterology Association.">
+<meta property="og:image" content="https://ibd-connect.vercel.app/Qawam/qawam-512.png">
+<meta name="twitter:card" content="summary">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<style>
+:root{
+  --bg:#0B0F14;--bg2:#0F151D;--card:#141C26;--card2:#1B2530;--line:#243140;
+  --txt:#EAF2F8;--muted:#8DA0B2;--faint:#5A6B7B;
+  --accent:#10B981;--accent2:#0EA5E9;--accent-d:#0C3A32;
+  --good:#2BD67B;--warn:#FFB23E;--bad:#FF5C72;--rose:#FF6B9D;
+  --r:18px;--maxw:480px;--nav:rgba(15,21,29,.92);
+  --sh:0 1px 2px rgba(0,0,0,.18),0 12px 28px -18px rgba(0,0,0,.55);
+}
+html[data-mode=light]{
+  --bg:#F1F7F5;--bg2:#FFFFFF;--card:#FFFFFF;--card2:#EAF2EF;--line:#DCE6E2;
+  --txt:#12211C;--muted:#5B6B65;--faint:#8496; --faint:#849690;--nav:rgba(255,255,255,.85);
+  --accent-d:#D6F5EC;--sh:0 1px 2px rgba(20,40,32,.05),0 12px 26px -16px rgba(20,40,32,.2);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:'Inter','Segoe UI',system-ui,Arial,sans-serif;letter-spacing:-.01em;overflow:hidden}
+html[dir=rtl] body{font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,Arial,sans-serif;letter-spacing:normal}
+#app{width:100%;max-width:var(--maxw);height:100vh;height:100dvh;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column}
+@media(min-width:480px){#app{margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.5);border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+#screens{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.screen{flex:1;min-height:0;display:none;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding-bottom:96px;animation:fade .3s ease}
+.screen.active{display:flex}
+.screen::-webkit-scrollbar{width:0}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+.content{padding:6px 18px 0;display:flex;flex-direction:column;gap:15px}
+.content>*{animation:rise .4s cubic-bezier(.2,.8,.2,1) both}
+.content>*:nth-child(2){animation-delay:.04s}.content>*:nth-child(3){animation-delay:.08s}.content>*:nth-child(4){animation-delay:.12s}.content>*:nth-child(n+5){animation-delay:.16s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:calc(16px + env(safe-area-inset-top)) 18px 12px;background:linear-gradient(180deg,var(--bg) 82%,transparent);backdrop-filter:blur(6px)}
+.topbar h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.5px}
+.topbar .sub{font-size:12.5px;color:var(--muted);margin-top:1px}
+.iconbtn{min-width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;color:var(--txt)}
+.spacer{flex:1}
+.section-title{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:6px 2px -4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:17px;box-shadow:var(--sh)}
+.card.tap{cursor:pointer;transition:.15s}.card.tap:active{transform:scale(.985);background:var(--card2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+.kpi .v{font-size:24px;font-weight:800;letter-spacing:-1px}
+.kpi .l{font-size:11px;color:var(--muted);margin-top:2px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border:none;border-radius:14px;font-weight:700;font-size:15.5px;cursor:pointer;transition:.15s;font-family:inherit}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-ghost{background:var(--card);border:1px solid var(--line);color:var(--txt)}
+.btn-danger{background:rgba(255,92,114,.14);border:1px solid rgba(255,92,114,.4);color:#ff8b9b}
+.btn-sm{padding:10px 15px;font-size:13.5px;width:auto;border-radius:11px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.field label{font-size:13px;color:var(--muted);font-weight:600;margin-inline-start:2px}
+.input{width:100%;padding:13px 14px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;color:var(--txt);font-size:15px;font-family:inherit}
+.input:focus{outline:none;border-color:var(--accent)}
+textarea.input{resize:vertical;min-height:78px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:11px;background:var(--bg2);border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;font-family:inherit}
+.chip.on{background:var(--accent-d);border-color:var(--accent);color:var(--accent)}
+.chip:active{transform:scale(.96)}
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale button{flex:1;min-width:30px;padding:11px 0;border-radius:10px;background:var(--bg2);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.scale button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.scale button:active{transform:scale(.92)}
+.li{display:flex;align-items:center;gap:13px;padding:13px 4px;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:none}
+.li .ic{width:40px;height:40px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.li .tx{flex:1;min-width:0}.li .tx b{font-size:14.5px;font-weight:600;display:block}.li .tx small{font-size:12.5px;color:var(--muted)}
+.li .chev{color:var(--faint);font-size:16px}
+html[dir=rtl] .chev{transform:scaleX(-1)}
+.tabbar{position:absolute;bottom:0;left:0;right:0;min-height:76px;background:var(--nav);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(14px + env(safe-area-inset-bottom));z-index:30}
+.tabbar.hidden{display:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--faint);font-size:10.5px;font-weight:600;cursor:pointer;background:none;border:none;border-radius:12px;font-family:inherit;position:relative}
+.tab .ic{font-size:21px;line-height:1}
+.tab.on{color:var(--accent)}
+.tab.on::before{content:"";position:absolute;top:1px;width:26px;height:3px;border-radius:3px;background:var(--accent)}
+.tab:active{transform:scale(.92)}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:flex-end;animation:fade .2s}
+.sheet-bg.open{display:flex}
+.sheet{width:100%;max-height:90%;overflow-y:auto;background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--line);padding:10px 18px calc(28px + env(safe-area-inset-bottom));animation:up .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.grip{width:40px;height:4px;border-radius:3px;background:var(--line);margin:8px auto 14px}
+.toast{position:absolute;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card2);border:1px solid var(--accent);color:var(--txt);padding:12px 20px;border-radius:14px;font-size:14px;font-weight:600;z-index:80;opacity:0;transition:.3s;box-shadow:var(--sh);pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.pbar{height:7px;border-radius:6px;background:var(--bg2);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.badge{display:inline-block;padding:3px 9px;border-radius:8px;font-size:10.5px;font-weight:700}
+.badge.accent{background:var(--accent-d);color:var(--accent)}
+.splash{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:30px;background:radial-gradient(120% 80% at 50% 0%,#0c3a32 0%,var(--bg) 55%)}
+.logo-mark{width:92px;height:92px;border-radius:27px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;color:#fff;background:linear-gradient(140deg,var(--accent),var(--accent2));box-shadow:0 20px 50px rgba(16,185,129,.35)}
+.disc-note{background:var(--card2);border-radius:12px;padding:11px 13px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.center{text-align:center}.muted{color:var(--muted)}.row{display:flex;align-items:center}.between{display:flex;align-items:center;justify-content:space-between}
+.empty-art{width:84px;height:84px;margin:2px auto 8px;color:var(--accent);opacity:.9}
+.empty-art svg{width:100%;height:100%}
+.pathcard{border-radius:16px;padding:15px;border:1px solid var(--line);cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.pathcard:active{transform:scale(.985)}
+.pathcard .pi{font-size:26px}
+.pathcard b{display:block;font-size:15px;margin:8px 0 3px}
+.pathcard small{color:var(--muted);font-size:12px;line-height:1.5}
+.step{display:flex;gap:11px;padding:10px 2px}
+.step .num{width:26px;height:26px;border-radius:50%;background:var(--accent-d);color:var(--accent);font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step .st{font-size:13.5px;line-height:1.5}
+a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="screens"></div>
+  <nav class="tabbar hidden" id="tabbar"></nav>
+  <div class="sheet-bg" id="sheetbg"><div class="sheet" id="sheet"></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+/* ============================================================
+   Qawam · قوام — Weight management & health companion
+   Single-file, bilingual (AR/EN, RTL), non-medical, on-device.
+   Same architecture as the Rafeeq (IBD) & Maeen (EoE) apps.
+   Pathways: Dietary · Medical · Endoscopic · Surgical.
+   ============================================================ */
+const $=(s,r)=>(r||document).querySelector(s);
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function rid(){return Math.random().toString(36).slice(2,10);}
+const KEY='qawam_v1';
+
+/* ---------- i18n ---------- */
+const I18N={
+  appName:{en:'Qawam',ar:'قوام'},tagline:{en:'your weight & health companion',ar:'رفيقك في إدارة الوزن والصحة'},
+  getStarted:{en:'Get started',ar:'لنبدأ'},chooseLang:{en:'Choose your language',ar:'اختر لغتك'},continue:{en:'Continue',ar:'متابعة'},
+  iUnderstand:{en:'I understand',ar:'موافق'},
+  consentT:{en:'Before we start',ar:'قبل أن نبدأ'},
+  consentBody:{en:"Qawam is a non-medical health companion for people managing their weight. It helps you explore the dietary, medical, endoscopic and surgical pathways, record your weight, waist, meals, activity, medications, post-procedure diet phases and vitamins, see descriptive trends, and learn.\n\nIt does NOT provide medical advice, diagnosis, predictions, calorie prescriptions, drug dosing or treatment recommendations, and is not a medical device. All numbers, scores and charts are descriptive only.\n\nAlways consult your healthcare provider before starting any diet, medication, procedure or surgery. If you have severe abdominal pain, persistent vomiting, black stools, chest pain or trouble breathing, seek urgent care.",ar:"قوام رفيق صحي غير طبي لمن يديرون وزنهم. يساعدك على استكشاف المسارات الغذائية والدوائية والتنظيرية والجراحية، وتسجيل الوزن والخصر والوجبات والنشاط والأدوية ومراحل الغذاء بعد الإجراء والفيتامينات، ورؤية اتجاهات وصفية، والتعلّم.\n\nلا يقدّم نصيحة طبية أو تشخيصًا أو تنبؤًا أو وصفات سعرات أو جرعات دواء أو توصيات علاجية، وليس جهازًا طبيًا. كل الأرقام والدرجات والرسوم وصفية فقط.\n\nاستشر دائمًا مقدّم الرعاية الصحية قبل بدء أي حمية أو دواء أو إجراء أو جراحة. إذا كان لديك ألم بطن شديد أو قيء مستمر أو براز أسود أو ألم صدر أو صعوبة تنفّس، اطلب رعاية عاجلة."},
+  yourName:{en:'Your name',ar:'اسمك'},namePh:{en:'e.g. Sara',ar:'مثال: سارة'},
+  profileT:{en:'A few details',ar:'بعض التفاصيل'},profileSub:{en:'Used only on this device to personalise your trends. Everything is optional.',ar:'تُستخدم على هذا الجهاز فقط لتخصيص اتجاهاتك. كل شيء اختياري.'},
+  sex:{en:'Sex',ar:'الجنس'},male:{en:'Male',ar:'ذكر'},female:{en:'Female',ar:'أنثى'},
+  height:{en:'Height (cm)',ar:'الطول (سم)'},curWeight:{en:'Current weight (kg)',ar:'الوزن الحالي (كجم)'},startWeight:{en:'Starting weight (kg)',ar:'وزن البداية (كجم)'},targetWeight:{en:'Goal weight (kg)',ar:'الوزن المستهدف (كجم)'},
+  yourPathway:{en:'Which pathway are you exploring?',ar:'أي مسار تستكشف؟'},
+  tabToday:{en:'Today',ar:'اليوم'},tabTrack:{en:'Track',ar:'تتبّع'},tabProgress:{en:'Progress',ar:'التقدّم'},tabLearn:{en:'Learn',ar:'تعلّم'},tabMore:{en:'More',ar:'المزيد'},
+  goodMorning:{en:'Good morning',ar:'صباح الخير'},goodAfternoon:{en:'Good afternoon',ar:'مساء الخير'},goodEvening:{en:'Good evening',ar:'مساء الخير'},
+  quickLog:{en:'Quick log',ar:'تسجيل سريع'},
+  logWeight:{en:'Weight',ar:'الوزن'},logWaist:{en:'Waist',ar:'الخصر'},logMeal:{en:'Meal',ar:'وجبة'},logActivity:{en:'Activity',ar:'نشاط'},logMed:{en:'Medication',ar:'دواء'},logSymptom:{en:'Symptom',ar:'عَرَض'},
+  recent:{en:'Recent activity',ar:'النشاط الأخير'},noLogs:{en:'No entries yet — tap a quick-log button to start.',ar:'لا سجلات بعد — اضغط زر تسجيل سريع للبدء.'},
+  streak:{en:'day streak',ar:'يوم متتابع'},logsToday:{en:'logs today',ar:'سجلات اليوم'},
+  trackT:{en:'Track',ar:'تتبّع'},trackSub:{en:'Log weight, meals, activity & more',ar:'سجّل الوزن والوجبات والنشاط والمزيد'},
+  progressT:{en:'Progress',ar:'التقدّم'},progressSub:{en:'Descriptive trends over time',ar:'اتجاهات وصفية عبر الوقت'},
+  learnT:{en:'Learn',ar:'تعلّم'},learnSub:{en:'Understand every pathway',ar:'افهم كل مسار'},
+  moreT:{en:'More',ar:'المزيد'},
+  pathwaysT:{en:'Treatment pathways',ar:'مسارات العلاج'},pathwaysSub:{en:'Four routes to a healthier weight',ar:'أربعة مسارات لوزن أصحّ'},
+  notes:{en:'Notes (optional)',ar:'ملاحظات (اختياري)'},notesPh:{en:'Anything to remember…',ar:'أي شيء تود تذكّره…'},save:{en:'Save',ar:'حفظ'},cancel:{en:'Cancel',ar:'إلغاء'},saved:{en:'Saved',ar:'تم الحفظ'},loggedOk:{en:'Logged ✓',ar:'تم التسجيل ✓'},
+  minRead:{en:'min read',ar:'دقيقة قراءة'},
+  none:{en:'None',ar:'لا شيء'},mild:{en:'Mild',ar:'خفيف'},moderate:{en:'Moderate',ar:'متوسط'},severe:{en:'Severe',ar:'شديد'},
+  export:{en:'Export my data',ar:'تصدير بياناتي'},del:{en:'Delete my data',ar:'حذف بياناتي'},
+  theme:{en:'Theme',ar:'المظهر'},language:{en:'Language',ar:'اللغة'},about:{en:'About & disclaimer',ar:'حول وإخلاء المسؤولية'},share:{en:'Share with my doctor',ar:'مشاركة مع طبيبي'},
+  back:{en:'Back',ar:'رجوع'},myPlan:{en:'My pathway',ar:'مساري'},
+  bmi:{en:'BMI',ar:'مؤشر الكتلة'},tbwl:{en:'Total weight loss',ar:'نقص الوزن الكلي'},ewl:{en:'Excess weight loss',ar:'نقص الوزن الزائد'},waist:{en:'Waist',ar:'الخصر'},goal:{en:'Goal progress',ar:'التقدّم نحو الهدف'},
+  toolsT:{en:'Tools',ar:'الأدوات'},toolsSub:{en:'Calculators, medications & reminders',ar:'حاسبات وأدوية وتذكيرات'},
+  age:{en:'Age (years)',ar:'العمر (سنوات)'},activity:{en:'Activity level',ar:'مستوى النشاط'},
+  actSed:{en:'Sedentary',ar:'خامل'},actLight:{en:'Lightly active',ar:'نشاط خفيف'},actMod:{en:'Moderately active',ar:'نشاط متوسط'},actHigh:{en:'Very active',ar:'نشاط عالٍ'},actAth:{en:'Athlete',ar:'رياضي'},
+  calc:{en:'Calculate',ar:'احسب'},add:{en:'Add',ar:'إضافة'},remove:{en:'Remove',ar:'إزالة'},done:{en:'Done',ar:'تم'},time:{en:'Time',ar:'الوقت'},everyDay:{en:'Every day',ar:'كل يوم'}
+};
+function isAr(){return S.lang==='ar';}
+function t(k){const e=I18N[k];return e?(isAr()?e.ar:e.en):k;}
+function L(arr){return isAr()?(arr[1]||arr[0]):arr[0];}
+
+/* ---------- domain data ---------- */
+const PATHWAYS=[
+ {id:'diet',icon:'🥗',color:'#10B981',n:['Dietary & lifestyle','الغذاء ونمط الحياة'],
+  d:['Nutrition, activity, sleep and habits — the foundation for everyone, and effective on its own for many.','التغذية والنشاط والنوم والعادات — الأساس للجميع، وفعّال بمفرده لكثيرين.'],
+  steps:[['Set a realistic, gradual goal (about 5–10% of your weight to start).','ضع هدفًا واقعيًا تدريجيًا (نحو ٥–١٠٪ من وزنك كبداية).'],
+   ['Build balanced meals: protein, vegetables, whole grains; watch portion sizes.','ابنِ وجبات متوازنة: بروتين، خضار، حبوب كاملة؛ وانتبه لحجم الحصص.'],
+   ['Cut sugary drinks and ultra-processed snacks.','قلّل المشروبات المحلّاة والوجبات فائقة المعالجة.'],
+   ['Aim for 150+ minutes of activity a week and good sleep.','استهدف ١٥٠+ دقيقة نشاط أسبوعيًا ونومًا جيدًا.'],
+   ['Track weight weekly and meals/activity daily to spot patterns.','تابع الوزن أسبوعيًا والوجبات/النشاط يوميًا لملاحظة الأنماط.']]},
+ {id:'medical',icon:'💊',color:'#0EA5E9',n:['Medical (medications)','الدوائي (الأدوية)'],
+  d:['Anti-obesity medicines that reduce appetite or absorption, prescribed and monitored by your doctor.','أدوية السمنة التي تقلّل الشهية أو الامتصاص، تُوصَف وتُتابَع من طبيبك.'],
+  steps:[['Discuss whether medication suits you (BMI, health conditions, goals).','ناقش إن كان الدواء مناسبًا لك (المؤشر، الحالات الصحية، الأهداف).'],
+   ['Your doctor chooses the medicine and titrates the dose slowly.','يختار طبيبك الدواء ويرفع الجرعة تدريجيًا.'],
+   ['Learn the injection or tablet technique and timing.','تعلّم طريقة الحقن أو القرص والتوقيت.'],
+   ['Expect early side effects (often nausea) that usually settle.','توقّع آثارًا جانبية مبكرة (غالبًا غثيان) تهدأ عادة.'],
+   ['Keep lifestyle changes going — medicine works best alongside them.','واصل تغييرات نمط الحياة — الدواء أنجع معها.']]},
+ {id:'endoscopic',icon:'🔬',color:'#8B5CF6',n:['Endoscopic','التنظيري'],
+  d:['Procedures done through a scope, no external cuts — intragastric balloon, endoscopic sleeve, aspiration therapy.','إجراءات عبر المنظار دون شقوق خارجية — بالون معدي، تكميم بالمنظار، علاج الشفط.'],
+  steps:[['Understand your option, how long it lasts, and what to expect.','افهم خيارك ومدّته وما تتوقّعه.'],
+   ['Prepare as advised (fasting, medication review).','استعدّ حسب التوجيه (صيام، مراجعة أدوية).'],
+   ['After the procedure, follow the staged diet: liquids → puréed → soft → regular.','بعد الإجراء اتّبع الغذاء المتدرّج: سوائل ← مهروس ← طري ← عادي.'],
+   ['Sip fluids often; manage early nausea or cramping.','ارتشف السوائل كثيرًا؛ وأدِر الغثيان أو المغص المبكر.'],
+   ['Attend follow-ups and keep lifestyle habits for lasting results.','احضر المتابعات وحافظ على العادات لنتائج دائمة.']]},
+ {id:'surgery',icon:'🏥',color:'#F59E0B',n:['Surgical (bariatric)','الجراحي (السمنة)'],
+  d:['Bariatric surgery — sleeve gastrectomy or gastric bypass — the most effective option for severe obesity.','جراحة السمنة — التكميم أو تحويل المسار — الخيار الأكثر فعالية للسمنة الشديدة.'],
+  steps:[['Complete pre-op work-up: labs, assessments, and a liver-shrink diet.','أكمل تقييم ما قبل الجراحة: تحاليل، تقييمات، وحمية تصغير الكبد.'],
+   ['Know your operation and its risks and benefits.','اعرف عمليتك ومخاطرها وفوائدها.'],
+   ['Advance through the post-op diet stages over about 6–8 weeks.','تدرّج في مراحل الغذاء بعد الجراحة خلال نحو ٦–٨ أسابيع.'],
+   ['Take lifelong vitamins and hit your protein and fluid goals.','تناول الفيتامينات مدى الحياة وحقّق أهداف البروتين والسوائل.'],
+   ['Keep lifelong follow-up and lab checks.','حافظ على المتابعة والتحاليل مدى الحياة.']]}
+];
+function pathwayById(id){return PATHWAYS.find(p=>p.id===id);}
+
+// Anti-obesity medications (generic INN only, descriptive)
+const MEDS=[
+ {id:'semaglutide',cls:'glp1',n:['Semaglutide (GLP-1)','سيماجلوتيد (GLP-1)'],note:['Weekly injection; reduces appetite','حقنة أسبوعية؛ تقلّل الشهية']},
+ {id:'liraglutide',cls:'glp1',n:['Liraglutide (GLP-1)','ليراجلوتيد (GLP-1)'],note:['Daily injection','حقنة يومية']},
+ {id:'tirzepatide',cls:'glp1',n:['Tirzepatide (GIP/GLP-1)','تيرزيباتيد (GIP/GLP-1)'],note:['Weekly injection','حقنة أسبوعية']},
+ {id:'orlistat',cls:'other',n:['Orlistat','أورليستات'],note:['Blocks some fat absorption','يمنع امتصاص بعض الدهون']},
+ {id:'naltbup',cls:'other',n:['Naltrexone–bupropion','نالتريكسون–بوبروبيون'],note:['Acts on appetite & cravings','يؤثر على الشهية والرغبة']},
+ {id:'phentermine',cls:'other',n:['Phentermine (short-term)','فينترمين (قصير المدى)'],note:['Appetite suppressant','مثبّط شهية']}
+];
+// Post-procedure staged diet (endoscopic & surgical)
+const DIETPHASES=[
+ {k:'clear',n:['Clear liquids','سوائل صافية'],d:['Water, broth, sugar-free clear drinks. Small frequent sips.','ماء، مرق، مشروبات صافية بلا سكر. رشفات صغيرة متكرّرة.']},
+ {k:'full',n:['Full liquids','سوائل كاملة'],d:['Protein shakes, milk, thin yogurt, strained soup.','مخفوق بروتين، حليب، زبادي سائل، شوربة مصفّاة.']},
+ {k:'puree',n:['Puréed foods','أطعمة مهروسة'],d:['Smooth, blended protein-first foods; no lumps.','أطعمة مهروسة ناعمة والبروتين أولًا؛ بلا كتل.']},
+ {k:'soft',n:['Soft foods','أطعمة طرية'],d:['Moist, tender, easily-chewed foods; eat slowly.','أطعمة رطبة طرية سهلة المضغ؛ كُل ببطء.']},
+ {k:'regular',n:['Regular textures','قوام عادي'],d:['Balanced meals, protein first, mindful portions.','وجبات متوازنة، البروتين أولًا، وحصص واعية.']}
+];
+// Bariatric vitamins/supplements checklist (descriptive)
+const VITS=[
+ {id:'mvi',n:['Multivitamin','فيتامينات متعدّدة']},
+ {id:'b12',n:['Vitamin B12','فيتامين ب١٢']},
+ {id:'iron',n:['Iron','الحديد']},
+ {id:'calcvitd',n:['Calcium + Vitamin D','كالسيوم + فيتامين د']},
+ {id:'folate',n:['Folic acid','حمض الفوليك']}
+];
+// Symptoms to track
+const SYMPTOMS=[['Nausea','غثيان'],['Vomiting','قيء'],['Reflux / heartburn','ارتجاع / حُرقة'],['Constipation','إمساك'],['Diarrhoea','إسهال'],['Dumping (sweating, racing heart after eating)','إغراق (تعرّق، خفقان بعد الأكل)'],['Dehydration','جفاف'],['Fatigue','إرهاق'],['Hair thinning','تساقط شعر']];
+// Meal quality tags
+const MEALTAGS=[['Protein-first','البروتين أولًا'],['Vegetables','خضار'],['Whole grains','حبوب كاملة'],['Sugary drink','مشروب محلّى'],['Fried / fast food','مقلي / وجبات سريعة'],['Sweet / dessert','حلويات'],['Large portion','حصة كبيرة'],['Ate slowly','أكلت ببطء']];
+// Activity types
+const ACTS=[['Walking','مشي'],['Gym / weights','نادي / أوزان'],['Running','جري'],['Cycling','دراجة'],['Swimming','سباحة'],['Home workout','تمرين منزلي'],['Sports','رياضة'],['Other','أخرى']];
+// Labs to self-track (follow-up)
+const LABKEYS=[['Weight-related lab','تحليل متعلق بالوزن'],['HbA1c (%)','السكّر التراكمي (%)'],['Fasting glucose','سكّر صائم'],['Total cholesterol','الكوليسترول الكلي'],['Vitamin D','فيتامين د'],['Vitamin B12','فيتامين ب١٢'],['Ferritin / iron','الفيريتين / الحديد'],['Calcium','الكالسيوم']];
+
+/* ---------- Education library ---------- */
+const ART=[
+ {id:'basics',icon:'⚖️',cat:'basics',min:4,t:['Understanding weight & health','فهم الوزن والصحة'],body:[
+  "Excess weight is a chronic, relapsing medical condition — not a lack of willpower. Genes, hormones, sleep, stress, medications and environment all shape appetite and how the body stores energy.\n\nBecause it is chronic, weight is managed over the long term, and small sustained changes beat short crash diets. Even a 5–10% weight loss can meaningfully improve blood sugar, blood pressure, cholesterol, joint pain, sleep apnoea and fatty liver.\n\nThere is no single right path. Diet and lifestyle are the foundation for everyone; medications, endoscopic procedures and surgery are added tools chosen with your doctor based on your health and goals.",
+  "الوزن الزائد حالة طبية مزمنة قابلة للانتكاس — وليست نقص إرادة. الجينات والهرمونات والنوم والتوتر والأدوية والبيئة كلها تُشكّل الشهية وطريقة تخزين الجسم للطاقة.\n\nلأنه مزمن، يُدار الوزن على المدى الطويل، والتغييرات الصغيرة المستدامة تتفوّق على الحميات القاسية القصيرة. حتى نقص ٥–١٠٪ من الوزن يحسّن بوضوح سكّر الدم والضغط والكوليسترول وألم المفاصل وانقطاع النفس النومي والكبد الدهني.\n\nلا يوجد مسار وحيد صحيح. الغذاء ونمط الحياة أساس للجميع؛ والأدوية والإجراءات التنظيرية والجراحة أدوات إضافية تُختار مع طبيبك حسب صحتك وأهدافك."]},
+ {id:'bmi',icon:'📏',cat:'basics',min:3,t:['BMI, waist & what they mean','مؤشر الكتلة والخصر ومعناهما'],body:[
+  "Body mass index (BMI) is weight (kg) divided by height (m) squared. As a rough guide in adults: under 18.5 is underweight, 18.5–24.9 is a healthy range, 25–29.9 is overweight, and 30 or above is in the obesity range (class I 30–34.9, class II 35–39.9, class III 40+).\n\nBMI is only a screening number — it does not measure muscle, fat distribution or health directly, and cut-offs can differ for some populations. Waist circumference adds useful information about fat around the organs: broadly, higher risk is often quoted above about 102 cm in men and 88 cm in women (some guidance uses 94 cm and 80 cm).\n\nUse these as conversation starters with your team, not as verdicts about your health.",
+  "مؤشر كتلة الجسم هو الوزن (كجم) مقسومًا على مربع الطول (متر). كدليل تقريبي لدى البالغين: أقل من ١٨٫٥ نقص وزن، ١٨٫٥–٢٤٫٩ نطاق صحي، ٢٥–٢٩٫٩ زيادة وزن، و٣٠ فأكثر ضمن نطاق السمنة (الدرجة الأولى ٣٠–٣٤٫٩، الثانية ٣٥–٣٩٫٩، الثالثة ٤٠+).\n\nالمؤشر رقم فحص أوّلي فقط — لا يقيس العضلات أو توزيع الدهون أو الصحة مباشرة، وقد تختلف الحدود لبعض المجموعات. محيط الخصر يضيف معلومة مفيدة عن الدهون حول الأعضاء: عمومًا يُذكر ارتفاع الخطر فوق نحو ١٠٢ سم للرجال و٨٨ سم للنساء (وبعض التوجيهات تستخدم ٩٤ و٨٠ سم).\n\nاستخدمها كبداية للنقاش مع فريقك، لا كأحكام على صحتك."]},
+ {id:'diet',icon:'🥗',cat:'diet',min:5,t:['Eating for lasting weight change','الأكل من أجل تغيير دائم'],body:[
+  "No single diet is magic — the best eating plan is one you can keep. Most successful approaches share the same core: more protein and vegetables, more whole (less processed) foods, fewer sugary drinks and refined snacks, and portions matched to your needs.\n\nPractical habits that help: fill half your plate with vegetables, make protein the anchor of each meal, drink water instead of juice and soda, slow down and notice fullness, and don't keep tempting snacks within easy reach. Planning meals ahead reduces impulsive choices.\n\nCrash diets tend to rebound because they are hard to sustain and can reduce muscle. Aim for a gradual, comfortable deficit and combine it with activity. A dietitian can tailor this — especially with diabetes, kidney disease, pregnancy, or before and after a procedure.",
+  "لا حمية واحدة سحرية — أفضل خطة أكل هي التي تستطيع الاستمرار عليها. أغلب الأساليب الناجحة تشترك في الجوهر: بروتين وخضار أكثر، أطعمة كاملة (أقل معالجة) أكثر، مشروبات محلّاة ووجبات مكرّرة أقل، وحصص تناسب احتياجك.\n\nعادات عملية تساعد: املأ نصف الطبق خضارًا، واجعل البروتين محور كل وجبة، واشرب الماء بدل العصير والمشروبات الغازية، وتمهّل ولاحظ الشبع، ولا تُبقِ الوجبات المغرية في المتناول. التخطيط المسبق للوجبات يقلّل الخيارات الاندفاعية.\n\nالحميات القاسية تميل للارتداد لصعوبة الاستمرار وفقدان العضلات. استهدف عجزًا تدريجيًا مريحًا مع النشاط. يمكن لأخصائي التغذية تفصيلها — خاصة مع السكري أو مرض الكلى أو الحمل أو قبل وبعد الإجراءات."]},
+ {id:'activity',icon:'🏃',cat:'diet',min:4,t:['Activity, sleep & habits','النشاط والنوم والعادات'],body:[
+  "Physical activity supports weight change, protects muscle, and improves mood, blood sugar and heart health even when the scale moves slowly. A common target is at least 150 minutes a week of moderate activity (like brisk walking) plus muscle-strengthening twice a week — but the best plan is one you'll actually do. Start small and build.\n\nSleep and stress matter more than most expect: short or poor sleep raises appetite hormones and cravings, and stress can drive emotional eating. Protecting 7–9 hours of sleep and finding non-food ways to unwind both help.\n\nHabits beat motivation. Anchor new behaviours to existing routines, make the healthy choice the easy one, and track a few simple things so you can see progress and adjust.",
+  "النشاط البدني يدعم تغيير الوزن ويحمي العضلات ويحسّن المزاج وسكّر الدم وصحة القلب حتى عندما يتحرّك الميزان ببطء. هدف شائع هو ١٥٠ دقيقة أسبوعيًا على الأقل من النشاط المعتدل (كالمشي السريع) مع تقوية العضلات مرتين أسبوعيًا — لكن أفضل خطة هي التي ستلتزم بها. ابدأ صغيرًا وابنِ تدريجيًا.\n\nالنوم والتوتر أهم مما يظن الكثير: النوم القصير أو السيّئ يرفع هرمونات الشهية والرغبة، والتوتر قد يقود للأكل العاطفي. حماية ٧–٩ ساعات نوم وإيجاد وسائل استرخاء غير غذائية يساعدان.\n\nالعادات تتغلّب على الحماس. اربط السلوكيات الجديدة بروتينك الحالي، واجعل الخيار الصحي أسهل، وتابع أمورًا بسيطة لترى التقدّم وتعدّل."]},
+ {id:'meds',icon:'💊',cat:'medical',min:5,t:['Weight-loss medications explained','شرح أدوية إنقاص الوزن'],body:[
+  "Anti-obesity medications are prescription treatments that help when lifestyle change alone isn't enough. Most modern options are GLP-1 based — semaglutide and liraglutide, and the GIP/GLP-1 medicine tirzepatide. They mimic gut hormones that reduce appetite and slow stomach emptying, so you feel full sooner and eat less. Others work differently: orlistat blocks some fat absorption; naltrexone–bupropion acts on appetite and cravings; phentermine is a short-term appetite suppressant.\n\nDoses are started low and increased slowly to limit side effects. The most common are gastrointestinal — nausea, fullness, constipation or diarrhoea — which usually ease with time and smaller, slower meals. Your doctor screens for conditions where a medicine isn't suitable and monitors your response.\n\nThese medicines are tools, not shortcuts: they work best alongside eating and activity changes, and weight often returns if they stop, so they are usually taken long term under review. Never start, stop, adjust or borrow a dose without your doctor.",
+  "أدوية السمنة علاجات توصف عند عدم كفاية تغيير نمط الحياة وحده. أغلب الخيارات الحديثة قائمة على GLP-1 — سيماجلوتيد وليراجلوتيد، ودواء GIP/GLP-1 تيرزيباتيد. تحاكي هرمونات الأمعاء التي تقلّل الشهية وتبطئ إفراغ المعدة، فتشعر بالشبع أسرع وتأكل أقل. وأخرى تعمل بطرق مختلفة: أورليستات يمنع امتصاص بعض الدهون؛ نالتريكسون–بوبروبيون يؤثر على الشهية والرغبة؛ فينترمين مثبّط شهية قصير المدى.\n\nتُبدأ الجرعات منخفضة وتُرفع ببطء للحدّ من الآثار الجانبية. أكثرها شيوعًا هضمية — غثيان، امتلاء، إمساك أو إسهال — تخفّ عادة مع الوقت والوجبات الأصغر الأبطأ. يفحص طبيبك الحالات غير المناسبة للدواء ويتابع استجابتك.\n\nهذه الأدوية أدوات لا اختصارات: تعمل أفضل مع تغييرات الأكل والنشاط، وغالبًا يعود الوزن عند إيقافها، لذا تؤخذ عادة طويلًا تحت المتابعة. لا تبدأ أو توقف أو تعدّل أو تستعِر جرعة دون طبيبك."]},
+ {id:'inject',icon:'💉',cat:'medical',min:3,t:['Injection tips & side effects','نصائح الحقن والآثار الجانبية'],body:[
+  "If your medicine is an injection, technique makes it easier. It's usually given under the skin of the abdomen, thigh or upper arm; rotate the site each time to protect the skin. Store pens as directed (often refrigerated), let the pen reach a comfortable temperature, and use a fresh needle each dose. Pick a consistent day for weekly medicines.\n\nTo ease nausea, the most common early effect: eat smaller meals, stop when comfortably full, favour bland lower-fat foods, sip fluids, and avoid lying down right after eating. These effects usually fade as your body adjusts and as the dose is increased slowly.\n\nTell your doctor about severe or lasting vomiting, severe abdominal pain, signs of dehydration, or anything that worries you. Keep hydrated and keep up your protein and activity while on treatment.",
+  "إن كان دواؤك حقنة، فالتقنية تُسهّلها. تُعطى عادة تحت جلد البطن أو الفخذ أو أعلى الذراع؛ بدّل الموضع كل مرة لحماية الجلد. احفظ الأقلام حسب التعليمات (غالبًا بالثلاجة)، ودع القلم يصل حرارة مريحة، واستخدم إبرة جديدة كل جرعة. اختر يومًا ثابتًا للأدوية الأسبوعية.\n\nلتخفيف الغثيان، أكثر الآثار المبكرة: وجبات أصغر، توقّف عند الشبع المريح، أطعمة خفيفة قليلة الدهن، ارتشاف السوائل، وتجنّب الاستلقاء بعد الأكل مباشرة. تخفّ هذه الآثار عادة مع تأقلم الجسم والرفع البطيء للجرعة.\n\nأخبر طبيبك بالقيء الشديد أو المستمر أو ألم البطن الشديد أو علامات الجفاف أو أي شيء يقلقك. حافظ على الترطيب والبروتين والنشاط أثناء العلاج."]},
+ {id:'endo',icon:'🔬',cat:'endoscopic',min:5,t:['Endoscopic procedures','الإجراءات التنظيرية'],body:[
+  "Endoscopic weight procedures are done with a flexible scope passed through the mouth — no surgical cuts and usually a quick recovery. They sit between medications and surgery in intensity.\n\n• Intragastric balloon: a soft balloon is placed in the stomach and filled, so you feel full sooner and eat less. It is temporary — usually removed after about six months — and works best paired with lifestyle change.\n• Endoscopic sleeve gastroplasty (ESG): internal stitches reshape the stomach into a narrow tube, reducing its volume without removing any tissue.\n• Aspiration therapy: a tube lets a portion of a meal be drained from the stomach after eating.\n\nAfter any of these you follow a staged diet — clear liquids, then full liquids, purée, soft foods and finally regular textures — sipping fluids often and eating slowly. Early nausea or cramping is common. Results depend on keeping the eating and activity habits going, so follow-up matters.",
+  "الإجراءات التنظيرية للوزن تُجرى بمنظار مرن عبر الفم — دون شقوق جراحية وبتعافٍ سريع عادة. تقع بين الأدوية والجراحة في شدّتها.\n\n• البالون المعدي: يُوضع بالون ناعم في المعدة ويُملأ، فتشعر بالشبع أسرع وتأكل أقل. مؤقّت — يُزال عادة بعد نحو ستة أشهر — وأنجع مع تغيير نمط الحياة.\n• التكميم بالمنظار (ESG): غرز داخلية تعيد تشكيل المعدة أنبوبًا ضيّقًا فتقلّ سعتها دون إزالة نسيج.\n• علاج الشفط: أنبوب يسمح بتصريف جزء من الوجبة من المعدة بعد الأكل.\n\nبعد أيٍّ منها تتّبع غذاءً متدرّجًا — سوائل صافية ثم كاملة ثم مهروس ثم طري وأخيرًا قوام عادي — مع ارتشاف السوائل كثيرًا والأكل ببطء. الغثيان أو المغص المبكر شائع. النتائج تعتمد على استمرار عادات الأكل والنشاط، لذا المتابعة مهمّة."]},
+ {id:'surg',icon:'🏥',cat:'surgery',min:6,t:['Bariatric surgery: sleeve & bypass','جراحة السمنة: التكميم والتحويل'],body:[
+  "Bariatric (metabolic) surgery is the most effective and durable treatment for severe obesity, and it often improves or resolves type 2 diabetes, high blood pressure, sleep apnoea and fatty liver. The two most common operations:\n\n• Sleeve gastrectomy: about 80% of the stomach is removed, leaving a narrow tube. You feel full on much smaller amounts, and hunger hormones fall.\n• Roux-en-Y gastric bypass: a small stomach pouch is connected to a lower part of the small intestine, reducing intake and changing gut hormones and absorption.\n\nSurgery is a tool that requires lifelong partnership: a pre-op work-up and liver-shrink diet, a carefully staged post-op diet, daily vitamins for life, protein and fluid goals, and regular follow-up with blood tests. It is very safe in experienced centres, but like any operation it has risks, which your surgeon will explain.\n\nWeight regain can happen if habits slip, so the eating, activity and follow-up work continues long after the operation.",
+  "جراحة السمنة (الأيضية) أكثر العلاجات فعالية ودوامًا للسمنة الشديدة، وغالبًا تحسّن أو تُزيل السكري من النوع الثاني وارتفاع الضغط وانقطاع النفس النومي والكبد الدهني. أشيع عمليتين:\n\n• التكميم: يُزال نحو ٨٠٪ من المعدة تاركًا أنبوبًا ضيّقًا. تشعر بالشبع على كميات أصغر، وتنخفض هرمونات الجوع.\n• تحويل المسار (Roux-en-Y): تُوصل جيبة معدية صغيرة بجزء أدنى من الأمعاء الدقيقة، فتقلّ الكمية وتتغيّر هرمونات الأمعاء والامتصاص.\n\nالجراحة أداة تتطلّب شراكة مدى الحياة: تقييم قبل الجراحة وحمية تصغير الكبد، وغذاء متدرّج بعناية بعدها، وفيتامينات يومية مدى الحياة، وأهداف بروتين وسوائل، ومتابعة منتظمة بتحاليل الدم. آمنة جدًا في المراكز الخبيرة، لكن كأي عملية لها مخاطر يشرحها جرّاحك.\n\nقد يحدث استرجاع للوزن إن تراخت العادات، لذا يستمر عمل الأكل والنشاط والمتابعة طويلًا بعد العملية."]},
+ {id:'postop',icon:'🍽️',cat:'surgery',min:5,t:['Post-op diet & vitamins','الغذاء والفيتامينات بعد العملية'],body:[
+  "After endoscopic or surgical procedures your stomach needs time to heal, so food is reintroduced in stages — typically clear liquids, then full liquids, then puréed foods, then soft foods, and finally regular textures over about six to eight weeks. Your team gives you the exact timing.\n\nGolden rules through every stage: protein first, sip fluids between (not during) meals, eat slowly and chew thoroughly, stop at the first sign of fullness, and avoid sugary drinks and fizzy drinks. Aim for the protein and fluid targets your team sets to protect muscle and prevent dehydration.\n\nAfter bariatric surgery the body absorbs fewer nutrients, so lifelong daily supplements are essential — usually a bariatric multivitamin, vitamin B12, iron, calcium with vitamin D, and folic acid — with periodic blood tests to catch any deficiency early. Watch for persistent vomiting, inability to keep fluids down, severe pain, or dumping (sweating, racing heart, cramps and diarrhoea after sweet or rich food); the first three need urgent care.",
+  "بعد الإجراءات التنظيرية أو الجراحية تحتاج معدتك وقتًا للشفاء، فيُعاد إدخال الطعام على مراحل — عادة سوائل صافية ثم كاملة ثم أطعمة مهروسة ثم طرية وأخيرًا قوام عادي خلال نحو ستة إلى ثمانية أسابيع. يحدّد فريقك التوقيت الدقيق.\n\nقواعد ذهبية في كل مرحلة: البروتين أولًا، وارتشاف السوائل بين الوجبات لا أثناءها، والأكل ببطء والمضغ جيدًا، والتوقّف عند أول شعور بالشبع، وتجنّب المشروبات المحلّاة والغازية. استهدف أهداف البروتين والسوائل التي يحدّدها فريقك لحماية العضلات ومنع الجفاف.\n\nبعد جراحة السمنة يمتصّ الجسم عناصر أقل، لذا المكمّلات اليومية مدى الحياة ضرورية — عادة فيتامينات متعدّدة للسمنة، وب١٢، وحديد، وكالسيوم مع فيتامين د، وحمض فوليك — مع تحاليل دورية لاكتشاف أي نقص مبكرًا. انتبه للقيء المستمر أو عدم القدرة على إبقاء السوائل أو الألم الشديد أو الإغراق (تعرّق، خفقان، مغص وإسهال بعد الطعام الحلو أو الدسم)؛ الثلاثة الأولى تحتاج رعاية عاجلة."]},
+ {id:'choose',icon:'🧭',cat:'basics',min:4,t:['Choosing your pathway','اختيار مسارك'],body:[
+  "The right pathway depends on your starting point, health conditions, previous attempts, and what fits your life — and the pathways combine rather than compete. Lifestyle change is the foundation under all of them.\n\nAs a broad picture that your doctor personalises: dietary and lifestyle work suits everyone and is often tried first; medications are typically considered at a higher BMI or when weight-related conditions are present; endoscopic procedures offer a less invasive step with faster recovery; and bariatric surgery is the most effective option for severe obesity, especially with conditions like type 2 diabetes.\n\nThere is no failure in moving between pathways or using several tools together. Decisions should be shared with a specialist team who can weigh the benefits and risks for you. Use this app to learn, prepare good questions, and track your journey — whichever route you take.",
+  "المسار المناسب يعتمد على نقطة بدايتك وحالاتك الصحية ومحاولاتك السابقة وما يناسب حياتك — والمسارات تتكامل لا تتنافس. تغيير نمط الحياة أساس تحتها جميعًا.\n\nكصورة عامة يخصّصها طبيبك: العمل الغذائي ونمط الحياة يناسب الجميع ويُجرَّب أولًا غالبًا؛ والأدوية تُدرَس عادة عند مؤشر أعلى أو وجود حالات مرتبطة بالوزن؛ والإجراءات التنظيرية خطوة أقل توغّلًا وأسرع تعافيًا؛ وجراحة السمنة الخيار الأكثر فعالية للسمنة الشديدة، خاصة مع حالات كالسكري من النوع الثاني.\n\nلا فشل في الانتقال بين المسارات أو استخدام عدة أدوات معًا. تُتّخذ القرارات بالشراكة مع فريق مختص يوازن الفوائد والمخاطر لك. استخدم التطبيق لتتعلّم وتحضّر أسئلة جيدة وتتابع رحلتك — أيًّا كان طريقك."]},
+ {id:'plateau',icon:'📉',cat:'living',min:3,t:['Plateaus & keeping it off','الثبات والحفاظ على النتيجة'],body:[
+  "Weight loss almost never happens in a straight line. As you lose weight the body needs fewer calories and adapts to defend its weight, so progress slows and plateaus are normal — not a sign of failure. The day-to-day scale also swings with fluids, food, salt and sleep, so weekly or trend views tell you more than a single morning.\n\nWhen a plateau lasts, it can help to revisit portions and sugary drinks, add or vary activity, protect sleep, and make sure protein stays high to preserve muscle. If you are on a medication or have had a procedure, your team may review the plan.\n\nKeeping weight off is its own skill: ongoing monitoring, steady habits, and staying connected with your team all reduce regain. Treat lapses as data, not disaster — notice what happened and return to your routine.",
+  "نادرًا ما يسير نقص الوزن في خط مستقيم. مع النقص يحتاج الجسم سعرات أقل ويتكيّف للدفاع عن وزنه، فيبطؤ التقدّم والثبات طبيعي — لا علامة فشل. كما يتأرجح الميزان يوميًا مع السوائل والطعام والملح والنوم، لذا النظرة الأسبوعية أو الاتجاه أصدق من صباح واحد.\n\nعند طول الثبات قد يفيد مراجعة الحصص والمشروبات المحلّاة، وإضافة أو تنويع النشاط، وحماية النوم، وإبقاء البروتين مرتفعًا للحفاظ على العضلات. إن كنت على دواء أو أجريت إجراءً فقد يراجع فريقك الخطة.\n\nالحفاظ على النتيجة مهارة بذاتها: المتابعة المستمرة والعادات الثابتة والبقاء على تواصل مع فريقك تقلّل الاسترجاع. اعتبر الزلّات بيانات لا كارثة — لاحظ ما حدث وعُد لروتينك."]},
+ {id:'mind',icon:'💚',cat:'living',min:3,t:['Mind, mood & eating','النفس والمزاج والأكل'],body:[
+  "Weight and mood are closely linked. Stress, low mood, poor sleep and emotional eating can all work against your goals, and rigid all-or-nothing thinking often backfires. Being kind and patient with yourself is not a soft extra — it genuinely improves long-term results.\n\nHelpful practices: notice hunger versus emotional cues before eating, build non-food ways to cope with stress, avoid labelling foods or days as \"good\" or \"bad,\" and celebrate non-scale wins like more energy, better sleep, easier movement and improved lab numbers.\n\nIf eating feels out of control, if food causes distress, or if low mood or anxiety is affecting daily life, reach out to your healthcare team — support is available and effective, and it is a normal part of managing weight well.",
+  "الوزن والمزاج مترابطان. التوتر وتدنّي المزاج وقلة النوم والأكل العاطفي تعمل ضد أهدافك، والتفكير الصارم «الكل أو لا شيء» غالبًا يأتي بعكسه. اللطف والصبر مع نفسك ليسا رفاهية — بل يحسّنان النتائج طويلة الأمد فعلًا.\n\nممارسات مفيدة: ميّز الجوع عن المحفّزات العاطفية قبل الأكل، وابنِ وسائل غير غذائية لمواجهة التوتر، وتجنّب وصف الأطعمة أو الأيام بـ«جيدة» أو «سيئة»، واحتفِ بمكاسب غير الميزان كالطاقة والنوم وسهولة الحركة وتحسّن التحاليل.\n\nإن شعرت أن الأكل خارج السيطرة، أو سبّب الطعام ضيقًا، أو أثّر تدنّي المزاج أو القلق في حياتك اليومية، تواصل مع فريقك الصحي — الدعم متاح وفعّال، وهو جزء طبيعي من إدارة الوزن جيدًا."]}
+];
+const CATS={all:['All','الكل'],basics:['Basics','الأساسيات'],diet:['Diet & lifestyle','الغذاء ونمط الحياة'],medical:['Medical','الدوائي'],endoscopic:['Endoscopic','التنظيري'],surgery:['Surgical','الجراحي'],living:['Living well','التعايش']};
+
+/* ---------- state ---------- */
+function blank(){return{
+  lang:null, onboarded:false,
+  user:{name:'',sex:'',age:null,activity:'',heightCm:null,startWeight:null,targetWeight:null,pathway:''},
+  prefs:{theme:'dark',pace:0.5},
+  logs:[],                 // {id,type,t,...} meal/activity/med/symptom
+  weights:[],              // {date, kg}
+  waists:[],               // {date, cm}
+  labs:[],                 // {date, key, val}
+  meds:[],                 // ids of AOM meds currently on
+  regimen:[],              // {id,name,dose,freq,time,day,remind}  patient-entered
+  reminders:[],            // {id,kind,label,time,days,enabled}
+  protein:[],              // {date, g}
+  procedure:{type:'',date:'',phase:''}, // endoscopic/surgical journey
+  vits:{},                 // {date: [ids taken]}
+  seenDays:[]
+};}
+function deepMerge(b,o){if(b===null||typeof b!=='object'||Array.isArray(b))return o===undefined?b:o;const out=Object.assign({},b);if(o&&typeof o==='object'&&!Array.isArray(o)){for(const k in o){const x=b[k],y=o[k];out[k]=(x&&typeof x==='object'&&!Array.isArray(x)&&y&&typeof y==='object'&&!Array.isArray(y))?deepMerge(x,y):y;}}return out;}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY));return v?deepMerge(blank(),v):blank();}catch(e){return blank();}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let S=load();
+
+/* ---------- date helpers ---------- */
+function todayKey(d){d=d||new Date();return d.toISOString().slice(0,10);}
+function daysAgo(k){return Math.round((Date.now()-new Date(k+'T00:00').getTime())/864e5);}
+function lastNDays(n){const a=[];for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);a.push(todayKey(d));}return a;}
+function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString(isAr()?'ar-SA':'en-GB',{day:'numeric',month:'short'});}
+function fmtTime(iso){return new Date(iso).toLocaleTimeString(isAr()?'ar-SA':'en-GB',{hour:'2-digit',minute:'2-digit'});}
+function streak(){let n=0;for(let i=0;i<400;i++){const d=new Date();d.setDate(d.getDate()-i);if(S.seenDays.includes(todayKey(d)))n++;else if(i>0)break;}return n;}
+function markDay(){const k=todayKey();if(!S.seenDays.includes(k)){S.seenDays.push(k);save();}}
+
+/* ---------- metrics helpers ---------- */
+function latestWeight(){return S.weights.length?S.weights[S.weights.length-1].kg:(S.user.startWeight||null);}
+function bmiVal(){const w=latestWeight(),h=S.user.heightCm;if(!w||!h)return null;return w/Math.pow(h/100,2);}
+function bmiCat(b){if(b==null)return{l:['—','—'],c:'var(--muted)'};if(b<18.5)return{l:['Underweight','نقص وزن'],c:'var(--accent2)'};if(b<25)return{l:['Healthy range','نطاق صحي'],c:'var(--good)'};if(b<30)return{l:['Overweight','زيادة وزن'],c:'var(--warn)'};if(b<35)return{l:['Obesity I','سمنة (١)'],c:'#FF9A3E'};if(b<40)return{l:['Obesity II','سمنة (٢)'],c:'var(--bad)'};return{l:['Obesity III','سمنة (٣)'],c:'var(--bad)'};}
+function idealWeight(){const h=S.user.heightCm;if(!h)return null;return 25*Math.pow(h/100,2);}
+function tbwl(){const s=S.user.startWeight,w=latestWeight();if(!s||!w||s<=0)return null;return (s-w)/s*100;}
+function ewl(){const s=S.user.startWeight,w=latestWeight(),iw=idealWeight();if(!s||!w||!iw||(s-iw)<=0)return null;return (s-w)/(s-iw)*100;}
+function goalPct(){const s=S.user.startWeight,w=latestWeight(),g=S.user.targetWeight;if(!s||!w||!g||(s-g)<=0)return null;return Math.max(0,Math.min(100,(s-w)/(s-g)*100));}
+
+/* ---------- UI helpers ---------- */
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),1800);}
+function openSheet(h){$('#sheet').innerHTML='<div class="grip"></div>'+h;$('#sheetbg').classList.add('open');}
+function closeSheet(){$('#sheetbg').classList.remove('open');}
+$('#sheetbg').addEventListener('click',e=>{if(e.target.id==='sheetbg')closeSheet();});
+function topbar(titleK,subK,opts){opts=opts||{};const left=opts.back?`<button class="iconbtn" onclick="goBack()">${isAr()?'›':'‹'}</button>`:'';const right=opts.right||'';return `<div class="topbar">${left}<div style="flex:1"><h1>${opts.rawTitle||t(titleK)}</h1>${subK||opts.rawSub?`<div class="sub">${opts.rawSub||t(subK)}</div>`:''}</div>${right}</div>`;}
+function applyTheme(){document.documentElement.setAttribute('data-mode',S.prefs.theme==='light'?'light':'dark');const m=$('meta[name=theme-color]');if(m)m.setAttribute('content',S.prefs.theme==='light'?'#F1F7F5':'#0B0F14');}
+function applyDir(){document.documentElement.lang=S.lang||'en';document.documentElement.dir=isAr()?'rtl':'ltr';applyTheme();}
+
+/* ---------- router ---------- */
+const ROUTES={};let CURRENT='splash',STACK=[],CURRENT_OPTS={};
+function route(n,fn){ROUTES[n]=fn;}
+function go(n,o){o=o||{};if(!o.replace&&CURRENT&&CURRENT!==n)STACK.push(CURRENT);CURRENT=n;CURRENT_OPTS=o;render();}
+function goBack(){if(STACK.length){CURRENT=STACK.pop();render();}else navTab('today');}
+const MAIN=['today','track','progress','learn','more'];
+function navTab(n){STACK=[];CURRENT=n;CURRENT_OPTS={};render();}
+function render(){applyDir();const host=$('#screens');host.innerHTML='';const fn=ROUTES[CURRENT]||ROUTES['today'];const node=el('<div class="screen active"></div>');fn(node,CURRENT_OPTS);host.appendChild(node);node.scrollTop=0;const tb=$('#tabbar');if(MAIN.includes(CURRENT)){tb.classList.remove('hidden');renderTabs();}else tb.classList.add('hidden');}
+function renderTabs(){const tb=$('#tabbar');const items=[['today','🏠','tabToday'],['track','➕','tabTrack'],['progress','📈','tabProgress'],['learn','📚','tabLearn'],['more','⋯','tabMore']];tb.innerHTML=items.map(([n,ic,lab])=>`<button class="tab ${CURRENT===n?'on':''}" onclick="navTab('${n}')"><span class="ic">${ic}</span>${t(lab)}</button>`).join('');}
+
+/* ---------- charts (inline SVG) ---------- */
+function sparkline(vals,color,W,H){W=W||300;H=H||70;color=color||'var(--accent)';if(!vals.length)return '';const mx=Math.max(...vals),mn=Math.min(...vals);const X=i=>10+i*(W-20)/Math.max(vals.length-1,1);const Y=v=>H-12-(v-mn)/((mx-mn)||1)*(H-24);const pts=vals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');const dots=vals.map((v,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="2.4" fill="${color}"/>`).join('');return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet"><polyline fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>${dots}</svg>`;}
+function barChart(vals,labels,color,ref){const W=320,H=120,n=vals.length;color=color||'var(--accent2)';const mx=Math.max(...vals,ref||0,1);const bw=(W-30)/n*.62;const X=i=>20+i*(W-30)/n+((W-30)/n-bw)/2;const Y=v=>H-20-v/mx*(H-34);let bars=vals.map((v,i)=>`<rect x="${X(i).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-20-Y(v)).toFixed(1)}" rx="3" fill="${color}"/>`).join('');let rl='';if(ref){rl=`<line x1="20" y1="${Y(ref).toFixed(1)}" x2="${W-10}" y2="${Y(ref).toFixed(1)}" stroke="var(--warn)" stroke-width="1.4" stroke-dasharray="4 3"/><text x="${W-12}" y="${(Y(ref)-3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--warn)">${ref}</text>`;}const xl=labels?labels.map((l,i)=>`<text x="${(X(i)+bw/2).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="8" fill="var(--faint)">${l}</text>`).join(''):'';return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" font-family="inherit">${bars}${rl}${xl}</svg>`;}
+function ring(pct,color,label,sub){color=color||'var(--accent)';const R=52,C=2*Math.PI*R,off=C*(1-Math.max(0,Math.min(100,pct))/100);return `<svg viewBox="0 0 140 140" width="140" height="140"><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--card2)" stroke-width="12"/><circle cx="70" cy="70" r="${R}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 70 70)"/><text x="70" y="66" text-anchor="middle" font-size="26" font-weight="800" fill="var(--txt)" font-family="inherit">${label}</text><text x="70" y="88" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="inherit">${sub||''}</text></svg>`;}
+function heatmap(){const days=lastNDays(35);return `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${days.map(d=>{const c=S.logs.filter(l=>l.t.slice(0,10)===d).length+S.weights.filter(w=>w.date===d).length;const lvl=c===0?0:c<2?1:c<4?2:3;const col=['var(--card2)','#0c3a32','#0e7d68','var(--accent)'][lvl];return `<div title="${d}" style="aspect-ratio:1;border-radius:5px;background:${col};border:1px solid var(--line)"></div>`;}).join('')}</div>`;}
+
+/* ============================================================ SCREENS ============================================================ */
+route('splash',(n)=>{n.innerHTML=`<div class="splash"><div class="logo-mark">ق</div><div><h1 style="font-size:30px;margin:0">${t('appName')} · قوام</h1><p class="muted" style="margin:6px 0 0">${t('tagline')}</p></div><div class="spin" style="width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:rot 1s linear infinite"></div></div><style>@keyframes rot{to{transform:rotate(360deg)}}</style>`;
+  setTimeout(()=>{if(!S.lang)go('lang',{replace:true});else if(!S.onboarded)go('consent',{replace:true});else navTab('today');},900);});
+
+route('lang',(n)=>{n.innerHTML=`<div class="splash" style="background:var(--bg)"><div class="logo-mark">ق</div><h1 style="margin:0">Qawam · قوام</h1><p class="muted" style="margin:0">Choose your language · اختر لغتك</p>
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin-top:10px">
+   <button class="btn btn-primary" onclick="setLang('en')">English</button>
+   <button class="btn btn-ghost" onclick="setLang('ar')">العربية</button></div></div>`;});
+window.setLang=l=>{S.lang=l;save();applyDir();go('consent',{replace:true});};
+
+route('consent',(n)=>{n.innerHTML=`${topbar(null,null,{rawTitle:t('consentT')})}<div class="content">
+  <div class="card"><p style="font-size:14px;line-height:1.7;white-space:pre-wrap;margin:0">${t('consentBody')}</p></div>
+  <button class="btn btn-primary" onclick="go('profile')">${t('iUnderstand')}</button>
+  <button class="btn btn-ghost" onclick="toggleLangQuick()">🌐 ${isAr()?'English':'العربية'}</button></div>`;});
+window.toggleLangQuick=()=>{S.lang=isAr()?'en':'ar';save();render();};
+
+route('profile',(n)=>{const ar=isAr();n.innerHTML=`${topbar(null,null,{rawTitle:t('profileT')})}<div class="content">
+  <div class="disc-note">${t('profileSub')}</div>
+  <div class="field"><label>${t('yourName')}</label><input class="input" id="nm" placeholder="${t('namePh')}" value="${esc(S.user.name)}"></div>
+  <div class="grid2">
+   <div class="field"><label>${t('sex')}</label><div class="chips" id="sx">${[['male',t('male')],['female',t('female')]].map(([v,l])=>`<button class="chip ${S.user.sex===v?'on':''}" data-v="${v}" onclick="pick('sx',this)">${l}</button>`).join('')}</div></div>
+   <div class="field"><label>${t('age')}</label><input class="input" id="ag" inputmode="numeric" placeholder="40" value="${S.user.age||''}"></div>
+  </div>
+  <div class="field"><label>${t('activity')}</label><div class="chips" id="ac">${[['sed','actSed'],['light','actLight'],['mod','actMod'],['high','actHigh'],['ath','actAth']].map(([v,l])=>`<button class="chip ${S.user.activity===v?'on':''}" data-v="${v}" onclick="pick('ac',this)">${t(l)}</button>`).join('')}</div></div>
+  <div class="grid2">
+   <div class="field"><label>${t('height')}</label><input class="input" id="ht" inputmode="numeric" placeholder="170" value="${S.user.heightCm||''}"></div>
+   <div class="field"><label>${t('curWeight')}</label><input class="input" id="cw" inputmode="decimal" placeholder="95" value="${latestWeight()||''}"></div>
+  </div>
+  <div class="grid2">
+   <div class="field"><label>${t('startWeight')}</label><input class="input" id="sw" inputmode="decimal" placeholder="98" value="${S.user.startWeight||''}"></div>
+   <div class="field"><label>${t('targetWeight')}</label><input class="input" id="tw" inputmode="decimal" placeholder="80" value="${S.user.targetWeight||''}"></div>
+  </div>
+  <div class="field"><label>${t('yourPathway')}</label><div class="chips" id="pw">${PATHWAYS.map(p=>`<button class="chip ${S.user.pathway===p.id?'on':''}" data-v="${p.id}" onclick="pick('pw',this)">${p.icon} ${L(p.n)}</button>`).join('')}</div></div>
+  <button class="btn btn-primary" onclick="finishOnboard()">${t('continue')}</button>
+ </div>`;
+  if(S.user.sex)$('#sx').dataset.val=S.user.sex;if(S.user.pathway)$('#pw').dataset.val=S.user.pathway;if(S.user.activity)$('#ac').dataset.val=S.user.activity;});
+window.finishOnboard=()=>{const g=id=>{const e=$('#'+id);return e?e.value.trim():'';};S.user.name=g('nm');const sx=$('#sx');if(sx&&sx.dataset.val)S.user.sex=sx.dataset.val;const ac=$('#ac');if(ac&&ac.dataset.val)S.user.activity=ac.dataset.val;const ag=parseInt(g('ag'),10);if(!isNaN(ag))S.user.age=ag;const h=parseFloat(g('ht'));if(!isNaN(h))S.user.heightCm=h;const cw=parseFloat(g('cw'));const sw=parseFloat(g('sw'));if(!isNaN(sw))S.user.startWeight=sw;else if(!isNaN(cw))S.user.startWeight=cw;if(!isNaN(cw)){S.weights=[{date:todayKey(),kg:cw}];}const tw=parseFloat(g('tw'));if(!isNaN(tw))S.user.targetWeight=tw;const pw=$('#pw');if(pw&&pw.dataset.val){S.user.pathway=pw.dataset.val;if(pw.dataset.val==='endoscopic'||pw.dataset.val==='surgery')S.procedure.type=pw.dataset.val;}S.onboarded=true;save();navTab('today');};
+
+function greeting(){const h=new Date().getHours();return h<12?t('goodMorning'):h<18?t('goodAfternoon'):t('goodEvening');}
+route('today',(n)=>{markDay();const ar=isAr();const st=streak();const recentLogs=allEvents().slice(0,5);const b=bmiVal();const bc=bmiCat(b);const gp=goalPct();const wv=S.weights.slice(-12).map(w=>w.kg);const my=pathwayById(S.user.pathway);
+  n.innerHTML=`${topbar(null,null,{rawTitle:greeting(),rawSub:S.user.name?esc(S.user.name):t('tagline'),right:`<button class="iconbtn" onclick="navTab('more')">⚙️</button>`})}
+  <div class="content">
+   <div class="grid3">
+     <div class="kpi"><div class="v" style="color:var(--accent)">${st}</div><div class="l">${t('streak')}</div></div>
+     <div class="kpi"><div class="v">${b!=null?b.toFixed(1):'—'}</div><div class="l">${t('bmi')}</div></div>
+     <div class="kpi"><div class="v">${latestWeight()!=null?latestWeight():'—'}<span style="font-size:12px">${latestWeight()!=null?' kg':''}</span></div><div class="l">${ar?'الوزن':'weight'}</div></div>
+   </div>
+   ${gp!=null?`<div class="card"><div class="between"><div><b style="font-size:15px">${t('goal')}</b><div class="muted" style="font-size:12.5px;margin-top:3px">${ar?'من '+S.user.startWeight+' نحو '+S.user.targetWeight+' كجم':'from '+S.user.startWeight+' toward '+S.user.targetWeight+' kg'}</div></div><div style="width:96px;text-align:center">${ring(gp,'var(--accent)',Math.round(gp)+'%','')}</div></div></div>`:''}
+   ${my?`<div class="pathcard tap" onclick="openPathway('${my.id}')" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="between"><div><small style="color:var(--accent);font-weight:700">${t('myPlan')}</small><b style="margin-top:2px">${my.icon} ${L(my.n)}</b><small>${L(my.d)}</small></div><div class="chev" style="align-self:center">${ar?'‹':'›'}</div></div></div>`:''}
+   <div class="grid2">
+     <div class="pathcard" onclick="go('tools')" style="background:linear-gradient(150deg,#0EA5E922,transparent)"><div class="pi">🧰</div><b>${t('toolsT')}</b><small>${ar?'حاسبات وأدوية':'Calculators & meds'}</small></div>
+     <div class="pathcard" onclick="go('reminders')" style="background:linear-gradient(150deg,#10B98122,transparent)"><div class="pi">🔔</div><b>${ar?'التذكيرات':'Reminders'}</b><small>${ar?'لا تفوّت جرعة':'Never miss a dose'}</small></div>
+   </div>
+   <div class="section-title">${t('quickLog')}</div>
+   <div class="chips" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+     ${quickBtns()}
+   </div>
+   ${wv.length>1?`<div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'اتجاه الوزن':'Weight trend'}</div>${sparkline(wv)}</div>`:`<div class="card tap" onclick="openLog('weight')" style="text-align:center"><b>${ar?'سجّل وزنك الأول':'Log your first weight'}</b><div class="muted" style="font-size:12.5px;margin-top:3px">${ar?'لبدء رؤية اتجاهك':'to start seeing your trend'}</div></div>`}
+   <div class="section-title">${t('recent')}</div>
+   <div class="card">${recentLogs.length?recentLogs.map(liRow).join(''):`<p class="muted" style="padding:8px">${t('noLogs')}</p>`}</div>
+  </div>`;});
+function quickBtns(){const items=[['weight','⚖️','logWeight'],['meal','🍽️','logMeal'],['activity','🏃','logActivity'],['med','💊','logMed'],['symptom','🩹','logSymptom'],['waist','📏','logWaist']];return items.map(([ty,ic,lab])=>`<button class="chip" style="flex-direction:column;display:flex;align-items:center;gap:5px;padding:13px 6px" onclick="openLog('${ty}')"><span style="font-size:21px">${ic}</span>${t(lab)}</button>`).join('');}
+
+/* ---- unified event feed ---- */
+const TYPE_META={weight:['⚖️',['Weight','الوزن']],waist:['📏',['Waist','الخصر']],meal:['🍽️',['Meal','وجبة']],activity:['🏃',['Activity','نشاط']],med:['💊',['Medication','دواء']],symptom:['🩹',['Symptom','عَرَض']],lab:['🧪',['Lab result','نتيجة تحليل']],vits:['💊',['Vitamins','فيتامينات']]};
+function allEvents(){const ev=[];S.weights.forEach(w=>ev.push({type:'weight',t:w.date+'T09:00',kg:w.kg}));S.waists.forEach(w=>ev.push({type:'waist',t:w.date+'T09:00',cm:w.cm}));S.labs.forEach(l=>ev.push({type:'lab',t:l.date+'T09:00',key:l.key,val:l.val}));S.logs.forEach(l=>ev.push(l));return ev.sort((a,b)=>new Date(b.t)-new Date(a.t));}
+function liRow(l){const m=TYPE_META[l.type]||['•',['Log','سجل']];let sub='';if(l.type==='weight')sub=l.kg+' kg';else if(l.type==='waist')sub=l.cm+' cm';else if(l.type==='lab')sub=L(LABKEYS[l.key]||['',''])+': '+l.val;else if(l.type==='meal'&&l.tags)sub=l.tags.map(i=>L(MEALTAGS[i])).join(', ');else if(l.type==='activity')sub=(l.act!=null?L(ACTS[l.act]):'')+(l.mins?' · '+l.mins+(isAr()?' د':' min'):'')+(l.steps?' · '+l.steps+(isAr()?' خطوة':' steps'):'');else if(l.type==='med'&&l.med)sub=L((MEDS.find(x=>x.id===l.med)||{n:['','']}).n);else if(l.type==='symptom'&&l.sym!=null)sub=L(SYMPTOMS[l.sym])+(l.sev!=null?' · '+[t('mild'),t('moderate'),t('severe')][l.sev]:'');if(l.notes)sub=(sub?sub+' · ':'')+esc(l.notes.slice(0,32));return `<div class="li"><div class="ic">${m[0]}</div><div class="tx"><b>${L(m[1])}</b><small>${sub||fmtDate(l.t)}</small></div><small class="muted">${fmtDate(l.t)}</small></div>`;}
+function addLog(o){o.id=rid();o.t=o.t||new Date().toISOString();S.logs.push(o);save();}
+
+/* ---- loggers ---- */
+window.pickScale=(id,b)=>{$('#'+id).querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+id).dataset.val=b.dataset.v;};
+window.pick=(id,b)=>{$('#'+id).querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+id).dataset.val=b.dataset.v;};
+window.pickMulti=(id,b)=>{b.classList.toggle('on');};
+function getMulti(id){return [...$('#'+id).querySelectorAll('.chip.on')].map(x=>+x.dataset.v);}
+window.openLog=function(ty){const ar=isAr();
+  if(ty==='weight'){openSheet(`<h2 style="margin:4px 0 14px">⚖️ ${L(['Log weight','تسجيل الوزن'])}</h2>
+    <div class="field"><label>${t('curWeight')}</label><input class="input" id="wk" inputmode="decimal" placeholder="e.g. 92.5"></div>
+    <div class="field"><label>${ar?'التاريخ':'Date'}</label><input class="input" id="wd" type="date" value="${todayKey()}"></div>
+    <button class="btn btn-primary" onclick="saveWeight()">${t('save')}</button>`);}
+  else if(ty==='waist'){openSheet(`<h2 style="margin:4px 0 14px">📏 ${L(['Log waist','تسجيل الخصر'])}</h2>
+    <div class="field"><label>${ar?'محيط الخصر (سم)':'Waist circumference (cm)'}</label><input class="input" id="wc" inputmode="decimal" placeholder="e.g. 98"></div>
+    <div class="field"><label>${ar?'التاريخ':'Date'}</label><input class="input" id="wcd" type="date" value="${todayKey()}"></div>
+    <div class="disc-note">${ar?'قِس عند السرّة بعد الزفير برفق، دون شدّ الشريط.':'Measure at the navel after a gentle breath out, without pulling the tape tight.'}</div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="saveWaist()">${t('save')}</button>`);}
+  else if(ty==='meal'){openSheet(`<h2 style="margin:4px 0 14px">🍽️ ${L(['Log a meal','تسجيل وجبة'])}</h2>
+    <div class="field"><label>${ar?'ماذا أكلت؟':'What did you eat?'}</label><textarea class="input" id="desc" placeholder="${ar?'صف الوجبة…':'Describe the meal…'}"></textarea></div>
+    <div class="field"><label>${ar?'صفات الوجبة':'Meal qualities'}</label><div class="chips" id="mtag">${MEALTAGS.map((c,i)=>`<button class="chip" data-v="${i}" onclick="pickMulti('mtag',this)">${L(c)}</button>`).join('')}</div></div>
+    <button class="btn btn-primary" onclick="saveMeal()">${t('save')}</button>`);}
+  else if(ty==='activity'){openSheet(`<h2 style="margin:4px 0 14px">🏃 ${L(['Log activity','تسجيل نشاط'])}</h2>
+    <div class="field"><label>${ar?'نوع النشاط':'Activity type'}</label><div class="chips" id="act">${ACTS.map((c,i)=>`<button class="chip" data-v="${i}" onclick="pick('act',this)">${L(c)}</button>`).join('')}</div></div>
+    <div class="grid2"><div class="field"><label>${ar?'الدقائق':'Minutes'}</label><input class="input" id="amin" inputmode="numeric" placeholder="30"></div>
+    <div class="field"><label>${ar?'الخطوات (اختياري)':'Steps (optional)'}</label><input class="input" id="astep" inputmode="numeric" placeholder="6000"></div></div>
+    <button class="btn btn-primary" onclick="saveActivity()">${t('save')}</button>`);}
+  else if(ty==='med'){const on=S.meds.length?S.meds:MEDS.map(m=>m.id);openSheet(`<h2 style="margin:4px 0 14px">💊 ${L(['Medication taken','دواء تم تناوله'])}</h2>
+    <div class="field"><label>${ar?'اختر الدواء':'Choose medication'}</label><div class="chips" id="md">${MEDS.filter(m=>on.includes(m.id)).map(m=>`<button class="chip" data-v="${m.id}" onclick="pick('md',this)">${L(m.n)}</button>`).join('')}</div></div>
+    <div class="disc-note">${ar?'سجّل ما وصفه طبيبك فقط. لإدارة قائمة أدويتك افتح «علاجي».':'Log only what your doctor prescribed. Manage your medication list under “My treatment”.'}</div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="saveMed()">${t('save')}</button>`);}
+  else if(ty==='symptom'){openSheet(`<h2 style="margin:4px 0 14px">🩹 ${L(['Log a symptom','تسجيل عَرَض'])}</h2>
+    <div class="field"><label>${ar?'العَرَض':'Symptom'}</label><div class="chips" id="sym">${SYMPTOMS.map((c,i)=>`<button class="chip" data-v="${i}" onclick="pick('sym',this)">${L(c)}</button>`).join('')}</div></div>
+    <div class="field"><label>${t('severity')||(ar?'الشدة':'Severity')}</label><div class="scale" id="ssev">${[[0,t('mild')],[1,t('moderate')],[2,t('severe')]].map(([v,l])=>`<button data-v="${v}" onclick="pickScale('ssev',this)">${l}</button>`).join('')}</div></div>
+    <div class="disc-note" style="background:rgba(255,92,114,.12);color:var(--bad)">${ar?'قيء مستمر، عدم إبقاء السوائل، ألم شديد، براز أسود، ألم صدر أو صعوبة تنفّس — اطلب رعاية عاجلة.':'Persistent vomiting, unable to keep fluids down, severe pain, black stools, chest pain or trouble breathing — seek urgent care.'}</div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="saveSymptom()">${t('save')}</button>`);}
+};
+window.saveWeight=()=>{const k=parseFloat($('#wk').value);if(isNaN(k))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wd').value||todayKey();S.weights=S.weights.filter(w=>w.date!==d);S.weights.push({date:d,kg:k});S.weights.sort((a,b)=>a.date<b.date?-1:1);if(!S.user.startWeight)S.user.startWeight=k;save();closeSheet();toast(t('saved'));render();};
+window.saveWaist=()=>{const c=parseFloat($('#wc').value);if(isNaN(c))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wcd').value||todayKey();S.waists=S.waists.filter(w=>w.date!==d);S.waists.push({date:d,cm:c});S.waists.sort((a,b)=>a.date<b.date?-1:1);save();closeSheet();toast(t('saved'));render();};
+window.saveMeal=()=>{addLog({type:'meal',desc:($('#desc').value||'').trim(),tags:getMulti('mtag')});closeSheet();toast(t('loggedOk'));render();};
+window.saveActivity=()=>{const a=$('#act'),mins=parseInt($('#amin').value,10),steps=parseInt($('#astep').value,10);addLog({type:'activity',act:a.dataset.val!=null?+a.dataset.val:null,mins:isNaN(mins)?null:mins,steps:isNaN(steps)?null:steps});closeSheet();toast(t('loggedOk'));render();};
+window.saveMed=()=>{const m=$('#md');if(!m.dataset.val)return toast(isAr()?'اختر دواء':'Pick a medication');addLog({type:'med',med:m.dataset.val});closeSheet();toast(t('loggedOk'));render();};
+window.saveSymptom=()=>{const s=$('#sym');if(!s.dataset.val)return toast(isAr()?'اختر عرضًا':'Pick a symptom');const sv=$('#ssev');addLog({type:'symptom',sym:+s.dataset.val,sev:sv.dataset.val!=null?+sv.dataset.val:null});closeSheet();toast(t('loggedOk'));render();};
+
+/* ---- TRACK tab ---- */
+route('track',(n)=>{const ar=isAr();const byDay={};allEvents().forEach(l=>{const k=l.t.slice(0,10);(byDay[k]=byDay[k]||[]).push(l);});const keys=Object.keys(byDay).sort((a,b)=>a<b?1:-1);
+  n.innerHTML=`${topbar('trackT','trackSub')}<div class="content">
+   <div class="chips" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">${quickBtns()}</div>
+   <button class="btn btn-ghost" onclick="go('labs')">🧪 ${ar?'تحاليل المتابعة':'Follow-up labs'}</button>
+   ${keys.length?keys.map(k=>`<div><div class="section-title">${fmtDate(k+'T00:00')} · ${daysAgo(k)===0?(ar?'اليوم':'today'):daysAgo(k)+' '+(ar?'يوم':'d')}</div><div class="card">${byDay[k].map(liRow).join('')}</div></div>`).join(''):`<div class="card center" style="padding:30px">${emptyArt()}<p class="muted">${t('noLogs')}</p></div>`}
+  </div>`;});
+function emptyArt(){return `<div class="empty-art"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 40l12-12 10 8 18-20"/><path d="M8 52h48"/></svg></div>`;}
+
+route('labs',(n)=>{const ar=isAr();const rows=S.labs.slice().sort((a,b)=>a.date<b.date?1:-1);
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'تحاليل المتابعة':'Follow-up labs'})}<div class="content">
+   <div class="disc-note">${ar?'سجّل نتائج تحاليلك لمتابعتها مع فريقك — التطبيق لا يفسّرها.':'Record your lab results to track them with your team — the app does not interpret them.'}</div>
+   <button class="btn btn-primary" onclick="openLab()">＋ ${ar?'إضافة نتيجة':'Add a result'}</button>
+   ${rows.length?`<div class="card">${rows.map(l=>`<div class="li"><div class="ic">🧪</div><div class="tx"><b>${L(LABKEYS[l.key]||['',''])}</b><small>${fmtDate(l.date+'T00:00')}</small></div><b>${esc(l.val)}</b></div>`).join('')}</div>`:''}
+  </div>`;});
+window.openLab=()=>{const ar=isAr();openSheet(`<h2 style="margin:4px 0 14px">🧪 ${ar?'إضافة نتيجة تحليل':'Add a lab result'}</h2>
+  <div class="field"><label>${ar?'التحليل':'Test'}</label><div class="chips" id="lk">${LABKEYS.map((c,i)=>`<button class="chip" data-v="${i}" onclick="pick('lk',this)">${L(c)}</button>`).join('')}</div></div>
+  <div class="grid2"><div class="field"><label>${ar?'القيمة':'Value'}</label><input class="input" id="lv" placeholder="e.g. 6.4"></div>
+  <div class="field"><label>${ar?'التاريخ':'Date'}</label><input class="input" id="ld" type="date" value="${todayKey()}"></div></div>
+  <button class="btn btn-primary" onclick="saveLab()">${t('save')}</button>`);};
+window.saveLab=()=>{const k=$('#lk');if(!k.dataset.val)return toast(isAr()?'اختر تحليلًا':'Pick a test');const v=($('#lv').value||'').trim();if(!v)return toast(isAr()?'أدخل القيمة':'Enter a value');S.labs.push({date:$('#ld').value||todayKey(),key:+k.dataset.val,val:v});save();closeSheet();toast(t('saved'));render();};
+
+/* ---- PROGRESS tab ---- */
+route('progress',(n)=>{const ar=isAr();const b=bmiVal();const bc=bmiCat(b);const wv=S.weights.slice(-16);const cv=S.waists.slice(-16);const tb=tbwl(),ew=ewl(),gp=goalPct();const acts=S.logs.filter(l=>l.type==='activity');const wk=lastNDays(7);const wkMins=acts.filter(a=>wk.includes(a.t.slice(0,10))).reduce((s,a)=>s+(a.mins||0),0);
+  n.innerHTML=`${topbar('progressT','progressSub')}<div class="content">
+   <div class="disc-note">${ar?'كل الأرقام وصفية للمتابعة والنقاش مع فريقك — وليست تشخيصًا أو هدفًا طبيًا.':'All numbers are descriptive, to track and discuss with your team — not a diagnosis or a medical target.'}</div>
+   <div class="card"><div class="between"><div><b>${t('bmi')}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'الوزن ÷ مربع الطول':'weight ÷ height²'}</div></div><div style="text-align:${ar?'left':'right'}"><b style="font-size:26px;color:${bc.c}">${b!=null?b.toFixed(1):'—'}</b><div style="font-size:11.5px;color:${bc.c};font-weight:700">${L(bc.l)}</div></div></div>
+     ${!S.user.heightCm?`<button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%" onclick="go('profile')">${ar?'أضف طولك لحساب المؤشر':'Add your height to calculate BMI'}</button>`:''}</div>
+   <div class="grid2">
+     <div class="kpi"><div class="v" style="color:var(--accent)">${tb!=null?tb.toFixed(1)+'%':'—'}</div><div class="l">${t('tbwl')}</div></div>
+     <div class="kpi"><div class="v" style="color:var(--accent2)">${ew!=null?Math.round(ew)+'%':'—'}</div><div class="l">${t('ewl')}</div></div>
+   </div>
+   ${gp!=null?`<div class="card center"><div class="section-title" style="margin:0 0 6px">${t('goal')}</div>${ring(gp,'var(--accent)',Math.round(gp)+'%',(latestWeight())+'→'+S.user.targetWeight)}</div>`:''}
+   ${wv.length>1?`<div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'اتجاه الوزن (كجم)':'Weight trend (kg)'}</b><small class="muted">${wv[0].kg} → ${wv[wv.length-1].kg}</small></div>${sparkline(wv.map(w=>w.kg),'var(--accent)')}</div>`:''}
+   ${cv.length>1?`<div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'اتجاه الخصر (سم)':'Waist trend (cm)'}</b><small class="muted">${cv[0].cm} → ${cv[cv.length-1].cm}</small></div>${sparkline(cv.map(w=>w.cm),'var(--accent2)')}</div>`:''}
+   <div class="card"><div class="between"><div><b>${ar?'النشاط هذا الأسبوع':'Activity this week'}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'هدف شائع: ١٥٠ د/أسبوع':'a common target: 150 min/week'}</div></div><b style="font-size:22px;color:var(--accent)">${wkMins}<span style="font-size:12px"> ${ar?'د':'min'}</span></b></div><div class="pbar" style="margin-top:10px"><i style="width:${Math.min(100,wkMins/150*100)}%"></i></div></div>
+   <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'نشاط التسجيل (٥ أسابيع)':'Logging activity (5 weeks)'}</div>${heatmap()}</div>
+  </div>`;});
+
+/* ---- LEARN tab ---- */
+let learnCat='all';
+route('learn',(n)=>{const ar=isAr();const items=ART.filter(a=>learnCat==='all'||a.cat===learnCat);
+  n.innerHTML=`${topbar('learnT','learnSub')}<div class="content">
+   <div class="card tap" onclick="go('pathways')" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="between"><div><b style="font-size:15px">🧭 ${t('pathwaysT')}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${t('pathwaysSub')}</div></div><div class="chev" style="align-self:center">${ar?'‹':'›'}</div></div></div>
+   <div class="chips" style="overflow-x:auto;flex-wrap:nowrap">${Object.keys(CATS).map(c=>`<button class="chip ${learnCat===c?'on':''}" style="white-space:nowrap" onclick="setCat('${c}')">${L(CATS[c])}</button>`).join('')}</div>
+   <div class="card">${items.map(a=>`<div class="li" onclick="openArticle('${a.id}')"><div class="ic">${a.icon}</div><div class="tx"><b>${L(a.t)}</b><small>${a.min} ${t('minRead')} · ${L(CATS[a.cat])}</small></div><div class="chev">${ar?'‹':'›'}</div></div>`).join('')}</div>
+  </div>`;});
+window.setCat=c=>{learnCat=c;render();};
+window.openArticle=function(id){const a=ART.find(x=>x.id===id);if(!a)return;go('article',{a});};
+route('article',(n,o)=>{const a=o.a;if(!a)return navTab('learn');n.innerHTML=`${topbar(null,null,{back:true,rawTitle:L(a.t)})}<div class="content"><div class="card"><div style="font-size:40px;text-align:center;margin-bottom:8px">${a.icon}</div><p style="font-size:15px;line-height:1.8;white-space:pre-wrap;margin:0">${L(a.body)}</p></div><div class="disc-note">${isAr()?'محتوى تثقيفي عام — ليس نصيحة طبية فردية. استشر فريقك.':'General education — not individual medical advice. Consult your team.'}</div></div>`;});
+
+/* ---- PATHWAYS ---- */
+route('pathways',(n)=>{const ar=isAr();n.innerHTML=`${topbar(null,null,{back:true,rawTitle:t('pathwaysT'),rawSub:t('pathwaysSub')})}<div class="content">
+   <div class="disc-note">${ar?'المسارات تتكامل لا تتنافس، ونمط الحياة أساس تحتها جميعًا. يختار طبيبك ما يناسبك.':'The pathways combine rather than compete, and lifestyle is the foundation under all of them. Your doctor chooses what fits you.'}</div>
+   <div class="grid2">${PATHWAYS.map(p=>`<div class="pathcard" onclick="openPathway('${p.id}')" style="background:linear-gradient(150deg,${p.color}22,transparent)"><div class="pi">${p.icon}</div><b>${L(p.n)}</b><small>${L(p.d)}</small></div>`).join('')}</div>
+  </div>`;});
+window.openPathway=function(id){go('pathway',{id});};
+route('pathway',(n,o)=>{const ar=isAr();const p=pathwayById(o.id);if(!p)return go('pathways');const isMine=S.user.pathway===p.id;const relArt={diet:['diet','activity'],medical:['meds','inject'],endoscopic:['endo','postop'],surgery:['surg','postop']}[p.id]||[];
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:L(p.n)})}<div class="content">
+   <div class="card" style="background:linear-gradient(150deg,${p.color}22,transparent)"><div style="font-size:34px">${p.icon}</div><p style="font-size:14.5px;line-height:1.7;margin:10px 0 0">${L(p.d)}</p></div>
+   <button class="btn ${isMine?'btn-ghost':'btn-primary'}" onclick="setMyPathway('${p.id}')">${isMine?(ar?'✓ مساري الحالي':'✓ My current pathway'):(ar?'اجعله مساري':'Make this my pathway')}</button>
+   <div class="section-title">${ar?'خطوات هذا المسار':'Steps in this pathway'}</div>
+   <div class="card">${p.steps.map((s,i)=>`<div class="step"><div class="num">${i+1}</div><div class="st">${L(s)}</div></div>`).join('')}</div>
+   ${(p.id==='endoscopic'||p.id==='surgery')?`<button class="btn btn-ghost" onclick="go('journey')">🍽️ ${ar?'رحلة الغذاء والفيتامينات':'Diet phases & vitamins'}</button>`:''}
+   ${p.id==='medical'?`<button class="btn btn-ghost" onclick="go('treatment')">💊 ${ar?'قائمة أدويتي':'My medication list'}</button>`:''}
+   <div class="section-title">${ar?'اقرأ المزيد':'Read more'}</div>
+   <div class="card">${relArt.map(id=>{const a=ART.find(x=>x.id===id);return a?`<div class="li" onclick="openArticle('${a.id}')"><div class="ic">${a.icon}</div><div class="tx"><b>${L(a.t)}</b><small>${a.min} ${t('minRead')}</small></div><div class="chev">${ar?'‹':'›'}</div></div>`:'';}).join('')}</div>
+   <div class="disc-note">${ar?'محتوى تثقيفي عام. قرارات العلاج تُتّخذ مع فريق مختص.':'General education. Treatment decisions are made with a specialist team.'}</div>
+  </div>`;});
+window.setMyPathway=(id)=>{S.user.pathway=id;if((id==='endoscopic'||id==='surgery')&&!S.procedure.type)S.procedure.type=id;save();toast(isAr()?'تم تحديث مسارك':'Pathway updated');render();};
+
+/* ---- JOURNEY: diet phases & vitamins ---- */
+route('journey',(n)=>{const ar=isAr();const today=todayKey();const takenToday=S.vits[today]||[];
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'الغذاء والفيتامينات':'Diet phases & vitamins'})}<div class="content">
+   <div class="disc-note">${ar?'المدد الزمنية تقريبية ويحدّدها فريقك. تقدّم للمرحلة التالية فقط بموافقتهم.':'Timings are approximate and set by your team. Move to the next stage only with their approval.'}</div>
+   <div class="section-title">${ar?'مرحلتي الحالية':'My current stage'}</div>
+   <div class="card"><div class="chips">${DIETPHASES.map(d=>`<button class="chip ${S.procedure.phase===d.k?'on':''}" onclick="setPhase('${d.k}')">${L(d.n)}</button>`).join('')}</div>
+     ${S.procedure.phase?`<p class="muted" style="font-size:13px;margin:12px 2px 0">${L((DIETPHASES.find(d=>d.k===S.procedure.phase)||{d:['','']}).d)}</p>`:''}</div>
+   <div class="section-title">${ar?'مراحل الغذاء':'The diet stages'}</div>
+   <div class="card">${DIETPHASES.map((d,i)=>`<div class="step"><div class="num">${i+1}</div><div class="st"><b>${L(d.n)}</b><br><span class="muted" style="font-size:12.5px">${L(d.d)}</span></div></div>`).join('')}</div>
+   <div class="section-title">${ar?'فيتامينات اليوم':"Today's vitamins"}</div>
+   <div class="card"><div class="chips">${VITS.map(v=>`<button class="chip ${takenToday.includes(v.id)?'on':''}" onclick="toggleVit('${v.id}')">${takenToday.includes(v.id)?'✓ ':''}${L(v.n)}</button>`).join('')}</div>
+     <div class="disc-note" style="margin-top:12px">${ar?'الفيتامينات بعد جراحة السمنة مدى الحياة. اتبع وصفة فريقك — هذه قائمة تذكير عامة.':'Vitamins after bariatric surgery are lifelong. Follow your team\'s prescription — this is a general reminder list.'}</div></div>
+  </div>`;});
+window.setPhase=(k)=>{S.procedure.phase=S.procedure.phase===k?'':k;save();render();};
+window.toggleVit=(id)=>{const k=todayKey();const arr=S.vits[k]||[];const i=arr.indexOf(id);if(i<0)arr.push(id);else arr.splice(i,1);S.vits[k]=arr;save();render();};
+
+/* ---- MORE tab ---- */
+route('more',(n)=>{const ar=isAr();n.innerHTML=`${topbar('moreT')}<div class="content">
+   <div class="card" style="text-align:center;padding:22px"><div class="logo-mark" style="width:64px;height:64px;font-size:30px;margin:0 auto 10px">ق</div><b style="font-size:16px">${S.user.name?esc(S.user.name):'Qawam'}</b><div class="muted" style="font-size:12.5px">${t('tagline')}</div></div>
+   <div class="card">
+     ${mLi('🧰',t('toolsT'),'go(\'tools\')')}
+     ${mLi('🔔',ar?'التذكيرات':'Reminders','go(\'reminders\')')}
+     ${mLi('🧭',t('pathwaysT'),'go(\'pathways\')')}
+     ${mLi('💊',ar?'علاجي':'My treatment','go(\'treatment\')')}
+     ${mLi('🧪',ar?'تحاليل المتابعة':'Follow-up labs','go(\'labs\')')}
+     ${mLi('📤',t('share'),'doShare()')}
+   </div>
+   <div class="section-title">${ar?'ملفي':'My profile'}</div>
+   <div class="card">${mLi('👤',ar?'تعديل التفاصيل':'Edit my details','go(\'profile\')')}</div>
+   <div class="section-title">${ar?'الإعدادات':'Settings'}</div>
+   <div class="card">
+     ${mLi('🌓',t('theme'),'toggleTheme()',S.prefs.theme==='light'?(ar?'فاتح':'Light'):(ar?'داكن':'Dark'))}
+     ${mLi('🌐',t('language'),'toggleLangQuick()',isAr()?'العربية':'English')}
+     ${mLi('ℹ️',t('about'),'go(\'about\')')}
+   </div>
+   <div class="section-title">${ar?'البيانات':'Data'}</div>
+   <div class="card">
+     ${mLi('⬇️',t('export'),'doExport()')}
+     ${mLi('🗑️',t('del'),'confirmDelete()')}
+   </div>
+   <p class="center muted" style="font-size:11px;margin-top:6px">Qawam · قوام — Saudi Gastroenterology Association</p>
+  </div>`;});
+function mLi(ic,lab,onclick,right){return `<div class="li" style="cursor:pointer" onclick="${onclick}"><div class="ic">${ic}</div><div class="tx"><b>${lab}</b></div>${right?`<small class="muted">${right}</small>`:''}<div class="chev">${isAr()?'‹':'›'}</div></div>`;}
+window.toggleTheme=()=>{S.prefs.theme=S.prefs.theme==='light'?'dark':'light';save();render();};
+
+route('treatment',(n)=>{const ar=isAr();n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'علاجي':'My treatment'})}<div class="content">
+   <div class="section-title">${ar?'أدوية إنقاص الوزن':'Weight-loss medications'}</div>
+   <div class="card">${MEDS.map(m=>`<div class="li"><div class="ic">💊</div><div class="tx"><b>${L(m.n)}</b><small>${L(m.note)}</small></div><button class="chip ${S.meds.includes(m.id)?'on':''}" onclick="toggleMed('${m.id}')">${S.meds.includes(m.id)?(ar?'مفعّل':'On'):(ar?'إضافة':'Add')}</button></div>`).join('')}</div>
+   <button class="btn btn-primary" onclick="go('regimen')">💊 ${ar?'الجرعات والتذكيرات':'Doses & reminders'}</button>
+   <div class="disc-note">${ar?'سجّل ما وصفه طبيبك فقط. لا تبدأ أو توقف أو تغيّر جرعة دون استشارته. هذا التطبيق لا يقدّم جرعات.':'Record only what your doctor prescribed. Do not start, stop or change a dose without them. This app does not give doses.'}</div>
+   ${(S.user.pathway==='endoscopic'||S.user.pathway==='surgery')?`<button class="btn btn-ghost" onclick="go('journey')">🍽️ ${ar?'رحلة الغذاء والفيتامينات':'Diet phases & vitamins'}</button>`:''}
+  </div>`;});
+window.toggleMed=(id)=>{const i=S.meds.indexOf(id);if(i<0)S.meds.push(id);else S.meds.splice(i,1);save();render();};
+
+route('about',(n)=>{n.innerHTML=`${topbar(null,null,{back:true,rawTitle:t('about')})}<div class="content"><div class="card"><p style="font-size:14px;line-height:1.75;white-space:pre-wrap;margin:0">${t('consentBody')}</p></div><p class="center muted" style="font-size:11px">Qawam · قوام — Saudi Gastroenterology Association · v1</p></div>`;});
+
+/* ---- share / export / delete ---- */
+window.doShare=function(){const ar=isAr();const b=bmiVal();const tb=tbwl(),ew=ewl();const w=latestWeight();const wa=S.waists.length?S.waists[S.waists.length-1]:null;const my=pathwayById(S.user.pathway);
+ const lines=[
+  (ar?'ملخّص قوام (للقراءة فقط):':'Qawam summary (read-only):'),
+  (ar?'الاسم: ':'Name: ')+(S.user.name||'—'),
+  (ar?'المسار: ':'Pathway: ')+(my?L(my.n):'—'),
+  (ar?'الوزن الحالي: ':'Current weight: ')+(w!=null?w+' kg':'—'),
+  'BMI: '+(b!=null?b.toFixed(1)+' ('+L(bmiCat(b).l)+')':'—'),
+  (ar?'نقص الوزن الكلي: ':'Total weight loss: ')+(tb!=null?tb.toFixed(1)+'%':'—'),
+  (ar?'نقص الوزن الزائد: ':'Excess weight loss: ')+(ew!=null?Math.round(ew)+'%':'—'),
+  (ar?'الخصر: ':'Waist: ')+(wa?wa.cm+' cm':'—'),
+  (ar?'أدوية مفعّلة: ':'Active meds: ')+(S.meds.length?S.meds.map(id=>L((MEDS.find(m=>m.id===id)||{n:['','']}).n)).join(', '):'—'),
+  (ar?'مرحلة الغذاء: ':'Diet stage: ')+(S.procedure.phase?L((DIETPHASES.find(d=>d.k===S.procedure.phase)||{n:['','']}).n):'—'),
+  (ar?'سجلات آخر ١٤ يومًا: ':'Logs (14d): ')+allEvents().filter(l=>daysAgo(l.t.slice(0,10))<=14).length
+ ].join('\n');
+ openSheet(`<h2 style="margin:4px 0 12px">📤 ${t('share')}</h2><div class="card" style="background:var(--card2)"><pre style="white-space:pre-wrap;font-size:12.5px;margin:0;font-family:inherit;color:var(--txt)">${esc(lines)}</pre></div>
+  <button class="btn btn-primary" style="margin-top:14px" onclick="copyShare()">${ar?'نسخ الملخّص':'Copy summary'}</button>
+  ${navigator.share?`<button class="btn btn-ghost" style="margin-top:10px" onclick="navigator.share({title:'Qawam',text:document.getElementById('shareTxt').value})">${ar?'مشاركة':'Share'}</button>`:''}
+  <textarea id="shareTxt" style="position:absolute;left:-9999px">${esc(lines)}</textarea>
+  <div class="disc-note" style="margin-top:12px">${ar?'بيانات يبلّغ عنها المريض، وصفية فقط، ليست تشخيصًا — كمحفّز للنقاش أثناء الزيارة.':'Patient-reported, descriptive only, not a diagnosis — a conversation aid for your visit.'}</div>`);};
+window.copyShare=()=>{const v=$('#shareTxt').value;if(navigator.clipboard)navigator.clipboard.writeText(v);toast(isAr()?'نُسخ':'Copied');};
+window.doExport=()=>{const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='qawam-'+todayKey()+'.json';a.click();toast(isAr()?'تم التصدير':'Exported');};
+window.confirmDelete=()=>{openSheet(`<div style="text-align:center;font-size:40px">⚠️</div><h2 style="text-align:center;font-size:18px">${t('del')}</h2><p class="muted center" style="font-size:13px">${isAr()?'سيُحذف كل ما سجّلته على هذا الجهاز. لا يمكن التراجع.':'This permanently clears everything you logged on this device.'}</p><button class="btn btn-danger" onclick="reallyDelete()">${isAr()?'حذف نهائي':'Delete everything'}</button><button class="btn btn-ghost" style="margin-top:10px" onclick="closeSheet()">${t('cancel')}</button>`);};
+window.reallyDelete=()=>{const lang=S.lang,theme=S.prefs.theme;S=blank();S.lang=lang;S.onboarded=true;S.prefs.theme=theme;save();closeSheet();toast(isAr()?'تم الحذف':'Deleted');navTab('today');};
+
+/* ============================================================ TOOLS ============================================================ */
+const ACTF={sed:1.2,light:1.375,mod:1.55,high:1.725,ath:1.9};
+const METS=[['Walking (moderate)','مشي معتدل',3.5],['Brisk walking','مشي سريع',4.3],['Running','جري',9.0],['Cycling','دراجة',7.0],['Swimming','سباحة',6.0],['Gym / weights','نادي / أوزان',5.0],['Household chores','أعمال منزلية',3.3],['Sports','رياضة',7.0]];
+function bmr(kg,cm,age,sex){if(!kg||!cm||!age)return null;const base=10*kg+6.25*cm-5*age;return sex==='male'?base+5:sex==='female'?base-161:base-78;}
+function fmt(n){return n==null?'—':Math.round(n).toLocaleString(isAr()?'ar-SA':'en-US');}
+
+route('tools',(n)=>{const ar=isAr();const tools=[
+   ['calorie','🔥',['Energy & calories','الطاقة والسعرات'],['Estimate your daily energy use','قدّر استهلاكك اليومي للطاقة']],
+   ['healthyw','⚖️',['Healthy weight range','نطاق الوزن الصحي'],['For your height','حسب طولك']],
+   ['w2h','📐',['Waist-to-height ratio','نسبة الخصر للطول'],['A simple risk indicator','مؤشر خطر بسيط']],
+   ['projector','🎯',['Goal projector','متوقّع الهدف'],['A realistic timeline','جدول زمني واقعي']],
+   ['targets','🥩',['Protein & fluid targets','أهداف البروتين والسوائل'],['General daily reference','مرجع يومي عام']],
+   ['burn','⚡',['Activity calorie burn','سعرات النشاط'],['Estimate kcal burned','قدّر السعرات المحروقة']],
+   ['protein','💪',['Weekly protein tracker','متتبّع البروتين'],['Log & hit your target','سجّل وحقّق هدفك']],
+   ['plate','🍽️',['The balanced plate','الطبق المتوازن'],['A simple portion guide','دليل حصص بسيط']]
+ ];
+  n.innerHTML=`${topbar('toolsT','toolsSub',{back:true})}<div class="content">
+   <div class="card tap" onclick="go('regimen')" style="background:linear-gradient(140deg,var(--accent-d),transparent)"><div class="between"><div><b style="font-size:15px">💊 ${ar?'أدويتي والجرعات':'My medications & doses'}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${ar?'سجّل ما وصفه طبيبك واضبط تذكيرًا':'Record what your doctor prescribed & set a reminder'}</div></div><div class="chev" style="align-self:center">${ar?'‹':'›'}</div></div></div>
+   <div class="card tap" onclick="go('reminders')"><div class="between"><div><b style="font-size:15px">🔔 ${ar?'التذكيرات':'Reminders'}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${ar?'وزن، دواء، نشاط، ماء، فيتامينات':'Weigh-in, medication, activity, water, vitamins'}</div></div><div class="chev" style="align-self:center">${ar?'‹':'›'}</div></div></div>
+   <div class="section-title">${ar?'الحاسبات':'Calculators'}</div>
+   <div class="grid2">${tools.map(([id,ic,nm,d])=>`<div class="pathcard" onclick="openTool('${id}')"><div class="pi">${ic}</div><b>${L(nm)}</b><small>${L(d)}</small></div>`).join('')}</div>
+   <div class="disc-note">${ar?'الحاسبات تقديرية للتثقيف فقط — ليست وصفة سعرات أو خطة علاجية. لخطة مخصّصة راجع أخصائي التغذية أو طبيبك.':'Calculators are estimates for education only — not a calorie prescription or a treatment plan. For a personalised plan see a dietitian or your doctor.'}</div>
+  </div>`;});
+window.openTool=function(id){const ar=isAr();
+  if(id==='calorie'){const u=S.user;openSheet(`<h2 style="margin:4px 0 10px">🔥 ${ar?'الطاقة والسعرات':'Energy & calories'}</h2>
+    <div class="grid2"><div class="field"><label>${t('sex')}</label><div class="chips" id="c_sx">${[['male',t('male')],['female',t('female')]].map(([v,l])=>`<button class="chip ${u.sex===v?'on':''}" data-v="${v}" onclick="pick('c_sx',this)">${l}</button>`).join('')}</div></div>
+    <div class="field"><label>${t('age')}</label><input class="input" id="c_ag" inputmode="numeric" value="${u.age||''}" placeholder="40"></div></div>
+    <div class="grid2"><div class="field"><label>${t('height')}</label><input class="input" id="c_ht" inputmode="numeric" value="${u.heightCm||''}" placeholder="170"></div>
+    <div class="field"><label>${ar?'الوزن (كجم)':'Weight (kg)'}</label><input class="input" id="c_wt" inputmode="decimal" value="${latestWeight()||''}" placeholder="90"></div></div>
+    <div class="field"><label>${t('activity')}</label><div class="chips" id="c_ac">${[['sed','actSed'],['light','actLight'],['mod','actMod'],['high','actHigh'],['ath','actAth']].map(([v,l])=>`<button class="chip ${u.activity===v?'on':''}" data-v="${v}" onclick="pick('c_ac',this)">${t(l)}</button>`).join('')}</div></div>
+    <button class="btn btn-primary" onclick="calcCalorie()">${t('calc')}</button>
+    <div id="c_out" style="margin-top:14px"></div>`);if(u.sex)$('#c_sx').dataset.val=u.sex;if(u.activity)$('#c_ac').dataset.val=u.activity;}
+  else if(id==='healthyw'){openSheet(`<h2 style="margin:4px 0 10px">⚖️ ${ar?'نطاق الوزن الصحي':'Healthy weight range'}</h2>
+    <div class="field"><label>${t('height')}</label><input class="input" id="h_ht" inputmode="numeric" value="${S.user.heightCm||''}" placeholder="170"></div>
+    <button class="btn btn-primary" onclick="calcHealthy()">${t('calc')}</button><div id="h_out" style="margin-top:14px"></div>`);}
+  else if(id==='w2h'){const wa=S.waists.length?S.waists[S.waists.length-1].cm:'';openSheet(`<h2 style="margin:4px 0 10px">📐 ${ar?'نسبة الخصر للطول':'Waist-to-height ratio'}</h2>
+    <div class="grid2"><div class="field"><label>${ar?'الخصر (سم)':'Waist (cm)'}</label><input class="input" id="r_wc" inputmode="decimal" value="${wa}" placeholder="94"></div>
+    <div class="field"><label>${t('height')}</label><input class="input" id="r_ht" inputmode="numeric" value="${S.user.heightCm||''}" placeholder="170"></div></div>
+    <button class="btn btn-primary" onclick="calcW2H()">${t('calc')}</button><div id="r_out" style="margin-top:14px"></div>`);}
+  else if(id==='projector'){const cur=latestWeight()||'';openSheet(`<h2 style="margin:4px 0 10px">🎯 ${ar?'متوقّع الهدف':'Goal projector'}</h2>
+    <div class="grid2"><div class="field"><label>${ar?'الوزن الحالي (كجم)':'Current weight (kg)'}</label><input class="input" id="p_cur" inputmode="decimal" value="${cur}" placeholder="95"></div>
+    <div class="field"><label>${t('targetWeight')}</label><input class="input" id="p_tgt" inputmode="decimal" value="${S.user.targetWeight||''}" placeholder="80"></div></div>
+    <div class="field"><label>${ar?'الوتيرة':'Pace'}</label><div class="chips" id="p_pace">${[[0.25,ar?'٠٫٢٥ كجم/أسبوع':'0.25 kg/wk'],[0.5,ar?'٠٫٥ كجم/أسبوع':'0.5 kg/wk'],[0.75,ar?'٠٫٧٥ كجم/أسبوع':'0.75 kg/wk']].map(([v,l])=>`<button class="chip ${S.prefs.pace===v?'on':''}" data-v="${v}" onclick="pick('p_pace',this)">${l}</button>`).join('')}</div></div>
+    <button class="btn btn-primary" onclick="calcProjector()">${t('calc')}</button><div id="p_out" style="margin-top:14px"></div>`);$('#p_pace').dataset.val=S.prefs.pace;}
+  else if(id==='targets'){const cur=latestWeight()||'';openSheet(`<h2 style="margin:4px 0 10px">🥩 ${ar?'أهداف البروتين والسوائل':'Protein & fluid targets'}</h2>
+    <div class="field"><label>${ar?'الوزن (كجم)':'Weight (kg)'}</label><input class="input" id="tg_wt" inputmode="decimal" value="${cur}" placeholder="90"></div>
+    <button class="btn btn-primary" onclick="calcTargets()">${t('calc')}</button><div id="tg_out" style="margin-top:14px"></div>`);}
+  else if(id==='protein'){go('protein');return;}
+  else if(id==='burn'){const cur=latestWeight()||'';openSheet(`<h2 style="margin:4px 0 10px">⚡ ${ar?'سعرات النشاط':'Activity calorie burn'}</h2>
+    <div class="field"><label>${ar?'النشاط':'Activity'}</label><div class="chips" id="bn_act">${METS.map((m,i)=>`<button class="chip" data-v="${i}" onclick="pick('bn_act',this)">${L(m)}</button>`).join('')}</div></div>
+    <div class="grid2"><div class="field"><label>${ar?'الدقائق':'Minutes'}</label><input class="input" id="bn_min" inputmode="numeric" placeholder="30"></div>
+    <div class="field"><label>${ar?'الوزن (كجم)':'Weight (kg)'}</label><input class="input" id="bn_wt" inputmode="decimal" value="${cur}" placeholder="90"></div></div>
+    <button class="btn btn-primary" onclick="calcBurn()">${t('calc')}</button><div id="bn_out" style="margin-top:14px"></div>`);}
+  else if(id==='plate'){openSheet(`<h2 style="margin:4px 0 12px">🍽️ ${ar?'الطبق المتوازن':'The balanced plate'}</h2>
+    <div class="card" style="background:var(--card2)"><div style="display:flex;gap:10px;margin-bottom:12px"><div style="flex:2;background:var(--accent);border-radius:10px;padding:14px 8px;text-align:center;color:#fff;font-weight:700;font-size:12.5px">½ ${ar?'خضار':'Vegetables'}</div><div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="background:var(--accent2);border-radius:10px;padding:8px;text-align:center;color:#fff;font-weight:700;font-size:12.5px">¼ ${ar?'بروتين':'Protein'}</div><div style="background:var(--amber,#F59E0B);border-radius:10px;padding:8px;text-align:center;color:#fff;font-weight:700;font-size:12.5px">¼ ${ar?'حبوب':'Grains'}</div></div></div>
+    <p class="muted" style="font-size:13px;line-height:1.7;margin:0">${ar?'اجعل نصف الطبق خضارًا، وربعه بروتينًا خالي الدهن، وربعه حبوبًا كاملة. أضِف قليلًا من الدهون الصحية، واختر الماء شرابًا.':'Fill half your plate with vegetables, a quarter with lean protein, and a quarter with whole grains. Add a little healthy fat, and make water your drink.'}</p></div>
+    <div class="disc-note">${ar?'دليل عام للحصص — عدّله مع فريقك، خاصة بعد الإجراءات حيث يأتي البروتين أولًا.':'A general portion guide — adapt it with your team, especially after procedures where protein comes first.'}</div>`);}
+};
+window.calcCalorie=()=>{const sx=$('#c_sx').dataset.val||S.user.sex;const age=parseInt($('#c_ag').value,10);const ht=parseFloat($('#c_ht').value);const wt=parseFloat($('#c_wt').value);const ac=$('#c_ac').dataset.val||'sed';const ar=isAr();
+  const b=bmr(wt,ht,age,sx);if(b==null)return toast(ar?'أكمل البيانات':'Fill in the details');const tdee=b*(ACTF[ac]||1.2);const floor=sx==='female'?1200:1500;const d1=Math.max(tdee-500,floor),d2=Math.max(tdee-750,floor);
+  $('#c_out').innerHTML=`<div class="grid2"><div class="kpi"><div class="v" style="color:var(--accent2)">${fmt(b)}</div><div class="l">${ar?'الأيض الأساسي (BMR)':'BMR (at rest)'}</div></div><div class="kpi"><div class="v" style="color:var(--accent)">${fmt(tdee)}</div><div class="l">${ar?'الطاقة اليومية (صيانة)':'daily energy (maintenance)'}</div></div></div>
+   <div class="card" style="margin-top:11px"><div class="section-title" style="margin:0 0 8px">${ar?'مثال لعجز لطيف':'Example of a gentle deficit'}</div>
+   <div class="li" style="border:none;padding:6px 2px"><div class="tx"><b>${fmt(d1)} ${ar?'سعرة/يوم':'kcal/day'}</b><small>${ar?'≈ ٠٫٥ كجم/أسبوع':'≈ 0.5 kg/week'}</small></div></div>
+   <div class="li" style="border:none;padding:6px 2px"><div class="tx"><b>${fmt(d2)} ${ar?'سعرة/يوم':'kcal/day'}</b><small>${ar?'≈ ٠٫٧٥ كجم/أسبوع':'≈ 0.75 kg/week'}</small></div></div></div>
+   <div class="disc-note" style="margin-top:10px">${ar?'تقدير تثقيفي فقط، وليس وصفة سعرات. لا تنزل تحت حدّ آمن دون إشراف. لخطة مخصّصة راجع أخصائي التغذية.':'An educational estimate only, not a calorie prescription. Do not go below a safe floor without supervision. For a personalised plan see a dietitian.'}</div>`;};
+window.calcHealthy=()=>{const ht=parseFloat($('#h_ht').value);const ar=isAr();if(!ht)return toast(ar?'أدخل الطول':'Enter height');const m=ht/100;const lo=18.5*m*m,hi=24.9*m*m;const w=latestWeight();let where='';if(w){const b=w/(m*m);where=`<div class="disc-note" style="margin-top:10px">${ar?'وزنك الحالي ':'Your current weight '}<b>${w} kg</b> — ${b<18.5?(ar?'تحت النطاق':'below range'):b<25?(ar?'داخل النطاق ✓':'within range ✓'):(ar?'فوق النطاق بـ '+ (w-hi).toFixed(1)+' كجم':(w-hi).toFixed(1)+' kg above range')}.</div>`;}
+  $('#h_out').innerHTML=`<div class="card center"><div class="section-title" style="margin:0 0 6px">${ar?'نطاق صحي لطولك':'Healthy range for your height'}</div><div style="font-size:26px;font-weight:800;color:var(--accent)">${lo.toFixed(0)}–${hi.toFixed(0)} kg</div><small class="muted">${ar?'يقابل مؤشر كتلة ١٨٫٥–٢٥':'corresponds to BMI 18.5–25'}</small></div>${where}
+   <div class="disc-note" style="margin-top:10px">${ar?'النطاق دليل عام؛ لا يقيس العضلات أو توزيع الدهون.':'A general guide; it does not measure muscle or fat distribution.'}</div>`;};
+window.calcW2H=()=>{const wc=parseFloat($('#r_wc').value);const ht=parseFloat($('#r_ht').value);const ar=isAr();if(!wc||!ht)return toast(ar?'أكمل البيانات':'Fill in both');const r=wc/ht;const band=r<0.5?[ar?'أقل خطرًا':'lower risk','var(--good)']:r<0.6?[ar?'خطر متزايد':'increased risk','var(--warn)']:[ar?'خطر أعلى':'higher risk','var(--bad)'];
+  $('#r_out').innerHTML=`<div class="card center"><div style="font-size:30px;font-weight:800;color:${band[1]}">${r.toFixed(2)}</div><div style="color:${band[1]};font-weight:700;font-size:13px">${band[0]}</div><small class="muted">${ar?'إبقاء الخصر أقل من نصف الطول هدف شائع':'keeping waist under half your height is a common aim'}</small></div>
+   <div class="disc-note" style="margin-top:10px">${ar?'مؤشر وصفي بسيط — ناقشه مع فريقك.':'A simple descriptive indicator — discuss it with your team.'}</div>`;};
+window.calcProjector=()=>{const cur=parseFloat($('#p_cur').value);const tgt=parseFloat($('#p_tgt').value);const pace=parseFloat($('#p_pace').dataset.val||0.5);const ar=isAr();if(!cur||!tgt)return toast(ar?'أكمل البيانات':'Fill in both');S.prefs.pace=pace;save();
+  if(tgt>=cur){$('#p_out').innerHTML=`<div class="disc-note">${ar?'هدفك يساوي وزنك الحالي أو أعلى منه — عدّل الهدف.':'Your goal is at or above your current weight — adjust the target.'}</div>`;return;}
+  const wks=Math.ceil((cur-tgt)/pace);const dt=new Date();dt.setDate(dt.getDate()+wks*7);const dstr=dt.toLocaleDateString(ar?'ar-SA':'en-GB',{month:'long',year:'numeric'});
+  $('#p_out').innerHTML=`<div class="grid2"><div class="kpi"><div class="v" style="color:var(--accent)">${(cur-tgt).toFixed(1)}<span style="font-size:12px"> kg</span></div><div class="l">${ar?'لتفقده':'to lose'}</div></div><div class="kpi"><div class="v">${wks}<span style="font-size:12px"> ${ar?'أسبوع':'wk'}</span></div><div class="l">${ar?'بالوتيرة المختارة':'at chosen pace'}</div></div></div>
+   <div class="card center" style="margin-top:11px"><div class="section-title" style="margin:0 0 4px">${ar?'وصول تقريبي':'Approximate arrival'}</div><b style="font-size:20px;color:var(--accent2)">${dstr}</b></div>
+   <div class="disc-note" style="margin-top:10px">${ar?'تقدير خطّي؛ التقدّم الحقيقي يتذبذب وتحدث فترات ثبات — وهذا طبيعي.':'A straight-line estimate; real progress fluctuates and plateaus happen — that is normal.'}</div>`;};
+window.calcTargets=()=>{const wt=parseFloat($('#tg_wt').value);const ar=isAr();if(!wt)return toast(ar?'أدخل الوزن':'Enter weight');const p1=Math.round(wt*1.0),p2=Math.round(wt*1.5),fl=Math.round(wt*30/1000*10)/10;const surg=S.user.pathway==='surgery'||S.user.pathway==='endoscopic';
+  $('#tg_out').innerHTML=`<div class="card"><div class="li" style="border-bottom:1px solid var(--line)"><div class="ic">🥩</div><div class="tx"><b>${ar?'البروتين':'Protein'}</b><small>${surg?(ar?'شائع بعد جراحة السمنة: ٦٠–٨٠ جم/يوم':'common after bariatric surgery: 60–80 g/day'):(ar?'عام: ~':'general: ~')+' '+p1+'–'+p2+' '+(ar?'جم/يوم':'g/day')}</small></div></div>
+   <div class="li"><div class="ic">💧</div><div class="tx"><b>${ar?'السوائل':'Fluids'}</b><small>${ar?'~':''}${fl} ${ar?'لتر/يوم تقريبًا (≈٣٠ مل/كجم)':'L/day approx (≈30 ml/kg)'}</small></div></div></div>
+   <div class="disc-note" style="margin-top:10px">${ar?'نطاقات مرجعية عامة — احتياجك يعتمد على مسارك وصحتك. أكّدها مع فريقك أو أخصائي التغذية.':'General reference ranges — your needs depend on your pathway and health. Confirm them with your team or dietitian.'}</div>`;};
+
+window.calcBurn=()=>{const ar=isAr();const ai=$('#bn_act').dataset.val;const min=parseFloat($('#bn_min').value);const wt=parseFloat($('#bn_wt').value);if(ai==null||!min||!wt)return toast(ar?'أكمل البيانات':'Fill in the details');const met=METS[+ai][2];const kcal=met*3.5*wt/200*min;
+  $('#bn_out').innerHTML=`<div class="card center"><div style="font-size:30px;font-weight:800;color:var(--accent)">${fmt(kcal)}<span style="font-size:14px"> ${ar?'سعرة':'kcal'}</span></div><small class="muted">${L(METS[+ai])} · ${min} ${ar?'دقيقة':'min'}</small></div>
+   <div class="disc-note" style="margin-top:10px">${ar?'تقدير تقريبي يعتمد على متوسطات؛ الحرق الفعلي يختلف بين الأشخاص.':'A rough estimate based on averages; actual burn varies between people.'}</div>`;};
+
+/* ---- WEEKLY PROTEIN TRACKER ---- */
+function proteinTarget(){const w=latestWeight();if(!w)return 70;return (S.user.pathway==='surgery'||S.user.pathway==='endoscopic')?70:Math.round(w*1.2);}
+route('protein',(n)=>{const ar=isAr();const tgt=proteinTarget();const days=lastNDays(7);const vals=days.map(d=>{const e=S.protein.find(p=>p.date===d);return e?e.g:0;});const today=S.protein.find(p=>p.date===todayKey());const wkTot=vals.reduce((a,b)=>a+b,0);const hit=vals.filter(v=>v>=tgt).length;
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'متتبّع البروتين':'Protein tracker'})}<div class="content">
+   <div class="card"><div class="between"><div><b>${ar?'هدف يومي مرجعي':'Daily reference target'}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'يمكن تعديله مع فريقك':'adjust it with your team'}</div></div><b style="font-size:24px;color:var(--accent)">${tgt}<span style="font-size:12px"> g</span></b></div></div>
+   <div class="card"><div class="section-title" style="margin:0 0 6px">${ar?'اليوم':'Today'}</div><div class="row" style="gap:10px"><input class="input" id="pr_g" inputmode="numeric" placeholder="${ar?'جرامات البروتين':'grams of protein'}" value="${today?today.g:''}" style="flex:1"><button class="btn btn-primary btn-sm" onclick="saveProtein()">${t('save')}</button></div>
+     <div class="pbar" style="margin-top:12px"><i style="width:${Math.min(100,(today?today.g:0)/tgt*100)}%"></i></div></div>
+   <div class="card"><div class="between" style="margin-bottom:6px"><b>${ar?'آخر ٧ أيام':'Last 7 days'}</b><small class="muted">${hit}/7 ${ar?'يوم حقّق الهدف':'days on target'}</small></div>${barChart(vals,days.map(d=>fmtDate(d+'T00:00')),'var(--accent)',tgt)}<div class="center muted" style="font-size:12px;margin-top:6px">${ar?'إجمالي الأسبوع':'week total'}: <b style="color:var(--txt)">${wkTot} g</b></div></div>
+   <div class="disc-note">${ar?'هدف مرجعي عام مبني على وزنك ومسارك — أكّده مع أخصائي التغذية.':'A general reference target based on your weight and pathway — confirm it with your dietitian.'}</div>
+  </div>`;});
+window.saveProtein=()=>{const g=parseInt($('#pr_g').value,10);if(isNaN(g))return toast(isAr()?'أدخل رقمًا':'Enter a number');const k=todayKey();S.protein=S.protein.filter(p=>p.date!==k);S.protein.push({date:k,g});save();toast(t('saved'));render();};
+
+/* ---- MEDICATION REGIMEN (patient-entered doses) ---- */
+route('regimen',(n)=>{const ar=isAr();n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'أدويتي والجرعات':'My medications & doses'})}<div class="content">
+   <div class="disc-note">${ar?'أدخل ما وصفه لك طبيبك تمامًا. قوام لا يقترح جرعات ولا يغيّرها — إنه مجرد سجل وتذكير.':'Enter exactly what your doctor prescribed. Qawam does not suggest or change doses — it is only a record and reminder.'}</div>
+   <button class="btn btn-primary" onclick="openRegimen()">＋ ${ar?'إضافة دواء':'Add a medication'}</button>
+   ${S.regimen.length?`<div class="card">${S.regimen.map(r=>`<div class="li"><div class="ic">💊</div><div class="tx"><b>${esc(r.name)}</b><small>${esc(r.dose||'')}${r.dose&&(r.freq||r.time)?' · ':''}${r.freq==='weekly'?(ar?'أسبوعيًا':'weekly'):r.freq==='daily'?(ar?'يوميًا':'daily'):''}${r.time?' · '+r.time:''}${r.remind?' · 🔔':''}</small></div><button class="chip" onclick="delRegimen('${r.id}')">${t('remove')}</button></div>`).join('')}</div>`:`<div class="card center" style="padding:26px"><p class="muted">${ar?'لا أدوية بعد.':'No medications yet.'}</p></div>`}
+  </div>`;});
+window.openRegimen=()=>{const ar=isAr();openSheet(`<h2 style="margin:4px 0 12px">💊 ${ar?'إضافة دواء':'Add a medication'}</h2>
+  <div class="field"><label>${ar?'الدواء':'Medication'}</label><div class="chips" id="rg_med">${MEDS.map(m=>`<button class="chip" data-v="${m.id}" data-nm="${esc(L(m.n))}" onclick="pick('rg_med',this);document.getElementById('rg_name').value=this.getAttribute('data-nm')">${L(m.n)}</button>`).join('')}</div></div>
+  <div class="field"><label>${ar?'الاسم (أو اكتب دواءً آخر)':'Name (or type another)'}</label><input class="input" id="rg_name" placeholder="${ar?'مثال: سيماجلوتيد':'e.g. Semaglutide'}"></div>
+  <div class="field"><label>${ar?'الجرعة كما وصفها طبيبك':'Dose as prescribed by your doctor'}</label><input class="input" id="rg_dose" placeholder="${ar?'مثال: ١ ملغ':'e.g. 1 mg'}"></div>
+  <div class="grid2"><div class="field"><label>${ar?'التكرار':'Frequency'}</label><div class="chips" id="rg_freq">${[['daily',ar?'يومي':'Daily'],['weekly',ar?'أسبوعي':'Weekly']].map(([v,l])=>`<button class="chip" data-v="${v}" onclick="pick('rg_freq',this)">${l}</button>`).join('')}</div></div>
+  <div class="field"><label>${t('time')}</label><input class="input" id="rg_time" type="time" value="09:00"></div></div>
+  <div class="li" style="border:none;padding:4px 2px"><div class="tx"><b>🔔 ${ar?'ذكّرني':'Remind me'}</b></div><button class="chip on" id="rg_rem" onclick="this.classList.toggle('on')">${ar?'مفعّل':'On'}</button></div>
+  <div class="disc-note" style="margin:8px 0 12px">${ar?'التذكيرات تعمل أثناء فتح التطبيق؛ للتذكير الموثوق أضِفها لتقويم هاتفك من شاشة التذكيرات.':'Reminders fire while the app is open; for reliable alerts add them to your phone calendar from the Reminders screen.'}</div>
+  <button class="btn btn-primary" onclick="saveRegimen()">${t('save')}</button>`);};
+window.saveRegimen=()=>{const ar=isAr();const name=($('#rg_name').value||'').trim();if(!name)return toast(ar?'أدخل اسم الدواء':'Enter a medication name');const freq=$('#rg_freq').dataset.val||'daily';const time=$('#rg_time').value||'09:00';const remind=$('#rg_rem').classList.contains('on');const r={id:rid(),name,dose:($('#rg_dose').value||'').trim(),freq,time,remind};S.regimen.push(r);
+  if(remind){S.reminders.push({id:'rm_'+r.id,kind:'med',label:(ar?'دواء: ':'Medication: ')+name+(r.dose?' ('+r.dose+')':''),time,days:'daily',enabled:true});}
+  save();closeSheet();toast(t('saved'));render();};
+window.delRegimen=(id)=>{S.regimen=S.regimen.filter(r=>r.id!==id);S.reminders=S.reminders.filter(x=>x.id!=='rm_'+id);save();render();};
+
+/* ---- REMINDERS ---- */
+const RKINDS=[['weigh','⚖️',['Weigh-in','قياس الوزن']],['med','💊',['Medication','دواء']],['activity','🏃',['Activity','نشاط']],['water','💧',['Drink water','شرب الماء']],['vitamin','💊',['Vitamins','فيتامينات']]];
+route('reminders',(n)=>{const ar=isAr();const perm=(typeof Notification!=='undefined')?Notification.permission:'unsupported';
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'التذكيرات':'Reminders'})}<div class="content">
+   ${perm==='granted'?`<div class="disc-note" style="border-inline-start:3px solid var(--good)">${ar?'الإشعارات مفعّلة ✓ — ستصلك التنبيهات أثناء فتح قوام.':'Notifications enabled ✓ — you\'ll get alerts while Qawam is open.'}</div>`:perm==='unsupported'?'':`<button class="btn btn-ghost" onclick="askNotif()">🔔 ${ar?'تفعيل الإشعارات':'Enable notifications'}</button>`}
+   <button class="btn btn-primary" onclick="openReminder()">＋ ${ar?'تذكير جديد':'New reminder'}</button>
+   ${S.reminders.length?`<div class="card">${S.reminders.map(r=>{const k=RKINDS.find(x=>x[0]===r.kind)||['','🔔',['','']];return `<div class="li"><div class="ic">${k[1]}</div><div class="tx"><b>${esc(r.label)}</b><small>${r.time} · ${r.days==='daily'?t('everyDay'):r.days}</small></div><button class="chip ${r.enabled?'on':''}" onclick="toggleReminder('${r.id}')">${r.enabled?(ar?'مفعّل':'On'):(ar?'موقف':'Off')}</button><button class="iconbtn" style="margin-inline-start:6px;min-width:34px;height:34px;font-size:14px" onclick="icsReminder('${r.id}')" title="calendar">📅</button><button class="iconbtn" style="margin-inline-start:6px;min-width:34px;height:34px;font-size:14px" onclick="delReminder('${r.id}')">✕</button></div>`;}).join('')}</div>`:`<div class="card center" style="padding:26px">${emptyArt()}<p class="muted">${ar?'لا تذكيرات بعد.':'No reminders yet.'}</p></div>`}
+   <div class="disc-note">${ar?'تعمل التذكيرات داخل التطبيق أثناء فتحه. للتنبيه الموثوق على هاتفك، اضغط 📅 لإضافة التذكير لتقويمك.':'In-app reminders fire while Qawam is open. For a reliable phone alert, tap 📅 to add the reminder to your calendar.'}</div>
+  </div>`;});
+window.askNotif=()=>{if(typeof Notification==='undefined')return;Notification.requestPermission().then(()=>{startReminderTick();render();});};
+window.openReminder=()=>{const ar=isAr();openSheet(`<h2 style="margin:4px 0 12px">🔔 ${ar?'تذكير جديد':'New reminder'}</h2>
+  <div class="field"><label>${ar?'النوع':'Type'}</label><div class="chips" id="rm_kind">${RKINDS.map(k=>`<button class="chip" data-v="${k[0]}" data-lb="${esc(L(k[2]))}" onclick="pick('rm_kind',this);document.getElementById('rm_lb').value=this.getAttribute('data-lb')">${k[1]} ${L(k[2])}</button>`).join('')}</div></div>
+  <div class="field"><label>${ar?'النص':'Label'}</label><input class="input" id="rm_lb" placeholder="${ar?'مثال: قياس الوزن الصباحي':'e.g. Morning weigh-in'}"></div>
+  <div class="grid2"><div class="field"><label>${t('time')}</label><input class="input" id="rm_time" type="time" value="08:00"></div>
+  <div class="field"><label>${ar?'التكرار':'Repeat'}</label><div class="chips" id="rm_days">${[['daily',ar?'كل يوم':'Every day'],['weekdays',ar?'أيام العمل':'Weekdays']].map(([v,l])=>`<button class="chip ${v==='daily'?'on':''}" data-v="${v}" onclick="pick('rm_days',this)">${l}</button>`).join('')}</div></div></div>
+  <button class="btn btn-primary" onclick="saveReminder()">${t('save')}</button>`);$('#rm_days').dataset.val='daily';};
+window.saveReminder=()=>{const ar=isAr();const kind=$('#rm_kind').dataset.val||'med';const label=($('#rm_lb').value||'').trim()||(RKINDS.find(k=>k[0]===kind)?L(RKINDS.find(k=>k[0]===kind)[2]):'Reminder');const time=$('#rm_time').value||'08:00';const days=$('#rm_days').dataset.val||'daily';S.reminders.push({id:rid(),kind,label,time,days,enabled:true});save();closeSheet();if(typeof Notification!=='undefined'&&Notification.permission==='default')askNotif();else startReminderTick();toast(t('saved'));render();};
+window.toggleReminder=(id)=>{const r=S.reminders.find(x=>x.id===id);if(r){r.enabled=!r.enabled;save();render();}};
+window.delReminder=(id)=>{S.reminders=S.reminders.filter(x=>x.id!==id);save();render();};
+window.icsReminder=(id)=>{const r=S.reminders.find(x=>x.id===id);if(!r)return;const [hh,mm]=r.time.split(':');const dt=new Date();dt.setHours(+hh,+mm,0,0);if(dt<new Date())dt.setDate(dt.getDate()+1);const pad=x=>String(x).padStart(2,'0');const stamp=d=>d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+'00Z';const rule=r.days==='weekdays'?'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR':'FREQ=DAILY';
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Qawam//EN','BEGIN:VEVENT','UID:'+r.id+'@qawam','DTSTAMP:'+stamp(new Date()),'DTSTART:'+stamp(dt),'RRULE:'+rule,'SUMMARY:Qawam — '+r.label,'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:'+r.label,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([ics],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='qawam-reminder.ics';a.click();toast(isAr()?'أُضيف للتقويم':'Added to calendar');};
+let _rtick=null,_fired={};
+function startReminderTick(){if(_rtick||typeof Notification==='undefined')return;_rtick=setInterval(()=>{if(Notification.permission!=='granted')return;const now=new Date();const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');const dow=now.getDay();const key=todayKey()+hm;
+   S.reminders.forEach(r=>{if(!r.enabled||r.time!==hm)return;if(r.days==='weekdays'&&(dow===5||dow===6))return;if(_fired[r.id]===key)return;_fired[r.id]=key;try{new Notification('Qawam · قوام',{body:r.label,icon:'qawam-192.png'});}catch(e){}});},30000);}
+
+/* ---------- boot ---------- */
+window.navTab=navTab;window.go=go;window.goBack=goBack;window.closeSheet=closeSheet;
+applyDir();
+if(typeof Notification!=='undefined'&&Notification.permission==='granted')startReminderTick();
+go('splash',{replace:true});
+</script>
+</body>
+</html>

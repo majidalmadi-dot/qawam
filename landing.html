@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0F14">
+<title>Qawam · قوام — your weight &amp; health companion</title>
+<meta name="description" content="Qawam (قوام) — a free, bilingual, non-medical companion for weight management. Explore the dietary, medical, endoscopic and surgical pathways; track weight, BMI, waist, activity, medications, post-op diet phases and vitamins; and read in-depth, plain-language guides. By the Saudi Gastroenterology Association.">
+<meta name="keywords" content="weight management, obesity, BMI, GLP-1, semaglutide, tirzepatide, intragastric balloon, endoscopic sleeve, gastric bypass, sleeve gastrectomy, bariatric surgery, Saudi Arabia, Arabic health app, قوام, إدارة الوزن, السمنة, تكميم المعدة">
+<link rel="icon" type="image/png" href="qawam-192.png">
+<link rel="apple-touch-icon" href="qawam-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Qawam · قوام — your weight &amp; health companion">
+<meta property="og:description" content="A free, bilingual non-medical companion for weight management across dietary, medical, endoscopic and surgical pathways. By the Saudi Gastroenterology Association.">
+<meta property="og:image" content="https://ibd-connect.vercel.app/Qawam/og-image.png">
+<meta property="og:url" content="https://ibd-connect.vercel.app/Qawam/landing.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{var _q=new URLSearchParams(location.search).get('lang')||localStorage.getItem('qawamweb_lang');if(_q==='ar'){document.documentElement.dir='rtl';document.documentElement.lang='ar';}}catch(e){}</script>
+<style>
+:root{--bg:#0B0F14;--bg2:#0F151D;--card:#141C26;--card2:#1B2530;--line:#243140;--txt:#EAF2F8;--muted:#8DA0B2;--faint:#5A6B7B;--accent:#10B981;--accent2:#0EA5E9;--amber:#F59E0B;--violet:#8B5CF6;--good:#2BD67B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,Arial,sans-serif;letter-spacing:-.01em;overflow-x:hidden}
+html[dir=rtl] body{font-family:'IBM Plex Sans Arabic','Inter',Tahoma,sans-serif;letter-spacing:normal}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.narrow{max-width:820px}
+/* nav */
+.nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:24px;padding:14px 24px;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.4px}
+.mark{width:36px;height:36px;border-radius:12px;background:linear-gradient(140deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:19px}
+.nlinks{display:flex;gap:24px;margin-inline-start:auto}
+.nlinks a{color:var(--muted);font-size:14.5px;font-weight:600}.nlinks a:hover{color:var(--txt)}
+.lang{background:var(--card);border:1px solid var(--line);color:var(--txt);padding:9px 14px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit}
+.cta{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 8px 22px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+@media(max-width:900px){.nlinks{display:none}}
+/* hero */
+.hero{position:relative;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(10px);opacity:.5;z-index:0}
+.b1{width:520px;height:520px;background:radial-gradient(circle,var(--accent),transparent 60%);top:-180px;right:-120px}
+.b2{width:420px;height:420px;background:radial-gradient(circle,var(--accent2),transparent 60%);bottom:-160px;left:-140px;opacity:.35}
+.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:1fr 380px;gap:54px;align-items:center;padding:64px 0 48px}
+.pill{display:inline-block;padding:7px 14px;border-radius:30px;font-size:12.5px;font-weight:700;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);margin-bottom:20px}
+h1{font-size:52px;line-height:1.05;letter-spacing:-1.6px;font-weight:800;margin-bottom:18px}
+h1 .grad{background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:17.5px;line-height:1.6;color:var(--muted);max-width:520px;margin-bottom:26px}
+.actions{display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:14px 24px;border-radius:14px;font-weight:700;font-size:15px;cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 12px 30px -10px color-mix(in srgb,var(--accent) 70%,transparent)}
+.btn-ghost{background:var(--card);border:1px solid var(--line);color:var(--txt)}
+.trust{margin-top:22px;font-size:13px;color:var(--faint)}
+.device{justify-self:center;width:340px;height:710px;max-height:80vh;border:13px solid #0b0d11;border-radius:48px;overflow:hidden;background:#000;box-shadow:0 40px 90px -30px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04) inset}
+.device iframe{width:100%;height:100%;border:0;display:block}
+@media(max-width:980px){.hero-in{grid-template-columns:1fr;gap:32px;padding:40px 0}.device{width:300px;height:600px}h1{font-size:38px;letter-spacing:-1px}}
+/* sections */
+.section{padding:62px 0}
+.section.tight{padding:40px 0}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.h2{font-size:34px;font-weight:800;letter-spacing:-.8px;margin-bottom:14px}
+.lead{font-size:17px;color:var(--muted);max-width:680px;line-height:1.65}
+.divider{height:1px;background:var(--line);max-width:1180px;margin:0 auto}
+/* stats */
+.stats{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+.stats .num{font-size:40px;font-weight:800;letter-spacing:-1.5px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats .lab{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.45}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr);gap:20px;padding:28px}}
+/* features */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 16px 36px -22px rgba(0,0,0,.55)}
+.fic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 22%,var(--card2)),var(--card2));border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);margin-bottom:14px}
+.fcard h3{font-size:17px;font-weight:700;margin-bottom:7px;letter-spacing:-.3px}
+.fcard p{font-size:13.5px;line-height:1.55;color:var(--muted)}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+/* pathway picker */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+.pcard{border:1px solid var(--line);border-radius:18px;padding:20px;cursor:pointer;transition:.15s;display:block}
+.pcard:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.pcard .pi{font-size:28px}
+.pcard b{display:block;font-size:16px;margin:10px 0 5px}
+.pcard small{color:var(--muted);font-size:12.5px;line-height:1.5}
+@media(max-width:820px){.pgrid{grid-template-columns:1fr 1fr}}
+/* long-form prose blocks */
+.pathblock{border:1px solid var(--line);border-radius:24px;padding:34px;margin-top:22px;background:var(--card);position:relative;overflow:hidden}
+.pathblock .tagrow{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.pathblock .badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px}
+.pathblock h3{font-size:25px;font-weight:800;letter-spacing:-.5px;margin-bottom:14px}
+.prose p{font-size:15.5px;line-height:1.8;color:#cdd8e3;margin-bottom:14px}
+html[data-mode] .prose p{color:#cdd8e3}
+.prose h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--txt)}
+.prose ul{margin:6px 0 16px;padding-inline-start:22px}
+.prose li{font-size:15px;line-height:1.7;color:#c2cdd8;margin-bottom:8px}
+.prose strong{color:var(--txt);font-weight:700}
+.note{background:var(--card2);border-inline-start:3px solid var(--accent);border-radius:10px;padding:13px 15px;font-size:13.5px;color:var(--muted);line-height:1.6;margin-top:8px}
+/* two-col prose */
+.readmore{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:38px}
+/* gallery */
+.gal{display:grid;grid-template-columns:2fr 1fr 1fr;grid-auto-rows:200px;gap:16px;margin-top:34px}
+.gcard{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--card2)}
+.gcard.big{grid-row:span 2}
+.gcard img{width:100%;height:100%;object-fit:cover;opacity:.92}
+.gcard .cap{position:absolute;inset:auto 0 0 0;padding:16px;background:linear-gradient(0deg,rgba(8,10,14,.92),transparent)}
+.gcard .cap b{display:block;font-size:15px}.gcard .cap span{font-size:12px;color:var(--muted)}
+@media(max-width:820px){.gal{grid-template-columns:1fr 1fr;grid-auto-rows:150px}.gcard.big{grid-row:span 1;grid-column:span 2}}
+/* faq */
+.faq{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 20px;transition:.15s}
+.faq details[open]{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:22px;color:var(--accent);font-weight:400}
+.faq details[open] summary::after{content:"–"}
+.faq .ans{padding:0 0 18px;font-size:14.5px;line-height:1.75;color:var(--muted)}
+/* quote */
+.quote{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:48px;max-width:900px;margin:0 auto;text-align:center}
+.quote blockquote{font-size:24px;font-weight:600;line-height:1.5;letter-spacing:-.4px}
+.quote .who{margin-top:16px;color:var(--muted);font-size:14px}
+/* cta band */
+.ctaband{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:32px;padding:60px 40px;text-align:center;position:relative;overflow:hidden}
+.ctaband h2{font-size:38px;font-weight:800;letter-spacing:-1px;color:#fff;margin-bottom:12px}
+.ctaband p{color:rgba(255,255,255,.92);font-size:17px;margin:0 auto 24px;max-width:520px}
+.ctaband .btn-primary{background:#0B0F14;color:#fff}
+/* footer */
+.foot{border-top:1px solid var(--line);margin-top:40px;padding:38px 0 60px;color:var(--muted)}
+.foot p{font-size:13px;line-height:1.6;max-width:820px;margin-bottom:10px}
+.foot .sub{color:var(--faint);font-size:12px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="#top"><span class="mark">ق</span><span data-en="Qawam" data-ar="قوام">Qawam</span></a>
+  <nav class="nlinks">
+    <a href="#features" data-en="Features" data-ar="المزايا">Features</a>
+    <a href="#pathways" data-en="Pathways" data-ar="المسارات">Pathways</a>
+    <a href="#understand" data-en="Understand" data-ar="افهم">Understand</a>
+    <a href="#faq" data-en="FAQ" data-ar="أسئلة">FAQ</a>
+    <a href="#about" data-en="About" data-ar="عن التطبيق">About</a>
+  </nav>
+  <button class="lang" onclick="setLang(L==='ar'?'en':'ar')">العربية</button>
+  <a class="cta" href="index.html" data-en="Open the app ↗" data-ar="افتح التطبيق ↗">Open the app ↗</a>
+</header>
+
+<section class="hero" id="top">
+  <span class="blob b1"></span><span class="blob b2"></span>
+  <div class="wrap hero-in">
+    <div>
+      <span class="pill" data-en="Saudi Gastroenterology Association · Weight management" data-ar="الجمعية السعودية للجهاز الهضمي · إدارة الوزن">Saudi Gastroenterology Association · Weight management</span>
+      <h1><span data-en="Your healthier weight," data-ar="وزنك الأصحّ،">Your healthier weight,</span><br><span class="grad" data-en="whichever path you take." data-ar="أيًّا كان مسارك.">whichever path you take.</span></h1>
+      <p class="sub" data-en="Qawam is a free, bilingual companion for managing your weight across four pathways — dietary, medical, endoscopic and surgical. Track your weight, BMI, waist, activity, medications and post-procedure journey, and read in-depth, plain-language guides. Made for life in Saudi Arabia &amp; the Gulf." data-ar="قوام رفيق مجاني ثنائي اللغة لإدارة وزنك عبر أربعة مسارات — الغذائي والدوائي والتنظيري والجراحي. تتبّع وزنك ومؤشر كتلتك وخصرك ونشاطك وأدويتك ورحلتك بعد الإجراء، واقرأ أدلّة معمّقة بلغة بسيطة. مصمّم للحياة في السعودية والخليج.">Qawam is a free, bilingual companion for managing your weight across four pathways — dietary, medical, endoscopic and surgical. Track your weight, BMI, waist, activity, medications and post-procedure journey, and read in-depth, plain-language guides. Made for life in Saudi Arabia &amp; the Gulf.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="index.html" data-en="Open the app" data-ar="افتح التطبيق">Open the app</a>
+        <a class="btn btn-ghost" href="#pathways" data-en="Explore the pathways" data-ar="استكشف المسارات">Explore the pathways</a>
+      </div>
+      <div class="trust" data-en="Free · Non-medical companion · Private on your device · English &amp; العربية" data-ar="مجاني · رفيق غير طبي · خاص على جهازك · العربية والإنجليزية">Free · Non-medical companion · Private on your device · English &amp; العربية</div>
+    </div>
+    <div class="device"><iframe id="appframe" src="index.html" title="Qawam app" loading="lazy"></iframe></div>
+  </div>
+</section>
+
+<section class="section tight"><div class="wrap">
+  <div class="stats reveal">
+    <div><div class="num"><span data-count="4">0</span></div><div class="lab" data-en="treatment pathways — from lifestyle to surgery" data-ar="مسارات علاجية — من نمط الحياة إلى الجراحة">treatment pathways — from lifestyle to surgery</div></div>
+    <div><div class="num"><span data-count="5">0</span>–<span data-count="10">0</span>%</div><div class="lab" data-en="weight loss that already improves health markers" data-ar="نقص وزن يحسّن مؤشرات الصحة بالفعل">weight loss that already improves health markers</div></div>
+    <div><div class="num"><span data-count="2">0</span>×</div><div class="lab" data-en="languages — fully bilingual with RTL" data-ar="لغتان — ثنائي اللغة بالكامل مع دعم RTL">languages — fully bilingual with RTL</div></div>
+    <div><div class="num"><span data-count="100">0</span>%</div><div class="lab" data-en="private — your data stays on your device" data-ar="خصوصية — بياناتك تبقى على جهازك">private — your data stays on your device</div></div>
+  </div>
+</div></section>
+
+<section class="section" id="features"><div class="wrap">
+  <div class="eyebrow reveal" data-en="Everything in one companion" data-ar="كل شيء في رفيق واحد">Everything in one companion</div>
+  <div class="h2 reveal" data-en="Built around your weight journey" data-ar="مبنيّ حول رحلة وزنك">Built around your weight journey</div>
+  <p class="lead reveal" data-en="Not a generic step counter — every screen is shaped by real weight-management care: the four pathways, the numbers that matter, and the day-to-day habits that make change last." data-ar="ليس عدّاد خطوات عامًا — كل شاشة مصمّمة وفق رعاية إدارة الوزن الحقيقية: المسارات الأربعة، والأرقام المهمة، والعادات اليومية التي تُديم التغيير.">Not a generic step counter — every screen is shaped by real weight-management care: the four pathways, the numbers that matter, and the day-to-day habits that make change last.</p>
+  <div class="grid">
+    <div class="fcard reveal"><div class="fic">🧭</div><h3 data-en="Four pathways" data-ar="أربعة مسارات">Four pathways</h3><p data-en="Explore dietary, medical, endoscopic and surgical routes side by side — each with clear steps, what to expect, and deep-dive reading." data-ar="استكشف المسارات الغذائية والدوائية والتنظيرية والجراحية جنبًا إلى جنب — كل منها بخطوات واضحة وتوقّعات وقراءة معمّقة.">Explore dietary, medical, endoscopic and surgical routes side by side — each with clear steps, what to expect, and deep-dive reading.</p></div>
+    <div class="fcard reveal"><div class="fic">📈</div><h3 data-en="Your numbers" data-ar="أرقامك">Your numbers</h3><p data-en="Weight and waist trends, BMI with its category, total and excess weight-loss percentages, and a goal ring toward your target." data-ar="اتجاهات الوزن والخصر، مؤشر الكتلة وفئته، نسب نقص الوزن الكلي والزائد، وحلقة تقدّم نحو هدفك.">Weight and waist trends, BMI with its category, total and excess weight-loss percentages, and a goal ring toward your target.</p></div>
+    <div class="fcard reveal"><div class="fic">🍽️</div><h3 data-en="Meals &amp; activity" data-ar="الوجبات والنشاط">Meals &amp; activity</h3><p data-en="Log meals with quality tags, record activity and minutes, and see your weekly movement against a common 150-minute goal." data-ar="سجّل الوجبات بصفاتها، ودوّن النشاط والدقائق، وشاهد حركتك الأسبوعية مقابل هدف ١٥٠ دقيقة الشائع.">Log meals with quality tags, record activity and minutes, and see your weekly movement against a common 150-minute goal.</p></div>
+    <div class="fcard reveal"><div class="fic">💊</div><h3 data-en="Medications, simply" data-ar="الأدوية ببساطة">Medications, simply</h3><p data-en="Keep a list of your anti-obesity medicines (generic names only), log doses taken, and read how each class works — never any dosing advice." data-ar="احتفظ بقائمة أدوية السمنة (بالأسماء العلمية فقط)، وسجّل الجرعات المتناولة، واقرأ كيف تعمل كل فئة — دون أي نصيحة جرعات.">Keep a list of your anti-obesity medicines (generic names only), log doses taken, and read how each class works — never any dosing advice.</p></div>
+    <div class="fcard reveal"><div class="fic">🍵</div><h3 data-en="Post-op journey" data-ar="رحلة ما بعد الإجراء">Post-op journey</h3><p data-en="After an endoscopic procedure or surgery, follow the staged diet — clear liquids to regular textures — and a daily vitamins checklist." data-ar="بعد الإجراء التنظيري أو الجراحة، اتبع الغذاء المتدرّج — من السوائل الصافية إلى القوام العادي — وقائمة فيتامينات يومية.">After an endoscopic procedure or surgery, follow the staged diet — clear liquids to regular textures — and a daily vitamins checklist.</p></div>
+    <div class="fcard reveal"><div class="fic">📤</div><h3 data-en="Share with your doctor" data-ar="شارك مع طبيبك">Share with your doctor</h3><p data-en="Generate a clean, read-only summary of your weight, BMI, waist, medications and diet stage to make every clinic visit count." data-ar="أنشئ ملخّصًا نظيفًا للقراءة فقط لوزنك ومؤشرك وخصرك وأدويتك ومرحلة غذائك لتجعل كل زيارة مثمرة.">Generate a clean, read-only summary of your weight, BMI, waist, medications and diet stage to make every clinic visit count.</p></div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ===================== PATHWAYS (expansive) ===================== -->
+<section class="section" id="pathways"><div class="wrap">
+  <div class="eyebrow reveal" data-en="The four pathways, in depth" data-ar="المسارات الأربعة بالتفصيل">The four pathways, in depth</div>
+  <div class="h2 reveal" data-en="Four routes to a healthier weight — they combine, not compete" data-ar="أربعة طرق لوزن أصحّ — تتكامل ولا تتنافس">Four routes to a healthier weight — they combine, not compete</div>
+  <p class="lead reveal" data-en="There is no single right path. Lifestyle change is the foundation under all of them; medications, endoscopic procedures and surgery are added tools chosen with your doctor based on your health, your history and your goals. Read each one below — or open the app to explore them interactively." data-ar="لا يوجد مسار وحيد صحيح. تغيير نمط الحياة أساس تحتها جميعًا؛ والأدوية والإجراءات التنظيرية والجراحة أدوات إضافية تُختار مع طبيبك حسب صحتك وتاريخك وأهدافك. اقرأ كلًّا منها أدناه — أو افتح التطبيق لاستكشافها تفاعليًا.">There is no single right path. Lifestyle change is the foundation under all of them; medications, endoscopic procedures and surgery are added tools chosen with your doctor based on your health, your history and your goals. Read each one below — or open the app to explore them interactively.</p>
+
+  <div class="pgrid reveal">
+    <a class="pcard" href="#p-diet" style="background:linear-gradient(150deg,#10B98122,transparent)"><div class="pi">🥗</div><b data-en="Dietary &amp; lifestyle" data-ar="الغذاء ونمط الحياة">Dietary &amp; lifestyle</b><small data-en="The foundation for everyone" data-ar="الأساس للجميع">The foundation for everyone</small></a>
+    <a class="pcard" href="#p-medical" style="background:linear-gradient(150deg,#0EA5E922,transparent)"><div class="pi">💊</div><b data-en="Medical (medications)" data-ar="الدوائي (الأدوية)">Medical (medications)</b><small data-en="Appetite &amp; absorption" data-ar="الشهية والامتصاص">Appetite &amp; absorption</small></a>
+    <a class="pcard" href="#p-endo" style="background:linear-gradient(150deg,#8B5CF622,transparent)"><div class="pi">🔬</div><b data-en="Endoscopic" data-ar="التنظيري">Endoscopic</b><small data-en="No external cuts" data-ar="دون شقوق خارجية">No external cuts</small></a>
+    <a class="pcard" href="#p-surg" style="background:linear-gradient(150deg,#F59E0B22,transparent)"><div class="pi">🏥</div><b data-en="Surgical (bariatric)" data-ar="الجراحي (السمنة)">Surgical (bariatric)</b><small data-en="Most effective for severe obesity" data-ar="الأكثر فعالية للسمنة الشديدة">Most effective for severe obesity</small></a>
+  </div>
+
+  <!-- DIET -->
+  <div class="pathblock reveal" id="p-diet">
+    <div class="tagrow"><span style="font-size:30px">🥗</span><span class="badge" style="background:#10B98122;color:#10B981" data-en="Pathway 1" data-ar="المسار ١">Pathway 1</span></div>
+    <h3 data-en="Dietary &amp; lifestyle change" data-ar="التغيير الغذائي ونمط الحياة">Dietary &amp; lifestyle change</h3>
+    <div class="prose">
+      <p data-en="Diet, activity, sleep and daily habits are the foundation of weight management — the base that every other pathway is built on, and enough on its own for many people. The goal is not a short, punishing diet but a comfortable, sustainable way of eating and moving that you can keep for years. Even a gradual loss of 5–10% of your body weight can meaningfully improve blood sugar, blood pressure, cholesterol, joint pain, sleep apnoea and fatty liver." data-ar="الغذاء والنشاط والنوم والعادات اليومية أساس إدارة الوزن — القاعدة التي يُبنى عليها كل مسار آخر، وكافٍ بمفرده لكثيرين. الهدف ليس حمية قصيرة قاسية بل طريقة أكل وحركة مريحة مستدامة تستطيع الاستمرار عليها سنوات. حتى نقص تدريجي بمقدار ٥–١٠٪ من وزنك يحسّن بوضوح سكّر الدم والضغط والكوليسترول وألم المفاصل وانقطاع النفس النومي والكبد الدهني.">Diet, activity, sleep and daily habits are the foundation of weight management — the base that every other pathway is built on, and enough on its own for many people. The goal is not a short, punishing diet but a comfortable, sustainable way of eating and moving that you can keep for years. Even a gradual loss of 5–10% of your body weight can meaningfully improve blood sugar, blood pressure, cholesterol, joint pain, sleep apnoea and fatty liver.</p>
+      <h4 data-en="What actually works" data-ar="ما ينجح فعلًا">What actually works</h4>
+      <p data-en="No single diet is magic — the best eating pattern is the one you can maintain. Most successful approaches share the same core: more protein and vegetables, more whole and less processed food, fewer sugary drinks and refined snacks, and portions matched to your needs. Crash diets tend to rebound because they are hard to sustain and can strip muscle; a gentle, steady calorie deficit combined with activity holds up far better over time." data-ar="لا حمية واحدة سحرية — أفضل نمط أكل هو الذي تستطيع الحفاظ عليه. أغلب الأساليب الناجحة تشترك في الجوهر: بروتين وخضار أكثر، أطعمة كاملة أكثر ومعالجة أقل، مشروبات محلّاة ووجبات مكرّرة أقل، وحصص تناسب احتياجك. الحميات القاسية تميل للارتداد لصعوبة الاستمرار وفقدان العضلات؛ أما العجز اللطيف الثابت مع النشاط فيصمد أفضل بكثير عبر الوقت.">No single diet is magic — the best eating pattern is the one you can maintain. Most successful approaches share the same core: more protein and vegetables, more whole and less processed food, fewer sugary drinks and refined snacks, and portions matched to your needs. Crash diets tend to rebound because they are hard to sustain and can strip muscle; a gentle, steady calorie deficit combined with activity holds up far better over time.</p>
+      <h4 data-en="Everyday habits that help" data-ar="عادات يومية تساعد">Everyday habits that help</h4>
+      <ul>
+        <li data-en="Fill half your plate with vegetables and make protein the anchor of each meal." data-ar="املأ نصف الطبق خضارًا واجعل البروتين محور كل وجبة.">Fill half your plate with vegetables and make protein the anchor of each meal.</li>
+        <li data-en="Drink water instead of juice and soft drinks — sugary drinks add calories without fullness." data-ar="اشرب الماء بدل العصير والمشروبات الغازية — المحلّاة تضيف سعرات دون شبع.">Drink water instead of juice and soft drinks — sugary drinks add calories without fullness.</li>
+        <li data-en="Slow down, notice fullness, and keep tempting snacks out of easy reach." data-ar="تمهّل، ولاحظ الشبع، وأبعِد الوجبات المغرية عن المتناول.">Slow down, notice fullness, and keep tempting snacks out of easy reach.</li>
+        <li data-en="Aim for at least 150 minutes of activity a week plus strengthening twice weekly — start small and build." data-ar="استهدف ١٥٠ دقيقة نشاط أسبوعيًا على الأقل مع تقوية مرتين أسبوعيًا — ابدأ صغيرًا وابنِ تدريجيًا.">Aim for at least 150 minutes of activity a week plus strengthening twice weekly — start small and build.</li>
+        <li data-en="Protect 7–9 hours of sleep: short sleep raises appetite hormones and cravings." data-ar="احمِ ٧–٩ ساعات نوم: النوم القصير يرفع هرمونات الشهية والرغبة.">Protect 7–9 hours of sleep: short sleep raises appetite hormones and cravings.</li>
+      </ul>
+      <div class="note" data-en="A dietitian can tailor all of this to you — especially with diabetes, kidney disease, pregnancy, or before and after a procedure." data-ar="يمكن لأخصائي التغذية تفصيل هذا كله لك — خاصة مع السكري أو مرض الكلى أو الحمل أو قبل وبعد الإجراءات.">A dietitian can tailor all of this to you — especially with diabetes, kidney disease, pregnancy, or before and after a procedure.</div>
+    </div>
+  </div>
+
+  <!-- MEDICAL -->
+  <div class="pathblock reveal" id="p-medical">
+    <div class="tagrow"><span style="font-size:30px">💊</span><span class="badge" style="background:#0EA5E922;color:#0EA5E9" data-en="Pathway 2" data-ar="المسار ٢">Pathway 2</span></div>
+    <h3 data-en="Medical — weight-loss medications" data-ar="الدوائي — أدوية إنقاص الوزن">Medical — weight-loss medications</h3>
+    <div class="prose">
+      <p data-en="Anti-obesity medications are prescription treatments that help when lifestyle change alone isn't enough. They are usually considered at a higher BMI or when weight-related conditions such as type 2 diabetes, high blood pressure or sleep apnoea are present. They are tools, not shortcuts — they work best alongside eating and activity changes, and weight often returns if they stop, so they are generally taken long term under medical review." data-ar="أدوية السمنة علاجات توصف عند عدم كفاية تغيير نمط الحياة وحده. تُدرَس عادة عند مؤشر أعلى أو وجود حالات مرتبطة بالوزن كالسكري من النوع الثاني أو ارتفاع الضغط أو انقطاع النفس النومي. هي أدوات لا اختصارات — تعمل أفضل مع تغييرات الأكل والنشاط، وغالبًا يعود الوزن عند إيقافها، لذا تؤخذ عادة طويلًا تحت المتابعة الطبية.">Anti-obesity medications are prescription treatments that help when lifestyle change alone isn't enough. They are usually considered at a higher BMI or when weight-related conditions such as type 2 diabetes, high blood pressure or sleep apnoea are present. They are tools, not shortcuts — they work best alongside eating and activity changes, and weight often returns if they stop, so they are generally taken long term under medical review.</p>
+      <h4 data-en="The main options (generic names)" data-ar="الخيارات الرئيسية (الأسماء العلمية)">The main options (generic names)</h4>
+      <ul>
+        <li data-en="GLP-1 medicines — semaglutide and liraglutide — mimic a gut hormone that reduces appetite and slows stomach emptying, so you feel full sooner and eat less." data-ar="أدوية GLP-1 — سيماجلوتيد وليراجلوتيد — تحاكي هرمون أمعاء يقلّل الشهية ويبطئ إفراغ المعدة، فتشعر بالشبع أسرع وتأكل أقل.">GLP-1 medicines — semaglutide and liraglutide — mimic a gut hormone that reduces appetite and slows stomach emptying, so you feel full sooner and eat less.</li>
+        <li data-en="Tirzepatide acts on two gut-hormone pathways (GIP and GLP-1) and is among the most effective medical options." data-ar="تيرزيباتيد يعمل على مسارَي هرمونين معويين (GIP وGLP-1) وهو من أكثر الخيارات الدوائية فعالية.">Tirzepatide acts on two gut-hormone pathways (GIP and GLP-1) and is among the most effective medical options.</li>
+        <li data-en="Orlistat blocks the absorption of some dietary fat in the gut." data-ar="أورليستات يمنع امتصاص بعض الدهون الغذائية في الأمعاء.">Orlistat blocks the absorption of some dietary fat in the gut.</li>
+        <li data-en="Naltrexone–bupropion acts on appetite and cravings; phentermine is a short-term appetite suppressant." data-ar="نالتريكسون–بوبروبيون يؤثر على الشهية والرغبة؛ وفينترمين مثبّط شهية قصير المدى.">Naltrexone–bupropion acts on appetite and cravings; phentermine is a short-term appetite suppressant.</li>
+      </ul>
+      <h4 data-en="Side effects &amp; getting started" data-ar="الآثار الجانبية والبدء">Side effects &amp; getting started</h4>
+      <p data-en="Doses are started low and increased slowly to limit side effects. The most common are gastrointestinal — nausea, fullness, constipation or diarrhoea — which usually ease with time and with smaller, slower, lower-fat meals. If your medicine is an injection, it is given under the skin of the abdomen, thigh or upper arm; rotating the site and using a fresh needle each time makes it easier. Your doctor screens for conditions where a medicine isn't suitable and monitors your response." data-ar="تُبدأ الجرعات منخفضة وتُرفع ببطء للحدّ من الآثار الجانبية. أكثرها شيوعًا هضمية — غثيان، امتلاء، إمساك أو إسهال — تخفّ عادة مع الوقت ومع وجبات أصغر أبطأ أقل دهنًا. إن كان دواؤك حقنة، تُعطى تحت جلد البطن أو الفخذ أو أعلى الذراع؛ وتبديل الموضع واستخدام إبرة جديدة كل مرة يُسهّلها. يفحص طبيبك الحالات غير المناسبة للدواء ويتابع استجابتك.">Doses are started low and increased slowly to limit side effects. The most common are gastrointestinal — nausea, fullness, constipation or diarrhoea — which usually ease with time and with smaller, slower, lower-fat meals. If your medicine is an injection, it is given under the skin of the abdomen, thigh or upper arm; rotating the site and using a fresh needle each time makes it easier. Your doctor screens for conditions where a medicine isn't suitable and monitors your response.</p>
+      <div class="note" data-en="Qawam never gives doses. Record only what your doctor prescribed, and never start, stop, adjust or borrow a dose without them." data-ar="قوام لا يقدّم جرعات أبدًا. سجّل ما وصفه طبيبك فقط، ولا تبدأ أو توقف أو تعدّل أو تستعِر جرعة دونه.">Qawam never gives doses. Record only what your doctor prescribed, and never start, stop, adjust or borrow a dose without them.</div>
+    </div>
+  </div>
+
+  <!-- ENDOSCOPIC -->
+  <div class="pathblock reveal" id="p-endo">
+    <div class="tagrow"><span style="font-size:30px">🔬</span><span class="badge" style="background:#8B5CF622;color:#8B5CF6" data-en="Pathway 3" data-ar="المسار ٣">Pathway 3</span></div>
+    <h3 data-en="Endoscopic procedures" data-ar="الإجراءات التنظيرية">Endoscopic procedures</h3>
+    <div class="prose">
+      <p data-en="Endoscopic weight procedures are done with a flexible scope passed through the mouth — no surgical cuts and usually a quick recovery. They sit between medications and surgery in intensity, offering a meaningful step for people who want more than medication but are not ready for, or do not need, an operation." data-ar="الإجراءات التنظيرية للوزن تُجرى بمنظار مرن عبر الفم — دون شقوق جراحية وبتعافٍ سريع عادة. تقع بين الأدوية والجراحة في شدّتها، وتوفّر خطوة مهمة لمن يريد أكثر من الدواء لكنه غير مستعدّ لعملية أو لا يحتاجها.">Endoscopic weight procedures are done with a flexible scope passed through the mouth — no surgical cuts and usually a quick recovery. They sit between medications and surgery in intensity, offering a meaningful step for people who want more than medication but are not ready for, or do not need, an operation.</p>
+      <h4 data-en="The main procedures" data-ar="الإجراءات الرئيسية">The main procedures</h4>
+      <ul>
+        <li data-en="Intragastric balloon — a soft balloon is placed in the stomach and filled, so you feel full sooner and eat less. It is temporary, usually removed after about six months, and works best paired with lifestyle change." data-ar="البالون المعدي — يُوضع بالون ناعم في المعدة ويُملأ، فتشعر بالشبع أسرع وتأكل أقل. مؤقّت، يُزال عادة بعد نحو ستة أشهر، وأنجع مع تغيير نمط الحياة.">Intragastric balloon — a soft balloon is placed in the stomach and filled, so you feel full sooner and eat less. It is temporary, usually removed after about six months, and works best paired with lifestyle change.</li>
+        <li data-en="Endoscopic sleeve gastroplasty (ESG) — internal stitches reshape the stomach into a narrow tube, reducing its volume without removing any tissue." data-ar="التكميم بالمنظار (ESG) — غرز داخلية تعيد تشكيل المعدة أنبوبًا ضيّقًا فتقلّ سعتها دون إزالة نسيج.">Endoscopic sleeve gastroplasty (ESG) — internal stitches reshape the stomach into a narrow tube, reducing its volume without removing any tissue.</li>
+        <li data-en="Aspiration therapy — a tube allows a portion of a meal to be drained from the stomach after eating." data-ar="علاج الشفط — أنبوب يسمح بتصريف جزء من الوجبة من المعدة بعد الأكل.">Aspiration therapy — a tube allows a portion of a meal to be drained from the stomach after eating.</li>
+      </ul>
+      <h4 data-en="Recovery &amp; results" data-ar="التعافي والنتائج">Recovery &amp; results</h4>
+      <p data-en="Afterwards you follow a staged diet — clear liquids, then full liquids, purée, soft foods and finally regular textures — sipping fluids often and eating slowly. Early nausea or cramping is common and settles. As with every pathway, results depend on keeping the eating and activity habits going, so follow-up matters. Qawam includes a built-in diet-phase tracker to guide you through each stage." data-ar="بعدها تتّبع غذاءً متدرّجًا — سوائل صافية ثم كاملة ثم مهروس ثم طري وأخيرًا قوام عادي — مع ارتشاف السوائل كثيرًا والأكل ببطء. الغثيان أو المغص المبكر شائع ويهدأ. وكأي مسار، النتائج تعتمد على استمرار عادات الأكل والنشاط، لذا المتابعة مهمّة. يتضمّن قوام متتبّع مراحل الغذاء ليرشدك خلال كل مرحلة.">Afterwards you follow a staged diet — clear liquids, then full liquids, purée, soft foods and finally regular textures — sipping fluids often and eating slowly. Early nausea or cramping is common and settles. As with every pathway, results depend on keeping the eating and activity habits going, so follow-up matters. Qawam includes a built-in diet-phase tracker to guide you through each stage.</p>
+    </div>
+  </div>
+
+  <!-- SURGICAL -->
+  <div class="pathblock reveal" id="p-surg">
+    <div class="tagrow"><span style="font-size:30px">🏥</span><span class="badge" style="background:#F59E0B22;color:#F59E0B" data-en="Pathway 4" data-ar="المسار ٤">Pathway 4</span></div>
+    <h3 data-en="Surgical — bariatric surgery" data-ar="الجراحي — جراحة السمنة">Surgical — bariatric surgery</h3>
+    <div class="prose">
+      <p data-en="Bariatric (metabolic) surgery is the most effective and durable treatment for severe obesity, and it often improves or resolves type 2 diabetes, high blood pressure, sleep apnoea and fatty liver. In experienced centres it is very safe, but like any operation it carries risks that your surgeon will explain in full." data-ar="جراحة السمنة (الأيضية) أكثر العلاجات فعالية ودوامًا للسمنة الشديدة، وغالبًا تحسّن أو تُزيل السكري من النوع الثاني وارتفاع الضغط وانقطاع النفس النومي والكبد الدهني. في المراكز الخبيرة آمنة جدًا، لكن كأي عملية لها مخاطر يشرحها جرّاحك بالكامل.">Bariatric (metabolic) surgery is the most effective and durable treatment for severe obesity, and it often improves or resolves type 2 diabetes, high blood pressure, sleep apnoea and fatty liver. In experienced centres it is very safe, but like any operation it carries risks that your surgeon will explain in full.</p>
+      <h4 data-en="The two most common operations" data-ar="أشيع عمليتين">The two most common operations</h4>
+      <ul>
+        <li data-en="Sleeve gastrectomy — about 80% of the stomach is removed, leaving a narrow tube. You feel full on much smaller amounts, and hunger hormones fall." data-ar="التكميم — يُزال نحو ٨٠٪ من المعدة تاركًا أنبوبًا ضيّقًا. تشعر بالشبع على كميات أصغر بكثير، وتنخفض هرمونات الجوع.">Sleeve gastrectomy — about 80% of the stomach is removed, leaving a narrow tube. You feel full on much smaller amounts, and hunger hormones fall.</li>
+        <li data-en="Roux-en-Y gastric bypass — a small stomach pouch is connected to a lower part of the small intestine, reducing intake and changing gut hormones and absorption." data-ar="تحويل المسار (Roux-en-Y) — تُوصل جيبة معدية صغيرة بجزء أدنى من الأمعاء الدقيقة، فتقلّ الكمية وتتغيّر هرمونات الأمعاء والامتصاص.">Roux-en-Y gastric bypass — a small stomach pouch is connected to a lower part of the small intestine, reducing intake and changing gut hormones and absorption.</li>
+      </ul>
+      <h4 data-en="A lifelong partnership" data-ar="شراكة مدى الحياة">A lifelong partnership</h4>
+      <p data-en="Surgery is a powerful tool that requires lifelong teamwork: a pre-operative work-up and liver-shrink diet; a carefully staged post-op diet over about six to eight weeks; daily vitamins for life; protein and fluid goals to protect muscle and prevent dehydration; and regular follow-up with blood tests. Golden rules at the table are protein first, sip fluids between meals, eat slowly, stop at the first sign of fullness, and avoid sugary and fizzy drinks. Weight regain can happen if habits slip, so the eating, activity and follow-up work continues long after the operation." data-ar="الجراحة أداة قوية تتطلّب عملًا جماعيًا مدى الحياة: تقييم قبل الجراحة وحمية تصغير الكبد؛ وغذاء متدرّج بعناية خلال نحو ستة إلى ثمانية أسابيع؛ وفيتامينات يومية مدى الحياة؛ وأهداف بروتين وسوائل لحماية العضلات ومنع الجفاف؛ ومتابعة منتظمة بتحاليل الدم. القواعد الذهبية على المائدة: البروتين أولًا، وارتشاف السوائل بين الوجبات، والأكل ببطء، والتوقّف عند أول شعور بالشبع، وتجنّب المشروبات المحلّاة والغازية. قد يحدث استرجاع للوزن إن تراخت العادات، لذا يستمر عمل الأكل والنشاط والمتابعة طويلًا بعد العملية.">Surgery is a powerful tool that requires lifelong teamwork: a pre-operative work-up and liver-shrink diet; a carefully staged post-op diet over about six to eight weeks; daily vitamins for life; protein and fluid goals to protect muscle and prevent dehydration; and regular follow-up with blood tests. Golden rules at the table are protein first, sip fluids between meals, eat slowly, stop at the first sign of fullness, and avoid sugary and fizzy drinks. Weight regain can happen if habits slip, so the eating, activity and follow-up work continues long after the operation.</p>
+      <div class="note" data-en="After bariatric surgery, the body absorbs fewer nutrients — lifelong daily supplements (a bariatric multivitamin, B12, iron, calcium with vitamin D, and folic acid) and periodic blood tests are essential. Qawam has a daily vitamins checklist to help." data-ar="بعد جراحة السمنة يمتصّ الجسم عناصر أقل — المكمّلات اليومية مدى الحياة (فيتامينات متعدّدة للسمنة، وب١٢، وحديد، وكالسيوم مع فيتامين د، وحمض فوليك) والتحاليل الدورية ضرورية. يتضمّن قوام قائمة فيتامينات يومية للمساعدة.">After bariatric surgery, the body absorbs fewer nutrients — lifelong daily supplements (a bariatric multivitamin, B12, iron, calcium with vitamin D, and folic acid) and periodic blood tests are essential. Qawam has a daily vitamins checklist to help.</div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ===================== UNDERSTAND (expansive) ===================== -->
+<section class="section" id="understand"><div class="wrap narrow">
+  <div class="eyebrow reveal" data-en="Understand weight &amp; health" data-ar="افهم الوزن والصحة">Understand weight &amp; health</div>
+  <div class="h2 reveal" data-en="A little science makes every pathway clearer" data-ar="قليل من العلم يوضّح كل مسار">A little science makes every pathway clearer</div>
+  <div class="readmore reveal" style="margin-top:26px">
+    <div class="prose">
+      <h4 data-en="Weight is a medical condition, not a character flaw" data-ar="الوزن حالة طبية لا عيب في الشخصية">Weight is a medical condition, not a character flaw</h4>
+      <p data-en="Excess weight is a chronic, relapsing medical condition — not a lack of willpower. Genes, hormones, sleep, stress, medications and environment all shape appetite and how the body stores energy. Because it is chronic, weight is managed over the long term, and small sustained changes beat short crash diets. Understanding this removes a lot of unnecessary guilt and helps you and your team choose tools that fit your biology, not just your motivation." data-ar="الوزن الزائد حالة طبية مزمنة قابلة للانتكاس — وليس نقص إرادة. الجينات والهرمونات والنوم والتوتر والأدوية والبيئة كلها تُشكّل الشهية وطريقة تخزين الجسم للطاقة. لأنه مزمن، يُدار الوزن على المدى الطويل، والتغييرات الصغيرة المستدامة تتفوّق على الحميات القاسية القصيرة. فهم ذلك يزيل كثيرًا من الشعور غير الضروري بالذنب ويساعدك وفريقك على اختيار أدوات تناسب بيولوجيتك، لا حماسك فقط.">Excess weight is a chronic, relapsing medical condition — not a lack of willpower. Genes, hormones, sleep, stress, medications and environment all shape appetite and how the body stores energy. Because it is chronic, weight is managed over the long term, and small sustained changes beat short crash diets. Understanding this removes a lot of unnecessary guilt and helps you and your team choose tools that fit your biology, not just your motivation.</p>
+      <h4 data-en="What BMI does — and doesn't — tell you" data-ar="ما الذي يخبرك به مؤشر الكتلة — وما لا يخبرك">What BMI does — and doesn't — tell you</h4>
+      <p data-en="Body mass index (BMI) is your weight in kilograms divided by your height in metres squared. As a rough adult guide: under 18.5 is underweight, 18.5–24.9 is a healthy range, 25–29.9 is overweight, and 30 or above is in the obesity range (class I 30–34.9, class II 35–39.9, class III 40+). But BMI is only a screening number: it does not measure muscle, fat distribution or health directly, and cut-offs can differ for some populations. An athlete and someone with little muscle can share a BMI yet have very different health." data-ar="مؤشر كتلة الجسم هو وزنك بالكيلوغرام مقسومًا على مربع طولك بالمتر. كدليل تقريبي للبالغين: أقل من ١٨٫٥ نقص وزن، ١٨٫٥–٢٤٫٩ نطاق صحي، ٢٥–٢٩٫٩ زيادة وزن، و٣٠ فأكثر ضمن نطاق السمنة (الدرجة الأولى ٣٠–٣٤٫٩، الثانية ٣٥–٣٩٫٩، الثالثة ٤٠+). لكن المؤشر رقم فحص فقط: لا يقيس العضلات أو توزيع الدهون أو الصحة مباشرة، وقد تختلف الحدود لبعض المجموعات. قد يتشارك رياضي وشخص قليل العضلات المؤشر نفسه بينما صحّتهما مختلفة جدًا.">Body mass index (BMI) is your weight in kilograms divided by your height in metres squared. As a rough adult guide: under 18.5 is underweight, 18.5–24.9 is a healthy range, 25–29.9 is overweight, and 30 or above is in the obesity range (class I 30–34.9, class II 35–39.9, class III 40+). But BMI is only a screening number: it does not measure muscle, fat distribution or health directly, and cut-offs can differ for some populations. An athlete and someone with little muscle can share a BMI yet have very different health.</p>
+      <h4 data-en="Why waist matters too" data-ar="لماذا يهم الخصر أيضًا">Why waist matters too</h4>
+      <p data-en="Waist circumference adds useful information about fat stored around the organs, which carries more health risk than fat elsewhere. Broadly, higher risk is often quoted above about 102 cm in men and 88 cm in women (some guidance uses 94 cm and 80 cm). Measure at the navel after breathing out gently, without pulling the tape tight. Watching your waist trend alongside your weight gives a fuller picture — and it sometimes improves even when the scale is stubborn." data-ar="محيط الخصر يضيف معلومة مفيدة عن الدهون المخزّنة حول الأعضاء، وهي أخطر على الصحة من دهون الأماكن الأخرى. عمومًا يُذكر ارتفاع الخطر فوق نحو ١٠٢ سم للرجال و٨٨ سم للنساء (وبعض التوجيهات تستخدم ٩٤ و٨٠ سم). قِس عند السرّة بعد الزفير برفق، دون شدّ الشريط. متابعة اتجاه خصرك مع وزنك تعطي صورة أكمل — وقد يتحسّن أحيانًا حتى عندما يعاند الميزان.">Waist circumference adds useful information about fat stored around the organs, which carries more health risk than fat elsewhere. Broadly, higher risk is often quoted above about 102 cm in men and 88 cm in women (some guidance uses 94 cm and 80 cm). Measure at the navel after breathing out gently, without pulling the tape tight. Watching your waist trend alongside your weight gives a fuller picture — and it sometimes improves even when the scale is stubborn.</p>
+      <h4 data-en="Plateaus are normal, not failure" data-ar="الثبات طبيعي، لا فشل">Plateaus are normal, not failure</h4>
+      <p data-en="Weight loss almost never happens in a straight line. As you lose weight the body needs fewer calories and adapts to defend its weight, so progress slows — plateaus are expected. The day-to-day scale also swings with fluids, food, salt and sleep, which is why weekly or trend views tell you far more than a single morning. Treat lapses as data, not disaster: notice what happened and return to your routine. Keeping weight off is its own skill, and ongoing tracking is one of the strongest predictors of success." data-ar="نادرًا ما يسير نقص الوزن في خط مستقيم. مع النقص يحتاج الجسم سعرات أقل ويتكيّف للدفاع عن وزنه، فيبطؤ التقدّم — والثبات متوقّع. كما يتأرجح الميزان يوميًا مع السوائل والطعام والملح والنوم، لذا النظرة الأسبوعية أو الاتجاه أصدق بكثير من صباح واحد. اعتبر الزلّات بيانات لا كارثة: لاحظ ما حدث وعُد لروتينك. الحفاظ على النتيجة مهارة بذاتها، والمتابعة المستمرة من أقوى مؤشّرات النجاح.">Weight loss almost never happens in a straight line. As you lose weight the body needs fewer calories and adapts to defend its weight, so progress slows — plateaus are expected. The day-to-day scale also swings with fluids, food, salt and sleep, which is why weekly or trend views tell you far more than a single morning. Treat lapses as data, not disaster: notice what happened and return to your routine. Keeping weight off is its own skill, and ongoing tracking is one of the strongest predictors of success.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section class="section" id="living"><div class="wrap">
+  <div class="eyebrow reveal" data-en="Made for real life" data-ar="مصمّم للحياة الواقعية">Made for real life</div>
+  <div class="h2 reveal" data-en="A companion for meals, movement and every visit" data-ar="رفيق للوجبات والحركة وكل زيارة">A companion for meals, movement and every visit</div>
+  <div class="gal reveal">
+    <div class="gcard big"><img loading="lazy" data-img="photo-1512621776951-a57141f2eefd" alt=""><div class="cap"><b data-en="Eat well, not less-of-everything" data-ar="كُل جيدًا، لا أقلّ من كل شيء">Eat well, not less-of-everything</b><span data-en="Protein-first, plants, portions" data-ar="البروتين أولًا، نباتات، حصص">Protein-first, plants, portions</span></div></div>
+    <div class="gcard"><img loading="lazy" data-img="photo-1476480862126-209bfaa8edc8" alt=""><div class="cap"><b data-en="Move a little more" data-ar="تحرّك أكثر قليلًا">Move a little more</b><span data-en="150 minutes a week" data-ar="١٥٠ دقيقة أسبوعيًا">150 minutes a week</span></div></div>
+    <div class="gcard"><img loading="lazy" data-img="photo-1523362628745-0c100150b504" alt=""><div class="cap"><b data-en="Hydrate" data-ar="حافظ على الترطيب">Hydrate</b><span data-en="Especially after procedures" data-ar="خاصة بعد الإجراءات">Especially after procedures</span></div></div>
+    <div class="gcard"><img loading="lazy" data-img="photo-1498837167922-ddd27525d352" alt=""><div class="cap"><b data-en="Plan meals" data-ar="خطّط لوجباتك">Plan meals</b><span data-en="Gulf foods in mind" data-ar="أطعمة الخليج في الحسبان">Gulf foods in mind</span></div></div>
+    <div class="gcard"><img loading="lazy" data-img="photo-1571019613454-1cb2f99b2d8b" alt=""><div class="cap"><b data-en="Protect your muscle" data-ar="احمِ عضلاتك">Protect your muscle</b><span data-en="Strength + protein" data-ar="قوة + بروتين">Strength + protein</span></div></div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ===================== FAQ (expansive) ===================== -->
+<section class="section" id="faq"><div class="wrap narrow">
+  <div class="eyebrow reveal" data-en="Questions, answered" data-ar="أسئلة وإجابات">Questions, answered</div>
+  <div class="h2 reveal" data-en="Frequently asked questions" data-ar="الأسئلة الشائعة">Frequently asked questions</div>
+  <div class="faq reveal">
+    <details><summary data-en="Is Qawam a medical device or a diet plan?" data-ar="هل قوام جهاز طبي أو خطة حمية؟">Is Qawam a medical device or a diet plan?</summary><div class="ans" data-en="No. Qawam is a non-medical health companion for personal tracking and education. It does not diagnose, predict, prescribe calories or drug doses, or replace professional care. Everything it shows is descriptive — a way to organise your journey and prepare for conversations with your healthcare team." data-ar="لا. قوام رفيق صحي غير طبي للتتبّع الذاتي والتثقيف. لا يشخّص أو يتنبّأ أو يصف سعرات أو جرعات دواء، ولا يحلّ محلّ الرعاية المهنية. كل ما يعرضه وصفي — وسيلة لتنظيم رحلتك والاستعداد للنقاش مع فريقك الصحي.">No. Qawam is a non-medical health companion for personal tracking and education. It does not diagnose, predict, prescribe calories or drug doses, or replace professional care. Everything it shows is descriptive — a way to organise your journey and prepare for conversations with your healthcare team.</div></details>
+    <details><summary data-en="Which pathway is right for me?" data-ar="أي مسار يناسبني؟">Which pathway is right for me?</summary><div class="ans" data-en="That depends on your starting point, health conditions, previous attempts and preferences — and the pathways combine rather than compete. Broadly, lifestyle change suits everyone and is often tried first; medications are typically considered at a higher BMI or with weight-related conditions; endoscopic procedures are a less invasive step; and surgery is the most effective option for severe obesity. This decision should always be shared with a specialist team. Qawam helps you learn about each and prepare good questions." data-ar="يعتمد ذلك على نقطة بدايتك وحالاتك الصحية ومحاولاتك السابقة وتفضيلاتك — والمسارات تتكامل لا تتنافس. عمومًا: تغيير نمط الحياة يناسب الجميع ويُجرَّب أولًا غالبًا؛ والأدوية تُدرَس عند مؤشر أعلى أو حالات مرتبطة بالوزن؛ والإجراءات التنظيرية خطوة أقل توغّلًا؛ والجراحة الأكثر فعالية للسمنة الشديدة. يُتّخذ هذا القرار دائمًا مع فريق مختص. يساعدك قوام على التعلّم عن كل مسار وتحضير أسئلة جيدة.">That depends on your starting point, health conditions, previous attempts and preferences — and the pathways combine rather than compete. Broadly, lifestyle change suits everyone and is often tried first; medications are typically considered at a higher BMI or with weight-related conditions; endoscopic procedures are a less invasive step; and surgery is the most effective option for severe obesity. This decision should always be shared with a specialist team. Qawam helps you learn about each and prepare good questions.</div></details>
+    <details><summary data-en="Do the GLP-1 medications mean I don't need to change my diet?" data-ar="هل تعني أدوية GLP-1 أنني لست بحاجة لتغيير غذائي؟">Do the GLP-1 medications mean I don't need to change my diet?</summary><div class="ans" data-en="No — medicines work best alongside eating and activity changes, not instead of them. They reduce appetite, which makes healthy eating easier, but protecting muscle with enough protein and strength activity, and building habits you can keep, is what makes results last. Weight often returns if a medicine stops, so lifestyle remains the foundation throughout." data-ar="لا — الأدوية تعمل أفضل مع تغييرات الأكل والنشاط لا بدلًا منها. تقلّل الشهية فتسهّل الأكل الصحي، لكن حماية العضلات ببروتين كافٍ ونشاط قوة، وبناء عادات تستطيع الاستمرار عليها، هو ما يُديم النتائج. غالبًا يعود الوزن عند إيقاف الدواء، لذا يبقى نمط الحياة الأساس طوال الوقت.">No — medicines work best alongside eating and activity changes, not instead of them. They reduce appetite, which makes healthy eating easier, but protecting muscle with enough protein and strength activity, and building habits you can keep, is what makes results last. Weight often returns if a medicine stops, so lifestyle remains the foundation throughout.</div></details>
+    <details><summary data-en="What happens to my data?" data-ar="ماذا يحدث لبياناتي؟">What happens to my data?</summary><div class="ans" data-en="Everything you log stays on your device by default — there is no account required to use Qawam. You can export a copy anytime, or permanently delete everything from the More tab. When you generate a doctor summary, you choose when and with whom to share it." data-ar="كل ما تسجّله يبقى على جهازك افتراضيًا — ولا يلزم حساب لاستخدام قوام. يمكنك تصدير نسخة في أي وقت، أو حذف كل شيء نهائيًا من تبويب «المزيد». وعند إنشاء ملخّص للطبيب، أنت تختار متى ومع من تشاركه.">Everything you log stays on your device by default — there is no account required to use Qawam. You can export a copy anytime, or permanently delete everything from the More tab. When you generate a doctor summary, you choose when and with whom to share it.</div></details>
+    <details><summary data-en="Can I use Qawam after surgery or an endoscopic procedure?" data-ar="هل أستطيع استخدام قوام بعد الجراحة أو الإجراء التنظيري؟">Can I use Qawam after surgery or an endoscopic procedure?</summary><div class="ans" data-en="Yes — that's exactly what the post-op journey is for. It walks you through the staged diet from clear liquids to regular textures, lets you mark your current stage, and gives you a daily vitamins checklist so lifelong supplements become a habit. Follow the exact timing your own team gives you." data-ar="نعم — لذلك وُجدت رحلة ما بعد الإجراء. ترشدك خلال الغذاء المتدرّج من السوائل الصافية إلى القوام العادي، وتتيح لك تحديد مرحلتك الحالية، وتمنحك قائمة فيتامينات يومية لتصبح المكمّلات مدى الحياة عادة. اتبع التوقيت الدقيق الذي يحدّده فريقك.">Yes — that's exactly what the post-op journey is for. It walks you through the staged diet from clear liquids to regular textures, lets you mark your current stage, and gives you a daily vitamins checklist so lifelong supplements become a habit. Follow the exact timing your own team gives you.</div></details>
+    <details><summary data-en="Is it free, and does it work offline?" data-ar="هل هو مجاني، ويعمل دون إنترنت؟">Is it free, and does it work offline?</summary><div class="ans" data-en="Yes to both. Qawam is completely free and works as an installable app: open it in your browser or add it to your home screen, and it keeps working offline. It is fully bilingual in English and Arabic with right-to-left support." data-ar="نعم لكليهما. قوام مجاني تمامًا ويعمل كتطبيق قابل للتثبيت: افتحه في متصفّحك أو أضِفه لشاشتك الرئيسية، ويستمر بالعمل دون إنترنت. وهو ثنائي اللغة بالكامل بالعربية والإنجليزية مع دعم الكتابة من اليمين لليسار.">Yes to both. Qawam is completely free and works as an installable app: open it in your browser or add it to your home screen, and it keeps working offline. It is fully bilingual in English and Arabic with right-to-left support.</div></details>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="quote reveal">
+    <blockquote data-en="“Seeing all four options explained in one place — and watching my own numbers move — made the whole journey feel possible instead of overwhelming.”" data-ar="«رؤية الخيارات الأربعة مشروحة في مكان واحد — ومتابعة أرقامي تتحرّك — جعلت الرحلة كلها ممكنة بدل أن تكون مرهقة.»">“Seeing all four options explained in one place — and watching my own numbers move — made the whole journey feel possible instead of overwhelming.”</blockquote>
+    <div class="who" data-en="— A person managing their weight" data-ar="— شخص يدير وزنه">— A person managing their weight</div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="ctaband reveal">
+    <h2 data-en="Start today" data-ar="ابدأ اليوم">Start today</h2>
+    <p data-en="Free, bilingual, and private. Explore all four pathways, track your progress, and read as deeply as you like — open it in your browser or add it to your home screen." data-ar="مجاني وثنائي اللغة وخاص. استكشف المسارات الأربعة، وتابع تقدّمك، واقرأ بالعمق الذي تريد — افتحه في متصفّحك أو أضِفه لشاشتك الرئيسية.">Free, bilingual, and private. Explore all four pathways, track your progress, and read as deeply as you like — open it in your browser or add it to your home screen.</p>
+    <a class="btn btn-primary" href="index.html" data-en="Open Qawam" data-ar="افتح قوام">Open Qawam</a>
+  </div>
+</div></section>
+
+<footer class="foot" id="about"><div class="wrap">
+  <div class="brand" style="margin-bottom:12px"><span class="mark">ق</span> <b>Qawam · قوام</b></div>
+  <p data-en="Qawam is a non-medical health companion for personal tracking and education about weight management. It does not provide medical advice, diagnosis, treatment, calorie prescriptions or drug dosing, and is not a substitute for professional care. Always consult your healthcare provider before starting any diet, medication, endoscopic procedure or surgery. If you have severe abdominal pain, persistent vomiting, black stools, chest pain or trouble breathing, seek urgent care." data-ar="قوام رفيق صحي غير طبي للتتبّع الذاتي والتثقيف حول إدارة الوزن. لا يقدّم نصيحة طبية أو تشخيصًا أو علاجًا أو وصفات سعرات أو جرعات دواء، وليس بديلًا عن الرعاية المهنية. استشر دائمًا مقدّم الرعاية الصحية قبل بدء أي حمية أو دواء أو إجراء تنظيري أو جراحة. إذا كان لديك ألم بطن شديد أو قيء مستمر أو براز أسود أو ألم صدر أو صعوبة تنفّس، اطلب رعاية عاجلة.">Qawam is a non-medical health companion for personal tracking and education about weight management. It does not provide medical advice, diagnosis, treatment, calorie prescriptions or drug dosing, and is not a substitute for professional care. Always consult your healthcare provider before starting any diet, medication, endoscopic procedure or surgery. If you have severe abdominal pain, persistent vomiting, black stools, chest pain or trouble breathing, seek urgent care.</p>
+  <p class="sub">By the Saudi Gastroenterology Association. © <span id="yr"></span> Qawam.</p>
+</div></footer>
+
+<script>
+var L=(new URLSearchParams(location.search).get('lang')||localStorage.getItem('qawamweb_lang'))==='ar'?'ar':'en';
+var UNS=function(id,w){return 'https://images.unsplash.com/'+id+'?w='+(w||900)+'&q=80&auto=format&fit=crop';};
+function imgs(){document.querySelectorAll('img[data-img]').forEach(function(im){var big=im.closest('.gcard.big');im.src=UNS(im.getAttribute('data-img'),big?1100:700);im.onerror=function(){im.style.opacity=0;im.parentElement.style.background='linear-gradient(150deg,var(--accent),var(--accent2))';};});}
+function setLang(l){L=l;try{localStorage.setItem('qawamweb_lang',l);}catch(e){}document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-en]').forEach(function(e){var v=e.getAttribute(l==='ar'?'data-ar':'data-en');if(v!=null)e.textContent=v;});
+  var lb=document.querySelector('.lang');if(lb)lb.textContent=l==='ar'?'English':'العربية';
+  var fr=document.getElementById('appframe');if(fr)fr.src='index.html?lang='+l;}
+function reveal(){if(!('IntersectionObserver' in window)){document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in');});return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});document.querySelectorAll('.reveal').forEach(function(e){io.observe(e);});}
+function counters(){var els=document.querySelectorAll('[data-count]');if(!('IntersectionObserver' in window)){els.forEach(function(e){e.textContent=e.getAttribute('data-count');});return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var el=e.target,to=+el.getAttribute('data-count'),t0=performance.now();(function step(t){var k=Math.min((t-t0)/900,1);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step);})(t0);io.unobserve(el);}});},{threshold:.5});els.forEach(function(e){io.observe(e);});}
+document.getElementById('yr').textContent=new Date().getFullYear();
+imgs();reveal();counters();
+if(L==='ar')setLang('ar');
+</script>
+</body>
+</html>
