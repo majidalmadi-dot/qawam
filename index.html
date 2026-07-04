@@ -393,7 +393,7 @@ function go(n,o){o=o||{};if(!o.replace&&CURRENT&&CURRENT!==n)STACK.push(CURRENT)
 function goBack(){if(STACK.length){CURRENT=STACK.pop();render();}else navTab('today');}
 const MAIN=['today','track','progress','learn','more'];
 function navTab(n){STACK=[];CURRENT=n;CURRENT_OPTS={};render();}
-function render(){applyDir();const host=$('#screens');host.innerHTML='';const fn=ROUTES[CURRENT]||ROUTES['today'];const node=el('<div class="screen active"></div>');fn(node,CURRENT_OPTS);host.appendChild(node);node.scrollTop=0;const tb=$('#tabbar');if(MAIN.includes(CURRENT)){tb.classList.remove('hidden');renderTabs();}else tb.classList.add('hidden');}
+function render(){applyDir();const host=$('#screens');host.innerHTML='';const fn=ROUTES[CURRENT]||ROUTES['today'];const node=el('<div class="screen active"></div>');fn(node,CURRENT_OPTS);host.appendChild(node);node.scrollTop=0;try{animNums(node);}catch(e){}const tb=$('#tabbar');if(MAIN.includes(CURRENT)){tb.classList.remove('hidden');renderTabs();}else tb.classList.add('hidden');}
 function renderTabs(){const tb=$('#tabbar');const items=[['today','🏠','tabToday'],['track','➕','tabTrack'],['progress','📈','tabProgress'],['learn','📚','tabLearn'],['more','⋯','tabMore']];tb.innerHTML=items.map(([n,ic,lab])=>`<button class="tab ${CURRENT===n?'on':''}" onclick="navTab('${n}')"><span class="ic">${ic}</span>${t(lab)}</button>`).join('');}
 
 /* ---------- charts (inline SVG) ---------- */
@@ -1027,6 +1027,9 @@ route('lesson',(n,o)=>{const ar=isAr();const c=courseById(o.id);if(!c)return go(
   </div>`;});
 window.toggleLesson=(id,day)=>{const st=S.courses[id]||{done:[]};const k=st.done.indexOf(day);if(k<0){st.done.push(day);toast(isAr()?'🎉 أحسنت':'🎉 Nice!');}else st.done.splice(k,1);S.courses[id]=st;save();
   const c=courseById(id);if(k<0&&day<c.days.length-1)go('lesson',{id,day:day+1});else render();};
+
+/* ---------- animated number count-ups (best-app motion) ---------- */
+function animNums(root){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;root.querySelectorAll('.kpi .v').forEach(function(el){if(el.children.length)return;var raw=el.textContent.trim().replace(/,/g,'');if(!/^\d+(\.\d+)?$/.test(raw))return;var to=parseFloat(raw);if(!(to>0)||to>100000)return;var dec=raw.indexOf('.')>=0?1:0;var t0=performance.now();(function step(t){var k=Math.min((t-t0)/520,1);var e2=1-Math.pow(1-k,3);el.textContent=(to*e2).toFixed(dec);if(k<1)requestAnimationFrame(step);else el.textContent=raw;})(performance.now());});}
 
 /* ---------- boot ---------- */
 window.navTab=navTab;window.go=go;window.goBack=goBack;window.closeSheet=closeSheet;
