@@ -131,6 +131,14 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 </style>
 </head>
 <body>
+<a id="floatCta" class="float-cta" href="index.html" data-en="Open the app" data-ar="افتح التطبيق">Open the app</a>
+<style>.float-cta{position:fixed;bottom:20px;left:50%;transform:translate(-50%,140%);z-index:300;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04121A;font-weight:800;padding:13px 24px;border-radius:999px;text-decoration:none;box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;transition:transform .45s cubic-bezier(.34,1.4,.5,1),opacity .3s;font-size:14.5px;letter-spacing:.2px}
+.float-cta::after{content:' ↗'}
+.float-cta.show{transform:translate(-50%,0);opacity:1}
+.float-cta:active{transform:translate(-50%,3px) scale(.97)}
+html[data-mode="light"] .float-cta{color:#fff}
+@media(prefers-reduced-motion:reduce){.float-cta{transition:opacity .3s}}</style>
+<script>(function(){var c=document.getElementById('floatCta');if(!c)return;function u(){var b=document.body.scrollHeight-window.innerHeight-window.scrollY;if(window.scrollY>440&&b>320)c.classList.add('show');else c.classList.remove('show');}window.addEventListener('scroll',u,{passive:true});window.addEventListener('resize',u);u();})();</script>
 <header class="nav">
   <a class="brand" href="#top"><span class="mark">ق</span><span data-en="Qawam" data-ar="قوام">Qawam</span></a>
   <nav class="nlinks">
