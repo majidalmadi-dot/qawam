@@ -185,11 +185,19 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
 html[data-mode="light"] #wallfx b{opacity:.17}
 html[data-anim="off"] #wallfx b{animation:none;opacity:.14}
 @media(prefers-reduced-motion:reduce){#wallfx b{animation:none}}
+#wallscrim{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
+html[data-wall="custom"] #wallscrim{display:block;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 42%,transparent),color-mix(in srgb,var(--bg) 72%,transparent))}
+html[data-wall="custom"] #wallfx b{opacity:.12}
+#app.flowbg{background-size:300% 300% !important;animation:flowmove 20s ease-in-out infinite}
+@keyframes flowmove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+html[data-anim="off"] #app.flowbg{animation:none}
+@media(prefers-reduced-motion:reduce){#app.flowbg{animation:none}}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="wallfx" aria-hidden="true"><b></b><b></b><b></b></div>
+  <div id="wallscrim" aria-hidden="true"></div>
   <div id="screens"></div>
   <nav class="tabbar hidden" id="tabbar"></nav>
   <button id="fab" aria-label="Quick log" onclick="openQuickAdd()"><span style="font-size:27px;line-height:1;font-weight:300;margin-top:-2px">＋</span></button>
@@ -1306,6 +1314,9 @@ const THEMES=[
   {id:'mono',en:'Ink',ar:'حبر',like:'Mono',mode:'light',cat:'calm',
    vars:{'--bg':'#F5F5F6','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#EFEFF1','--line':'#E0E0E3','--txt':'#16181C','--muted':'#55595F','--faint':'#7C8087','--accent':'#1F2937','--accent2':'#6B7280','--purple':'#6B7280','--warn':'#B4741A','--bad':'#B23B33','--good':'#2E7D5B','--accent-d':'#E8E8EB','--nav':'rgba(255,255,255,.85)'},
    art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F4F5"/><stop offset="1" stop-color="#FAFAFB"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="310" cy="120" r="70" fill="#E4E4E6"/><circle cx="70" cy="300" r="40" fill="#EAEAEC"/></svg>`},
+  {id:'flowaurora',en:'Living Aurora',ar:'شفق حيّ',like:'Live',mode:'dark',cat:'nature',flow:true,vars:{'--bg':'#08201c','--bg2':'#0c2a26','--card':'#102f2a','--card2':'#17403a','--line':'#255049','--txt':'#EAF5F0','--muted':'#8FB6AC','--faint':'#5C7E76','--accent':'#37E0B0','--accent2':'#4FA8FF','--purple':'#9B7CFF','--warn':'#FFC061','--bad':'#FF6B7E','--good':'#37E0B0','--accent-d':'#123c34','--nav':'rgba(12,42,38,.9)'},wall:'linear-gradient(125deg,#06231f,#0b3b4a,#123a6b,#2a1d5a,#06231f)'},
+  {id:'flowsunset',en:'Sunset Drift',ar:'انسياب الغروب',like:'Live',mode:'dark',cat:'seasonal',flow:true,vars:{'--bg':'#221636','--bg2':'#2a1c42','--card':'#32224e','--card2':'#3e2a60','--line':'#4c3673','--txt':'#F6ECFF','--muted':'#C0A6E0','--faint':'#8E74B8','--accent':'#FF7A4D','--accent2':'#FF5FA2','--purple':'#B36BFF','--warn':'#FFC061','--bad':'#FF6B6B','--good':'#37D9A0','--accent-d':'#3a2740','--nav':'rgba(42,28,66,.9)'},wall:'linear-gradient(125deg,#241a46,#5a2e5e,#8a3a4e,#c85a2e,#241a46)'},
+  {id:'flowocean',en:'Deep Current',ar:'تيار عميق',like:'Live',mode:'dark',cat:'nature',flow:true,vars:{'--bg':'#062033','--bg2':'#0a2c44','--card':'#0e3752','--card2':'#154865','--line':'#245f80','--txt':'#E4F3FA','--muted':'#8FBAD0','--faint':'#5E8AA2','--accent':'#2FC9E0','--accent2':'#37E0B0','--purple':'#8FA8FF','--warn':'#FFC061','--bad':'#FF6B7E','--good':'#37E0B0','--accent-d':'#123c50','--nav':'rgba(10,44,68,.9)'},wall:'linear-gradient(125deg,#062033,#0a3a54,#0e5a6e,#123a6b,#062033)'},
 ];
 const CATMAP={whoop:'brand',nebula:'brand',calm:'calm',apple:'calm',mint:'calm',forest:'nature',sandstone:'seasonal',headspace:'more',flo:'more',oura:'more'};
 const CAT_ORDER=[['brand',['Brand & signature','السمة والهوية'],'🩵'],['anime',['Anime & vibrant','أنمي وحيوية'],'✨'],['nature',['Nature','الطبيعة'],'🌿'],['seasonal',['Seasonal & Saudi','مواسم وسعودية'],'🌙'],['retro',['Bold & retro','جريء وكلاسيكي'],'🕹️'],['calm',['Calm & minimal','هدوء وبساطة'],'☁️'],['more',['More looks','مظاهر أخرى'],'🎨']];
@@ -1313,7 +1324,7 @@ function themeCat(th){return th.cat||CATMAP[th.id]||'more';}
 function wallCss(th){ if(th.art){return 'url("data:image/svg+xml,'+encodeURIComponent(th.art)+'") center top / cover no-repeat, '+(th.base||th.vars['--bg']); } return th.wall||th.vars['--bg']; }
 function applyTheme(){const th=THEMES.find(x=>x.id===(S.prefs.theme||'qawam'))||THEMES[0];
   const r=document.documentElement;Object.entries(th.vars).forEach(([k,v])=>r.style.setProperty(k,v));
-  const app=$('#app');if(app)app.style.background=wallCss(th);
+  const app=$('#app');const cw=S.prefs&&S.prefs.customWall;if(app){app.style.background=cw?('url("'+cw+'") center center / cover no-repeat'):(th.flow?th.wall:wallCss(th));app.classList.toggle('flowbg',!cw&&!!th.flow);}r.setAttribute('data-wall',cw?'custom':'');
   const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',th.vars['--bg']);
   if(S.prefs&&S.prefs.accent){r.style.setProperty('--accent',S.prefs.accent);r.style.setProperty('--accent-d','color-mix(in srgb, '+S.prefs.accent+' 15%, var(--card))');}
   r.setAttribute('data-mode',th.mode);r.setAttribute('data-anim',(S.prefs&&S.prefs.ambient===false)?'off':'on');}
@@ -1337,6 +1348,8 @@ route('theme',(n)=>{const ar=isAr();
    </div>`;
 });
 const ACCENTS=[['','',''],['#00E0B8','Teal','فيروزي'],['#19A0FF','Blue','أزرق'],['#9B7CFF','Purple','بنفسجي'],['#F0468A','Pink','وردي'],['#FF7A2E','Orange','برتقالي'],['#2BD67B','Green','أخضر'],['#FF5C72','Red','أحمر'],['#F5C24B','Gold','ذهبي']];
+window.pickWallpaper=function(){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){var f=inp.files&&inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var max=1080;var w=img.width,h=img.height;var s=Math.min(1,max/Math.max(w,h));var c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);var x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);var url=c.toDataURL('image/jpeg',0.72);if(url.length>2200000){var s2=Math.min(1,860/Math.max(w,h));c.width=Math.round(w*s2);c.height=Math.round(h*s2);x.drawImage(img,0,0,c.width,c.height);url=c.toDataURL('image/jpeg',0.62);}S.prefs.customWall=url;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast(isAr()?'الصورة كبيرة جدًا':'Image is too large');return;}applyTheme();render();toast(isAr()?'✓ تم ضبط خلفيتك':'✓ Your wallpaper is set');};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();};
+window.clearWallpaper=function(){if(S.prefs)delete S.prefs.customWall;save();applyTheme();render();toast(isAr()?'أُزيلت الخلفية':'Wallpaper removed');};
 window.setAmbient=function(on){S.prefs.ambient=on;save();document.documentElement.setAttribute('data-anim',on?'on':'off');render();};
 window.setAccent=function(hex){if(hex){S.prefs.accent=hex;}else if(S.prefs){delete S.prefs.accent;}save();applyTheme();render();};
 window.surpriseTheme=function(){var th=THEMES[Math.floor(Math.random()*THEMES.length)];setTheme(th.id);};
@@ -1348,7 +1361,7 @@ function accentRow(){var ar=isAr();var cur=(S.prefs&&S.prefs.accent)||'';
     var arg=hex?("'"+hex+"'"):'null';
     return '<button onclick="setAccent('+arg+')" aria-label="'+(isDef?(ar?'حسب السمة':'Theme default'):(ar?a[2]:a[1]))+'" style="width:34px;height:34px;border-radius:50%;'+bg+';border:'+border+';cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">'+mark+'</button>';
   }).join('');
-  return '<div class="card"><div class="between" style="margin-bottom:8px"><b style="font-size:14.5px">'+(ar?'اجعلها لك':'Make it yours')+'</b><div class="row" style="gap:7px"><button onclick="setAmbient(!(S.prefs&&S.prefs.ambient!==false))" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">'+((S.prefs&&S.prefs.ambient===false)?('✨ '+(ar?'مطفأ':'Off')):('✨ '+(ar?'مضيء':'On')))+'</button><button onclick="surpriseTheme()" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🎲 '+(ar?'فاجئني':'Surprise me')+'</button></div></div><div class="muted" style="font-size:12px;margin-bottom:10px">'+(ar?'لون مميّز يُطبّق فوق أي سمة':'A signature accent applied over any theme')+'</div><div class="row" style="gap:9px;flex-wrap:wrap">'+sw+'</div></div>';
+  return '<div class="card"><div class="between" style="margin-bottom:8px"><b style="font-size:14.5px">'+(ar?'اجعلها لك':'Make it yours')+'</b><div class="row" style="gap:7px"><button onclick="setAmbient(!(S.prefs&&S.prefs.ambient!==false))" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">'+((S.prefs&&S.prefs.ambient===false)?('✨ '+(ar?'مطفأ':'Off')):('✨ '+(ar?'مضيء':'On')))+'</button><button onclick="surpriseTheme()" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🎲 '+(ar?'فاجئني':'Surprise me')+'</button></div></div><div class="muted" style="font-size:12px;margin-bottom:10px">'+(ar?'لون مميّز يُطبّق فوق أي سمة':'A signature accent applied over any theme')+'</div><div class="row" style="gap:9px;flex-wrap:wrap">'+sw+'</div><div class="row" style="gap:8px;margin-top:11px;flex-wrap:wrap"><button onclick="pickWallpaper()" style="padding:8px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🖼️ '+(ar?'استخدم صورتي':'Use my photo')+'</button>'+((S.prefs&&S.prefs.customWall)?('<button onclick="clearWallpaper()" style="padding:8px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--muted);font-weight:700;cursor:pointer;font-size:12.5px">'+(ar?'إزالة الصورة':'Remove photo')+'</button>'):'')+'</div></div>';
 }
 
 window.setTheme=function(id){S.prefs.theme=id;save();applyTheme();render();toast(isAr()?'تم الحفظ':'Saved');};
