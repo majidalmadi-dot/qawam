@@ -172,10 +172,24 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
 .theme-card.on .tcheck{display:flex}
 .card,.hero,.topbar,.tabbar,.kpi,.li{transition:background-color .35s ease,border-color .3s ease,color .25s ease}
 @media(prefers-reduced-motion:reduce){.card,.hero,.topbar,.tabbar,.kpi,.li{transition:none!important}}
+#app{position:relative}
+#screens{position:relative;z-index:1}
+#wallfx{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#wallfx b{position:absolute;border-radius:50%;filter:blur(58px);opacity:.30;will-change:transform}
+#wallfx b:nth-child(1){width:46vmax;height:46vmax;background:var(--accent);top:-16vmax;inset-inline-start:-12vmax;animation:wfx1 34s ease-in-out infinite}
+#wallfx b:nth-child(2){width:40vmax;height:40vmax;background:var(--accent2);top:24vmax;inset-inline-end:-16vmax;animation:wfx2 44s ease-in-out infinite}
+#wallfx b:nth-child(3){width:34vmax;height:34vmax;background:var(--purple,var(--accent2));bottom:-14vmax;inset-inline-start:18vmax;animation:wfx3 38s ease-in-out infinite}
+@keyframes wfx1{50%{transform:translate(14vmax,16vmax) scale(1.15)}}
+@keyframes wfx2{50%{transform:translate(-16vmax,10vmax) scale(1.12)}}
+@keyframes wfx3{50%{transform:translate(12vmax,-14vmax) scale(1.2)}}
+html[data-mode="light"] #wallfx b{opacity:.17}
+html[data-anim="off"] #wallfx b{animation:none;opacity:.14}
+@media(prefers-reduced-motion:reduce){#wallfx b{animation:none}}
 </style>
 </head>
 <body>
 <div id="app">
+  <div id="wallfx" aria-hidden="true"><b></b><b></b><b></b></div>
   <div id="screens"></div>
   <nav class="tabbar hidden" id="tabbar"></nav>
   <button id="fab" aria-label="Quick log" onclick="openQuickAdd()"><span style="font-size:27px;line-height:1;font-weight:300;margin-top:-2px">＋</span></button>
@@ -1302,7 +1316,7 @@ function applyTheme(){const th=THEMES.find(x=>x.id===(S.prefs.theme||'qawam'))||
   const app=$('#app');if(app)app.style.background=wallCss(th);
   const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',th.vars['--bg']);
   if(S.prefs&&S.prefs.accent){r.style.setProperty('--accent',S.prefs.accent);r.style.setProperty('--accent-d','color-mix(in srgb, '+S.prefs.accent+' 15%, var(--card))');}
-  r.setAttribute('data-mode',th.mode);}
+  r.setAttribute('data-mode',th.mode);r.setAttribute('data-anim',(S.prefs&&S.prefs.ambient===false)?'off':'on');}
 function themePreview(th){const v=th.vars;
   return `<div class="tprev" style="background:${wallCss(th)}">
     <div style="background:${v['--card']};border:1px solid ${v['--line']};border-radius:8px;padding:6px;flex:1;display:flex;flex-direction:column;gap:5px">
@@ -1323,6 +1337,7 @@ route('theme',(n)=>{const ar=isAr();
    </div>`;
 });
 const ACCENTS=[['','',''],['#00E0B8','Teal','فيروزي'],['#19A0FF','Blue','أزرق'],['#9B7CFF','Purple','بنفسجي'],['#F0468A','Pink','وردي'],['#FF7A2E','Orange','برتقالي'],['#2BD67B','Green','أخضر'],['#FF5C72','Red','أحمر'],['#F5C24B','Gold','ذهبي']];
+window.setAmbient=function(on){S.prefs.ambient=on;save();document.documentElement.setAttribute('data-anim',on?'on':'off');render();};
 window.setAccent=function(hex){if(hex){S.prefs.accent=hex;}else if(S.prefs){delete S.prefs.accent;}save();applyTheme();render();};
 window.surpriseTheme=function(){var th=THEMES[Math.floor(Math.random()*THEMES.length)];setTheme(th.id);};
 function accentRow(){var ar=isAr();var cur=(S.prefs&&S.prefs.accent)||'';
@@ -1333,7 +1348,7 @@ function accentRow(){var ar=isAr();var cur=(S.prefs&&S.prefs.accent)||'';
     var arg=hex?("'"+hex+"'"):'null';
     return '<button onclick="setAccent('+arg+')" aria-label="'+(isDef?(ar?'حسب السمة':'Theme default'):(ar?a[2]:a[1]))+'" style="width:34px;height:34px;border-radius:50%;'+bg+';border:'+border+';cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">'+mark+'</button>';
   }).join('');
-  return '<div class="card"><div class="between" style="margin-bottom:8px"><b style="font-size:14.5px">'+(ar?'اجعلها لك':'Make it yours')+'</b><button onclick="surpriseTheme()" style="padding:7px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🎲 '+(ar?'فاجئني':'Surprise me')+'</button></div><div class="muted" style="font-size:12px;margin-bottom:10px">'+(ar?'لون مميّز يُطبّق فوق أي سمة':'A signature accent applied over any theme')+'</div><div class="row" style="gap:9px;flex-wrap:wrap">'+sw+'</div></div>';
+  return '<div class="card"><div class="between" style="margin-bottom:8px"><b style="font-size:14.5px">'+(ar?'اجعلها لك':'Make it yours')+'</b><div class="row" style="gap:7px"><button onclick="setAmbient(!(S.prefs&&S.prefs.ambient!==false))" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">'+((S.prefs&&S.prefs.ambient===false)?('✨ '+(ar?'مطفأ':'Off')):('✨ '+(ar?'مضيء':'On')))+'</button><button onclick="surpriseTheme()" style="padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🎲 '+(ar?'فاجئني':'Surprise me')+'</button></div></div><div class="muted" style="font-size:12px;margin-bottom:10px">'+(ar?'لون مميّز يُطبّق فوق أي سمة':'A signature accent applied over any theme')+'</div><div class="row" style="gap:9px;flex-wrap:wrap">'+sw+'</div></div>';
 }
 
 window.setTheme=function(id){S.prefs.theme=id;save();applyTheme();render();toast(isAr()?'تم الحفظ':'Saved');};
