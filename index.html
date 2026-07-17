@@ -163,6 +163,13 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
   ::-webkit-scrollbar-track{background:transparent}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn:active,.chip:active,.card.tap:active,.iconbtn:active,.card.tap:hover,.pathcard:hover{transform:none}}
+.theme-card{border-radius:18px;overflow:hidden;border:2px solid var(--line);cursor:pointer;transition:.18s;position:relative;aspect-ratio:.62}
+.theme-card.on{border-color:var(--accent);transform:translateY(-2px)}
+.theme-card .tprev{height:100%;display:flex;flex-direction:column;padding:10px;gap:6px}
+.theme-card .tbar{height:7px;border-radius:4px}
+.theme-card .tname{position:absolute;bottom:0;left:0;right:0;padding:8px 10px;font-size:12px;font-weight:700;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));color:#fff}
+.theme-card .tcheck{position:absolute;top:7px;inset-inline-end:7px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#04221d;display:none;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.theme-card.on .tcheck{display:flex}
 </style>
 </head>
 <body>
@@ -662,7 +669,7 @@ route('more',(n)=>{const ar=isAr();n.innerHTML=`${topbar('moreT')}<div class="co
    <div class="card">${mLi('👤',ar?'تعديل التفاصيل':'Edit my details','go(\'profile\')')}</div>
    <div class="section-title">${ar?'الإعدادات':'Settings'}</div>
    <div class="card">
-     ${mLi('🌓',t('theme'),'toggleTheme()',S.prefs.theme==='light'?(ar?'فاتح':'Light'):(ar?'داكن':'Dark'))}
+     ${mLi('🎨',ar?'السمات والخلفية':'Themes & wallpaper','go(\'theme\')')}
      ${mLi('🌐',t('language'),'toggleLangQuick()',isAr()?'العربية':'English')}
      ${mLi('ℹ️',t('about'),'go(\'about\')')}
    </div>
@@ -1207,9 +1214,116 @@ function nudgeBanner(){const nd=getNudge();if(!nd)return '';
   return `<div id="nudgeBan" class="card tap" style="display:flex;align-items:center;gap:11px;border-inline-start:3px solid var(--accent)"><span style="font-size:20px">${nd.icon}</span><div style="flex:1;font-size:13px" onclick="${nd.action}">${nd.text}</div><button onclick="dismissNudge('${nd.id}')" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer">✕</button></div>`;}
 window.dismissNudge=function(id){S.nudgeDismiss=S.nudgeDismiss||{};S.nudgeDismiss[id]=todayKey();save();render();};
 
+/* ===== theme gallery (ported from Rafeeq) ===== */
+const THEMES=[
+  {id:'qawam',en:'Qawam',ar:'قوام',like:'Signature',mode:'dark',cat:'brand',vars:{'--bg':'#0B0F14','--bg2':'#0F151D','--card':'#141C26','--card2':'#1B2530','--line':'#243140','--txt':'#EAF2F8','--muted':'#8DA0B2','--faint':'#5A6B7B','--accent':'#10B981','--accent2':'#0EA5E9','--purple':'#8B5CF6','--warn':'#FFB23E','--bad':'#FF5C72','--good':'#2BD67B','--accent-d':'#0E3A2E','--nav':'rgba(15,21,29,.9)'},wall:'radial-gradient(120% 90% at 50% -10%,#0d3a2e 0%,#0B0F14 55%)'},
+  {id:'whoop',en:'Midnight',ar:'منتصف الليل',like:'WHOOP',mode:'dark',
+   vars:{'--bg':'#0B0F14','--bg2':'#0F151D','--card':'#141C26','--card2':'#1B2530','--line':'#243140','--txt':'#EAF2F8','--muted':'#8DA0B2','--faint':'#5A6B7B','--accent':'#00E0B8','--accent2':'#19A0FF','--purple':'#9B7CFF','--warn':'#FFB23E','--bad':'#FF5C72','--good':'#2BD67B','--accent-d':'#0B3B36','--nav':'rgba(15,21,29,.9)'},
+   wall:'radial-gradient(120% 80% at 50% -10%,#0d2b2a 0%,#0B0F14 55%)'},
+  {id:'oura',en:'Aura',ar:'الهالة',like:'Oura',mode:'dark',
+   vars:{'--bg':'#0E0D12','--bg2':'#15131C','--card':'#1C1926','--card2':'#262232','--line':'#332D42','--txt':'#F1ECF6','--muted':'#A89CB8','--faint':'#6E6480','--accent':'#E8B07A','--accent2':'#C58BF2','--purple':'#C58BF2','--warn':'#F2C24B','--bad':'#FF6B8A','--good':'#7FD1A6','--accent-d':'#2A2030','--nav':'rgba(21,19,28,.92)'},
+   wall:'radial-gradient(120% 90% at 80% -10%,#3a2a1a 0%,#0E0D12 55%)'},
+  {id:'calm',en:'Deep Calm',ar:'هدوء عميق',like:'Calm',mode:'dark',
+   vars:{'--bg':'#0A1730','--bg2':'#0E1F40','--card':'#13294F','--card2':'#1B3361','--line':'#274377','--txt':'#E7F0FF','--muted':'#93AAD0','--faint':'#5E769E','--accent':'#4FA8FF','--accent2':'#7BD8FF','--purple':'#9BA8FF','--warn':'#FFC061','--bad':'#FF7C92','--good':'#5FD0C0','--accent-d':'#10294F','--nav':'rgba(14,31,64,.92)'},
+   wall:'radial-gradient(120% 90% at 50% -10%,#123a6b 0%,#0A1730 55%)'},
+  {id:'forest',en:'Forest',ar:'الغابة',like:'Fitbit',mode:'dark',
+   vars:{'--bg':'#0A1410','--bg2':'#0F1D17','--card':'#14271E','--card2':'#1D3528','--line':'#274A37','--txt':'#E8F5EC','--muted':'#8FB6A0','--faint':'#5C7E6A','--accent':'#46D08A','--accent2':'#8FD14F','--purple':'#9B7CFF','--warn':'#FFB23E','--bad':'#FF5C72','--good':'#46D08A','--accent-d':'#12271C','--nav':'rgba(15,29,23,.92)'},
+   wall:'radial-gradient(120% 90% at 50% -10%,#103a26 0%,#0A1410 55%)'},
+  {id:'apple',en:'Clean',ar:'نظيف',like:'Apple Health',mode:'light',
+   vars:{'--bg':'#F2F4F8','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#EDF1F6','--line':'#DCE3EC','--txt':'#0F1722','--muted':'#5C6B7D','--faint':'#6E7A88','--accent':'#0A84FF','--accent2':'#30C758','--purple':'#7C5CFF','--warn':'#FF9F0A','--bad':'#FF3B30','--good':'#30C758','--accent-d':'#DCEBFF','--nav':'rgba(255,255,255,.82)'},
+   wall:'linear-gradient(180deg,#E4EEFB 0%,#F2F4F8 40%)'},
+  {id:'headspace',en:'Sunshine',ar:'إشراق',like:'Headspace',mode:'light',
+   vars:{'--bg':'#FFF7EC','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#FBEFDD','--line':'#F0E2CC','--txt':'#2A2014','--muted':'#6E5C44','--faint':'#897962','--accent':'#E0691E','--accent2':'#4F86FF','--purple':'#9B7CFF','--warn':'#F2A93B','--bad':'#F0563B','--good':'#3FB984','--accent-d':'#FFE6D2','--nav':'rgba(255,255,255,.82)'},
+   wall:'linear-gradient(180deg,#FFEAD2 0%,#FFF7EC 40%)'},
+  {id:'flo',en:'Blossom',ar:'زهر',like:'Flo',mode:'light',
+   vars:{'--bg':'#FFF0F5','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#FCE6EF','--line':'#F3D7E3','--txt':'#2A1620','--muted':'#7E5868','--faint':'#9A7A8A','--accent':'#F0468A','--accent2':'#9B7CFF','--purple':'#9B7CFF','--warn':'#F2A93B','--bad':'#F0563B','--good':'#3FB984','--accent-d':'#FCE0EC','--nav':'rgba(255,255,255,.82)'},
+   wall:'radial-gradient(120% 80% at 80% -10%,#ffd6e6 0%,#FFF0F5 55%)'},
+  {id:'mint',en:'Fresh Mint',ar:'نعناع',like:'Clue',mode:'light',
+   vars:{'--bg':'#ECF7F0','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#E3F2E9','--line':'#D3EADC','--txt':'#0F2418','--muted':'#4E6B5A','--faint':'#6E9080','--accent':'#1FA85F','--accent2':'#0AAFA0','--purple':'#7C5CFF','--warn':'#E0962A','--bad':'#E2483C','--good':'#1FA85F','--accent-d':'#D6F1E1','--nav':'rgba(255,255,255,.82)'},
+   wall:'linear-gradient(180deg,#D9F2E3 0%,#ECF7F0 40%)'},
+  {id:'nebula',en:'Nebula',ar:'سديم',like:'Samsung Health',mode:'dark',
+   vars:{'--bg':'#0C0A1A','--bg2':'#131029','--card':'#1A1636','--card2':'#241E47','--line':'#332A5C','--txt':'#EFEAFB','--muted':'#AA9CCC','--faint':'#75699B','--accent':'#A78BFA','--accent2':'#5EB0FF','--purple':'#C58BF2','--warn':'#FFC061','--bad':'#FF6B8A','--good':'#5FD0A0','--accent-d':'#241B45','--nav':'rgba(19,16,41,.92)'},
+   wall:'radial-gradient(120% 90% at 50% -10%,#2a1d5a 0%,#0C0A1A 55%)'},
+  {id:'sandstone',en:'Sandstone',ar:'حجر رملي',like:'Vision 2030',mode:'light',
+   vars:{'--bg':'#F6F1E9','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#F1E8D9','--line':'#E6DAC6','--txt':'#241B12','--muted':'#6B5C49','--faint':'#8A7A64','--accent':'#9A6620','--accent2':'#2F8F77','--purple':'#7C5CFF','--warn':'#C9831F','--bad':'#C24A33','--good':'#2F8F77','--accent-d':'#F0E2C9','--nav':'rgba(255,255,255,.82)'},
+   wall:'linear-gradient(180deg,#EFE4D0 0%,#F6F1E9 40%)'},
+  /* ===== Illustrated / personality themes (original art — no third-party IP) ===== */
+  {id:'sakura',en:'Sakura Dream',ar:'حلم الساكورا',like:'Anime',mode:'light',cat:'anime',
+   vars:{'--bg':'#FFF0F6','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#FCE4F0','--line':'#F3D3E5','--txt':'#2A1622','--muted':'#7C5468','--faint':'#9A748A','--accent':'#F0468A','--accent2':'#A66BFF','--purple':'#A66BFF','--warn':'#E0962A','--bad':'#E2483C','--good':'#2FA86A','--accent-d':'#FCDCEC','--nav':'rgba(255,255,255,.82)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD9E8"/><stop offset=".55" stop-color="#F3E3FF"/><stop offset="1" stop-color="#FFF0F6"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="315" cy="120" r="64" fill="#FFC2DB" opacity="0.7"/><circle cx="315" cy="120" r="94" fill="#FFC2DB" opacity="0.22"/><g fill="#FF9EC4"><path d="M60 90c6-10 18-6 16 4 8-6 16 4 8 10 4 10-8 14-14 6-8 6-16-4-10-12-6-2-6-12 0-8z"/><path d="M150 210c5-8 15-5 13 3 7-5 13 3 7 8 3 8-7 11-11 5-7 5-13-3-8-10z" opacity="0.7"/><path d="M300 300c5-8 15-5 13 3 7-5 13 3 7 8 3 8-7 11-11 5-7 5-13-3-8-10z" opacity="0.6"/><path d="M225 130c4-7 13-4 11 3 6-4 11 3 6 7 3 7-6 9-9 4-6 4-11-3-7-8z" opacity="0.6"/></g><path d="M0 650c80-40 150-30 220 0s130 18 180-12v170H0z" fill="#FFD1E4" opacity="0.55"/></svg>`},
+  {id:'neon',en:'Neon City',ar:'مدينة النيون',like:'Anime',mode:'dark',cat:'anime',
+   vars:{'--bg':'#0A0714','--bg2':'#120A22','--card':'#180F2E','--card2':'#221640','--line':'#33235C','--txt':'#ECE6FF','--muted':'#A99BD6','--faint':'#7B6BA0','--accent':'#17E1E6','--accent2':'#FF4FD8','--purple':'#B36BFF','--warn':'#FFC061','--bad':'#FF5C72','--good':'#37E0B0','--accent-d':'#16233A','--nav':'rgba(18,10,34,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A0B3A"/><stop offset=".55" stop-color="#0E0722"/><stop offset="1" stop-color="#0A0714"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="300" cy="150" r="60" fill="#FF4FD8" opacity="0.3"/><circle cx="300" cy="150" r="32" fill="#FF7FE4" opacity="0.6"/><g fill="#0A0714" stroke="#17E1E6" stroke-width="1.5"><rect x="30" y="380" width="46" height="260"/><rect x="86" y="320" width="40" height="320"/><rect x="140" y="410" width="44" height="230"/><rect x="196" y="350" width="50" height="290"/><rect x="258" y="300" width="42" height="340"/><rect x="312" y="400" width="46" height="240"/></g><g fill="#FF4FD8"><rect x="40" y="410" width="6" height="6"/><rect x="96" y="360" width="6" height="6"/><rect x="206" y="390" width="6" height="6"/><rect x="270" y="340" width="6" height="6"/><rect x="322" y="440" width="6" height="6"/></g><g stroke="#17E1E6" stroke-width="1" opacity="0.35"><line x1="0" y1="660" x2="400" y2="660"/><line x1="0" y1="710" x2="400" y2="710"/><line x1="200" y1="640" x2="40" y2="800"/><line x1="200" y1="640" x2="360" y2="800"/></g></svg>`},
+  {id:'shonen',en:'Shonen Sunset',ar:'غروب شونين',like:'Anime',mode:'dark',cat:'anime',
+   vars:{'--bg':'#1C1436','--bg2':'#241A46','--card':'#2C2050','--card2':'#382863','--line':'#463473','--txt':'#F4ECFF','--muted':'#B7A6D6','--faint':'#8574A8','--accent':'#FF7A2E','--accent2':'#37B6FF','--purple':'#B36BFF','--warn':'#FFC061','--bad':'#FF6B6B','--good':'#37D9A0','--accent-d':'#3A2740','--nav':'rgba(36,26,70,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241A46"/><stop offset=".45" stop-color="#5A2E5E"/><stop offset=".8" stop-color="#FF7A2E"/><stop offset="1" stop-color="#FFB05A"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="200" cy="470" r="82" fill="#FFE08A" opacity="0.95"/><circle cx="200" cy="470" r="112" fill="#FFCF6B" opacity="0.28"/><g stroke="#FFFFFF" stroke-width="2" opacity="0.16"><line x1="200" y1="470" x2="0" y2="380"/><line x1="200" y1="470" x2="0" y2="560"/><line x1="200" y1="470" x2="400" y2="380"/><line x1="200" y1="470" x2="400" y2="560"/><line x1="200" y1="470" x2="40" y2="20"/><line x1="200" y1="470" x2="360" y2="20"/></g><path d="M0 620c60-18 120 8 200 0s150-20 200-4v190H0z" fill="#2A1636" opacity="0.7"/></svg>`},
+  {id:'kawaii',en:'Pastel Sky',ar:'سماء الباستيل',like:'Anime',mode:'light',cat:'anime',
+   vars:{'--bg':'#EFFAFF','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#EAF4FA','--line':'#DCEAF2','--txt':'#243040','--muted':'#5B6B7C','--faint':'#7A8A9A','--accent':'#FF8FB3','--accent2':'#3FC9C0','--purple':'#B98BFF','--warn':'#E0962A','--bad':'#E2483C','--good':'#2FA86A','--accent-d':'#FFE3EC','--nav':'rgba(255,255,255,.82)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9F7FF"/><stop offset=".5" stop-color="#F0E6FF"/><stop offset="1" stop-color="#FFF0F7"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><g fill="#FFFFFF" opacity="0.9"><ellipse cx="90" cy="140" rx="60" ry="30"/><ellipse cx="130" cy="150" rx="46" ry="26"/><ellipse cx="300" cy="240" rx="54" ry="28"/><ellipse cx="255" cy="250" rx="40" ry="22"/></g><path d="M320 90l6 14 15 1-11 10 3 15-13-8-13 8 3-15-11-10 15-1z" fill="#FFCF6B"/><g fill="#B98BFF" opacity="0.7"><path d="M70 330l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z"/><path d="M330 430l3 7 8 1-6 6 2 8-7-4-7 4 2-8-6-6 8-1z"/></g></svg>`},
+  {id:'mountain',en:'Mountain Dawn',ar:'فجر الجبال',like:'Nature',mode:'light',cat:'nature',
+   vars:{'--bg':'#EEF4F6','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#E6EEF1','--line':'#D6E2E6','--txt':'#14232A','--muted':'#4E6670','--faint':'#6E868F','--accent':'#E07A3E','--accent2':'#2F8FA8','--purple':'#7C5CFF','--warn':'#D9902A','--bad':'#DB4A3A','--good':'#2F9C7A','--accent-d':'#F6E1D2','--nav':'rgba(255,255,255,.82)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE7C2"/><stop offset=".45" stop-color="#FFD6E0"/><stop offset="1" stop-color="#EAF3F7"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="200" cy="200" r="56" fill="#FFB37A" opacity="0.9"/><path d="M0 520l90-130 70 90 60-120 90 150 90-80v420H0z" fill="#7FA8B0" opacity="0.5"/><path d="M0 600l110-90 80 70 90-100 110 120v240H0z" fill="#4E7A86" opacity="0.7"/></svg>`},
+  {id:'ocean',en:'Ocean Deep',ar:'أعماق المحيط',like:'Nature',mode:'dark',cat:'nature',
+   vars:{'--bg':'#08283C','--bg2':'#0B3350','--card':'#0F3E5E','--card2':'#164E70','--line':'#256084','--txt':'#E4F3FA','--muted':'#8FBAD0','--faint':'#5E8AA2','--accent':'#2FC9E0','--accent2':'#37E0B0','--purple':'#8FA8FF','--warn':'#FFC061','--bad':'#FF6B7E','--good':'#37E0B0','--accent-d':'#123C50','--nav':'rgba(11,51,80,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A2A44"/><stop offset=".5" stop-color="#0A3A54"/><stop offset="1" stop-color="#08283C"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><g fill="#2FA0C0" opacity="0.22"><path d="M0 300c60-30 120 30 200 0s140-30 200 0v60c-60 30-120-30-200 0s-140 30-200 0z"/><path d="M0 440c60-30 120 30 200 0s140-30 200 0v60c-60 30-120-30-200 0s-140 30-200 0z"/></g><g fill="#7FE0F0" opacity="0.5"><circle cx="80" cy="200" r="5"/><circle cx="150" cy="140" r="3"/><circle cx="300" cy="180" r="4"/><circle cx="330" cy="120" r="3"/><circle cx="220" cy="240" r="4"/></g></svg>`},
+  {id:'aurora',en:'Aurora',ar:'الشفق القطبي',like:'Nature',mode:'dark',cat:'nature',
+   vars:{'--bg':'#040B18','--bg2':'#08152A','--card':'#0C1E38','--card2':'#132A48','--line':'#1F3A5C','--txt':'#E6F0FA','--muted':'#93AEC8','--faint':'#5E7898','--accent':'#37E0A0','--accent2':'#9B7CFF','--purple':'#9B7CFF','--warn':'#FFC061','--bad':'#FF6B7E','--good':'#37E0A0','--accent-d':'#0E2A40','--nav':'rgba(8,21,42,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#071427"/><stop offset="1" stop-color="#040B18"/></linearGradient><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37E0A0" stop-opacity="0"/><stop offset=".5" stop-color="#37E0A0" stop-opacity=".55"/><stop offset="1" stop-color="#9B7CFF" stop-opacity="0"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><g fill="#FFFFFF"><circle cx="60" cy="90" r="1.5"/><circle cx="140" cy="60" r="1"/><circle cx="250" cy="100" r="1.5"/><circle cx="330" cy="70" r="1"/><circle cx="300" cy="160" r="1"/><circle cx="90" cy="180" r="1"/></g><path d="M-20 120c80 40 120-40 200-20s180 60 240 20v170c-80 40-160-40-240-20S60 330-20 290z" fill="url(#a)" opacity="0.85"/><path d="M-20 230c80 40 140-30 220-10s160 50 220 10v130c-80 40-160-30-240-10S60 420-20 380z" fill="url(#a)" opacity="0.5"/></svg>`},
+  {id:'ramadan',en:'Ramadan Night',ar:'ليلة رمضان',like:'Seasonal',mode:'dark',cat:'seasonal',
+   vars:{'--bg':'#0A1128','--bg2':'#0F1A3A','--card':'#152249','--card2':'#1E2E5E','--line':'#2C3E78','--txt':'#EAF0FF','--muted':'#9FB0D8','--faint':'#6E7EA8','--accent':'#F5D06B','--accent2':'#5B8DEF','--purple':'#9B7CFF','--warn':'#F5C24B','--bad':'#FF6B7E','--good':'#4FD0A0','--accent-d':'#1B2A54','--nav':'rgba(15,26,58,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14224E"/><stop offset=".6" stop-color="#0C1636"/><stop offset="1" stop-color="#0A1128"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><path d="M300 118a58 58 0 1 0 0 100 46 46 0 1 1 0-100z" fill="#F5D06B"/><g fill="#FFFFFF"><circle cx="70" cy="90" r="1.6"/><circle cx="130" cy="140" r="1.2"/><circle cx="200" cy="80" r="1.6"/><circle cx="160" cy="200" r="1.2"/><circle cx="90" cy="240" r="1.4"/><circle cx="250" cy="270" r="1.2"/></g><g fill="#F5D06B" opacity="0.5"><path d="M60 380l6-14 6 14v46l-6 8-6-8z"/><path d="M120 420l5-12 5 12v40l-5 7-5-7z"/></g><path d="M0 580l40-40h60l40 40 60-50 60 50 40-30h60v290H0z" fill="#0A1128" opacity="0.8"/></svg>`},
+  {id:'dune',en:'Desert Dune',ar:'كثبان الصحراء',like:'Seasonal',mode:'light',cat:'seasonal',
+   vars:{'--bg':'#F6EAD4','--bg2':'#FFFDF7','--card':'#FFFDF7','--card2':'#F2E6CE','--line':'#E6D6B6','--txt':'#2A2012','--muted':'#6E5C40','--faint':'#8C7A5C','--accent':'#C07A28','--accent2':'#2F8F77','--purple':'#7C5CFF','--warn':'#C9831F','--bad':'#C24A33','--good':'#2F8F77','--accent-d':'#F0E0C0','--nav':'rgba(255,253,247,.82)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCE7C0"/><stop offset=".5" stop-color="#F7D8A6"/><stop offset="1" stop-color="#EBC38A"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="120" cy="150" r="50" fill="#FFF1D6" opacity="0.9"/><path d="M0 470c120-50 220 20 400-20v380H0z" fill="#E0AE6E" opacity="0.65"/><path d="M0 570c140-40 260 30 400-10v280H0z" fill="#CE945A" opacity="0.7"/><path d="M0 670c120-30 260 20 400-6v166H0z" fill="#B87C46" opacity="0.75"/></svg>`},
+  {id:'cloudnine',en:'Cloud Nine',ar:'سحابة هادئة',like:'Calm',mode:'light',cat:'calm',
+   vars:{'--bg':'#EEF5FC','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#E8F0F8','--line':'#DAE6F0','--txt':'#1A2733','--muted':'#54677A','--faint':'#74889A','--accent':'#4F9CE8','--accent2':'#6BD0C8','--purple':'#7C5CFF','--warn':'#E0962A','--bad':'#E2483C','--good':'#2FA86A','--accent-d':'#DCEBFB','--nav':'rgba(255,255,255,.82)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFE6FF"/><stop offset="1" stop-color="#EEF5FC"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><g fill="#FFFFFF" opacity="0.9"><ellipse cx="110" cy="150" rx="70" ry="34"/><ellipse cx="160" cy="165" rx="54" ry="28"/><ellipse cx="300" cy="270" rx="66" ry="32"/><ellipse cx="250" cy="285" rx="48" ry="24"/><ellipse cx="80" cy="380" rx="50" ry="24" opacity="0.7"/></g></svg>`},
+  {id:'vapor',en:'Vaporwave',ar:'فيبورويف',like:'Retro',mode:'dark',cat:'retro',
+   vars:{'--bg':'#1A0E33','--bg2':'#241442','--card':'#2A1A4E','--card2':'#362260','--line':'#4A2E7A','--txt':'#F6EAFF','--muted':'#C0A6E0','--faint':'#8E74B8','--accent':'#FF6EC7','--accent2':'#2FE8E8','--purple':'#B36BFF','--warn':'#FFC061','--bad':'#FF5C72','--good':'#37E0B0','--accent-d':'#2E1B50','--nav':'rgba(36,20,66,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A1B4A"/><stop offset=".5" stop-color="#7A2E7E"/><stop offset=".72" stop-color="#FF6EC7"/><stop offset="1" stop-color="#1A0E33"/></linearGradient><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#FF5FA2"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="200" cy="290" r="90" fill="url(#s)"/><g fill="#7A2E7E"><rect x="100" y="320" width="200" height="6"/><rect x="100" y="336" width="200" height="8"/><rect x="100" y="355" width="200" height="10"/><rect x="100" y="378" width="200" height="12"/></g><g stroke="#2FE8E8" stroke-width="1.4" opacity="0.7"><line x1="0" y1="520" x2="400" y2="520"/><line x1="-100" y1="620" x2="500" y2="620"/><line x1="-260" y1="760" x2="660" y2="760"/><line x1="200" y1="500" x2="-160" y2="800"/><line x1="200" y1="500" x2="560" y2="800"/><line x1="200" y1="500" x2="60" y2="800"/><line x1="200" y1="500" x2="340" y2="800"/></g></svg>`},
+  {id:'oled',en:'OLED Black',ar:'أسود عميق',like:'AMOLED',mode:'dark',cat:'retro',
+   vars:{'--bg':'#000000','--bg2':'#0A0A0C','--card':'#0E0F12','--card2':'#16181C','--line':'#24272E','--txt':'#F2F4F8','--muted':'#9AA3AE','--faint':'#6A727C','--accent':'#00E0B8','--accent2':'#19A0FF','--purple':'#9B7CFF','--warn':'#FFB23E','--bad':'#FF5C72','--good':'#2BD67B','--accent-d':'#0A2622','--nav':'rgba(0,0,0,.9)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><rect width="400" height="800" fill="#000000"/><circle cx="200" cy="90" r="150" fill="#00E0B8" opacity="0.10"/><circle cx="330" cy="400" r="120" fill="#19A0FF" opacity="0.07"/></svg>`},
+  {id:'terminal',en:'Retro Terminal',ar:'طرفية كلاسيكية',like:'CRT',mode:'dark',cat:'retro',
+   vars:{'--bg':'#03110A','--bg2':'#06180E','--card':'#08200F','--card2':'#0C2C16','--line':'#164A28','--txt':'#C8FFDC','--muted':'#6FD59A','--faint':'#3E8C60','--accent':'#16FF7A','--accent2':'#37E0FF','--purple':'#9B7CFF','--warn':'#E0C64B','--bad':'#FF6B6B','--good':'#16FF7A','--accent-d':'#0A2A16','--nav':'rgba(6,24,14,.92)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><rect width="400" height="800" fill="#03110A"/><circle cx="200" cy="120" r="160" fill="#16FF7A" opacity="0.08"/><g fill="#16FF7A" opacity="0.16" font-family="monospace" font-size="13"><text x="24" y="200">10110 01001</text><text x="24" y="230">&gt;_ sync ok</text><text x="24" y="260">01101 11010</text></g></svg>`},
+  {id:'mono',en:'Ink',ar:'حبر',like:'Mono',mode:'light',cat:'calm',
+   vars:{'--bg':'#F5F5F6','--bg2':'#FFFFFF','--card':'#FFFFFF','--card2':'#EFEFF1','--line':'#E0E0E3','--txt':'#16181C','--muted':'#55595F','--faint':'#7C8087','--accent':'#1F2937','--accent2':'#6B7280','--purple':'#6B7280','--warn':'#B4741A','--bad':'#B23B33','--good':'#2E7D5B','--accent-d':'#E8E8EB','--nav':'rgba(255,255,255,.85)'},
+   art:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F4F5"/><stop offset="1" stop-color="#FAFAFB"/></linearGradient></defs><rect width="400" height="800" fill="url(#g)"/><circle cx="310" cy="120" r="70" fill="#E4E4E6"/><circle cx="70" cy="300" r="40" fill="#EAEAEC"/></svg>`},
+];
+const CATMAP={whoop:'brand',nebula:'brand',calm:'calm',apple:'calm',mint:'calm',forest:'nature',sandstone:'seasonal',headspace:'more',flo:'more',oura:'more'};
+const CAT_ORDER=[['brand',['Brand & signature','السمة والهوية'],'🩵'],['anime',['Anime & vibrant','أنمي وحيوية'],'✨'],['nature',['Nature','الطبيعة'],'🌿'],['seasonal',['Seasonal & Saudi','مواسم وسعودية'],'🌙'],['retro',['Bold & retro','جريء وكلاسيكي'],'🕹️'],['calm',['Calm & minimal','هدوء وبساطة'],'☁️'],['more',['More looks','مظاهر أخرى'],'🎨']];
+function themeCat(th){return th.cat||CATMAP[th.id]||'more';}
+function wallCss(th){ if(th.art){return 'url("data:image/svg+xml,'+encodeURIComponent(th.art)+'") center top / cover no-repeat, '+(th.base||th.vars['--bg']); } return th.wall||th.vars['--bg']; }
+function applyTheme(){const th=THEMES.find(x=>x.id===(S.prefs.theme||'qawam'))||THEMES[0];
+  const r=document.documentElement;Object.entries(th.vars).forEach(([k,v])=>r.style.setProperty(k,v));
+  const app=$('#app');if(app)app.style.background=wallCss(th);
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',th.vars['--bg']);
+  r.setAttribute('data-mode',th.mode);}
+function themePreview(th){const v=th.vars;
+  return `<div class="tprev" style="background:${wallCss(th)}">
+    <div style="background:${v['--card']};border:1px solid ${v['--line']};border-radius:8px;padding:6px;flex:1;display:flex;flex-direction:column;gap:5px">
+      <div class="tbar" style="background:${v['--accent']};width:60%"></div>
+      <div class="tbar" style="background:${v['--line']};width:90%"></div>
+      <div class="tbar" style="background:${v['--line']};width:75%"></div>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:${v['--accent']}"></span><span style="width:14px;height:14px;border-radius:50%;background:${v['--accent2']}"></span></div>
+    </div></div>`;}
+route('theme',(n)=>{const ar=isAr();
+  const grid=arr=>`<div class="grid3" style="gap:12px">${arr.map(th=>`<div class="theme-card ${S.prefs.theme===th.id?'on':''}" onclick="setTheme('${th.id}')">${themePreview(th)}<div class="tcheck">✓</div><div class="tname">${isAr()?th.ar:th.en}${th.like?`<br><span style="font-weight:400;opacity:.7;font-size:9px">${th.like}</span>`:''}</div></div>`).join('')}</div>`;
+  const sections=CAT_ORDER.map(([cat,lab,ic])=>{const arr=THEMES.filter(th=>themeCat(th)===cat);if(!arr.length)return '';return `<div class="section-title">${ic} ${ar?lab[1]:lab[0]}</div>${grid(arr)}`;}).join('');
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'السمات والخلفية':'Themes & wallpaper'})}
+   <div class="content">
+     ${sections}
+     <div style="height:14px"></div>
+   </div>`;
+});
+window.setTheme=function(id){S.prefs.theme=id;save();applyTheme();render();toast(isAr()?'تم الحفظ':'Saved');};
+
 /* ---------- boot ---------- */
 window.navTab=navTab;window.go=go;window.goBack=goBack;window.closeSheet=closeSheet;
 applyDir();
+if(typeof applyTheme==='function')applyTheme();
 if(typeof Notification!=='undefined'&&Notification.permission==='granted')startReminderTick();
 try{track('app_open');}catch(e){}
 go('splash',{replace:true});
