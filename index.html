@@ -362,11 +362,15 @@ function blank(){return{
   courses:{},              // {courseId:{done:[dayIdx...]}}
   procedure:{type:'',date:'',phase:''}, // endoscopic/surgical journey
   vits:{},                 // {date: [ids taken]}
-  seenDays:[]
+  seenDays:[],
+  nudgeDismiss:{},
+  metrics:{firstSeen:null, anonId:null, ev:[]},
+  cloud:{enabled:false, code:null, syncId:null, lastSync:null},
+  research:{enrolled:false, pid:null, consentAt:null, siteCode:null, baselineAt:null}
 };}
 function deepMerge(b,o){if(b===null||typeof b!=='object'||Array.isArray(b))return o===undefined?b:o;const out=Object.assign({},b);if(o&&typeof o==='object'&&!Array.isArray(o)){for(const k in o){const x=b[k],y=o[k];out[k]=(x&&typeof x==='object'&&!Array.isArray(x)&&y&&typeof y==='object'&&!Array.isArray(y))?deepMerge(x,y):y;}}return out;}
 function load(){try{const v=JSON.parse(localStorage.getItem(KEY));return v?deepMerge(blank(),v):blank();}catch(e){return blank();}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}try{cloudSchedulePush();}catch(e){}}
 let S=load();
 
 /* ---------- date helpers ---------- */
@@ -461,6 +465,7 @@ function greeting(){const h=new Date().getHours();return h<12?t('goodMorning'):h
 route('today',(n)=>{markDay();const ar=isAr();const st=streak();const recentLogs=allEvents().slice(0,5);const b=bmiVal();const bc=bmiCat(b);const gp=goalPct();const wv=S.weights.slice(-12).map(w=>w.kg);const my=pathwayById(S.user.pathway);
   n.innerHTML=`${heroToday()}
   <div class="content" style="padding-top:14px">
+   ${nudgeBanner()}
    <div class="grid3">
      <div class="kpi"><div class="v" style="color:var(--accent)">${st}</div><div class="l">${t('streak')}</div></div>
      <div class="kpi"><div class="v">${b!=null?b.toFixed(1):'—'}</div><div class="l">${t('bmi')}</div></div>
@@ -506,7 +511,7 @@ function quickBtns(){const items=[['weight','⚖️','logWeight'],['meal','🍽�
 const TYPE_META={weight:['⚖️',['Weight','الوزن']],waist:['📏',['Waist','الخصر']],meal:['🍽️',['Meal','وجبة']],activity:['🏃',['Activity','نشاط']],med:['💊',['Medication','دواء']],symptom:['🩹',['Symptom','عَرَض']],lab:['🧪',['Lab result','نتيجة تحليل']],vits:['💊',['Vitamins','فيتامينات']]};
 function allEvents(){const ev=[];S.weights.forEach(w=>ev.push({type:'weight',t:w.date+'T09:00',kg:w.kg}));S.waists.forEach(w=>ev.push({type:'waist',t:w.date+'T09:00',cm:w.cm}));S.labs.forEach(l=>ev.push({type:'lab',t:l.date+'T09:00',key:l.key,val:l.val}));S.logs.forEach(l=>ev.push(l));return ev.sort((a,b)=>new Date(b.t)-new Date(a.t));}
 function liRow(l){const m=TYPE_META[l.type]||['•',['Log','سجل']];let sub='';if(l.type==='weight')sub=l.kg+' kg';else if(l.type==='waist')sub=l.cm+' cm';else if(l.type==='lab')sub=L(LABKEYS[l.key]||['',''])+': '+l.val;else if(l.type==='meal'){const dot=l.q?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${mealQuality(l.tags).c};margin-inline-end:5px;vertical-align:middle"></span>`:'';sub=dot+((l.tags||[]).map(i=>L(MEALTAGS[i])).join(', ')||L(['Meal','وجبة']));}else if(l.type==='activity')sub=(l.act!=null?L(ACTS[l.act]):'')+(l.mins?' · '+l.mins+(isAr()?' د':' min'):'')+(l.steps?' · '+l.steps+(isAr()?' خطوة':' steps'):'');else if(l.type==='med'&&l.med)sub=L((MEDS.find(x=>x.id===l.med)||{n:['','']}).n);else if(l.type==='symptom'&&l.sym!=null)sub=L(SYMPTOMS[l.sym])+(l.sev!=null?' · '+[t('mild'),t('moderate'),t('severe')][l.sev]:'');if(l.notes)sub=(sub?sub+' · ':'')+esc(l.notes.slice(0,32));return `<div class="li"><div class="ic">${m[0]}</div><div class="tx"><b>${L(m[1])}</b><small>${sub||fmtDate(l.t)}</small></div><small class="muted">${fmtDate(l.t)}</small></div>`;}
-function addLog(o){o.id=rid();o.t=o.t||new Date().toISOString();S.logs.push(o);save();}
+function addLog(o){o.id=rid();o.t=o.t||new Date().toISOString();S.logs.push(o);save();try{track('log',{type:o.type});}catch(e){}}
 
 /* ---- loggers ---- */
 window.pickScale=(id,b)=>{$('#'+id).querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+id).dataset.val=b.dataset.v;};
@@ -542,7 +547,7 @@ window.openLog=function(ty){const ar=isAr();
     <div class="disc-note" style="background:rgba(255,92,114,.12);color:var(--bad)">${ar?'قيء مستمر، عدم إبقاء السوائل، ألم شديد، براز أسود، ألم صدر أو صعوبة تنفّس — اطلب رعاية عاجلة.':'Persistent vomiting, unable to keep fluids down, severe pain, black stools, chest pain or trouble breathing — seek urgent care.'}</div>
     <button class="btn btn-primary" style="margin-top:14px" onclick="saveSymptom()">${t('save')}</button>`);}
 };
-window.saveWeight=()=>{const k=parseFloat($('#wk').value);if(isNaN(k))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wd').value||todayKey();S.weights=S.weights.filter(w=>w.date!==d);S.weights.push({date:d,kg:k});S.weights.sort((a,b)=>a.date<b.date?-1:1);if(!S.user.startWeight)S.user.startWeight=k;save();closeSheet();toast(t('saved'));render();};
+window.saveWeight=()=>{const k=parseFloat($('#wk').value);if(isNaN(k))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wd').value||todayKey();S.weights=S.weights.filter(w=>w.date!==d);S.weights.push({date:d,kg:k});S.weights.sort((a,b)=>a.date<b.date?-1:1);if(!S.user.startWeight)S.user.startWeight=k;save();try{track('pro_weight');}catch(e){}closeSheet();toast(t('saved'));render();};
 window.saveWaist=()=>{const c=parseFloat($('#wc').value);if(isNaN(c))return toast(isAr()?'أدخل رقمًا':'Enter a number');const d=$('#wcd').value||todayKey();S.waists=S.waists.filter(w=>w.date!==d);S.waists.push({date:d,cm:c});S.waists.sort((a,b)=>a.date<b.date?-1:1);save();closeSheet();toast(t('saved'));render();};
 function mealQuality(tags){tags=tags||[];const green=tags.some(i=>[0,1,2].includes(i));const red=tags.some(i=>[3,4,5,6].includes(i));if(green&&!red)return{q:'green',c:'var(--good)',l:['Balanced choice','خيار متوازن']};if(red&&!green)return{q:'red',c:'var(--bad)',l:['Occasional treat','لمرّة أحيانًا']};if(green&&red)return{q:'yellow',c:'var(--warn)',l:['Mixed','متنوّع']};return{q:'gray',c:'var(--faint)',l:['Logged','مسجّل']};}
 window.saveMeal=()=>{const tags=getMulti('mtag');const mq=mealQuality(tags);addLog({type:'meal',desc:($('#desc').value||'').trim(),tags,q:mq.q});closeSheet();toast(isAr()?('تم · '+L(mq.l)):('Logged · '+L(mq.l)));render();};
@@ -663,6 +668,9 @@ route('more',(n)=>{const ar=isAr();n.innerHTML=`${topbar('moreT')}<div class="co
    </div>
    <div class="section-title">${ar?'البيانات':'Data'}</div>
    <div class="card">
+     ${mLi('☁️',ar?'النسخ الاحتياطي السحابي':'Cloud backup','go(\'backup\')',S.cloud&&S.cloud.enabled?(ar?'مُفعّل':'On'):(ar?'مُطفأ':'Off'))}
+     ${mLi('🔬',ar?'البحث والأثر':'Research & evidence','go(\'research\')',S.research&&S.research.enrolled?(ar?'مشارِك':'enrolled'):'')}
+     ${mLi('📊',ar?'التفاعل والمقاييس':'Engagement & KPIs','go(\'engagement\')')}
      ${mLi('⬇️',t('export'),'doExport()')}
      ${mLi('🗑️',t('del'),'confirmDelete()')}
    </div>
@@ -1061,10 +1069,149 @@ window.toggleLesson=(id,day)=>{const st=S.courses[id]||{done:[]};const k=st.done
 /* ---------- animated number count-ups (best-app motion) ---------- */
 function animNums(root){var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;root.querySelectorAll('.ringfx').forEach(function(c){var o=c.getAttribute('data-off');if(o==null)return;if(rm){c.style.strokeDashoffset=o;return;}requestAnimationFrame(function(){requestAnimationFrame(function(){c.style.strokeDashoffset=o;});});});if(rm)return;root.querySelectorAll('.kpi .v').forEach(function(el){if(el.children.length)return;var raw=el.textContent.trim().replace(/,/g,'');if(!/^\d+(\.\d+)?$/.test(raw))return;var to=parseFloat(raw);if(!(to>0)||to>100000)return;var dec=raw.indexOf('.')>=0?1:0;var t0=performance.now();(function step(t){var k=Math.min((t-t0)/520,1);var e2=1-Math.pow(1-k,3);el.textContent=(to*e2).toFixed(dec);if(k<1)requestAnimationFrame(step);else el.textContent=raw;})(performance.now());});}
 
+/* ================= PLATFORM MODULE (ported from Rafeeq/Maeen, adapted for Qawam) =================
+   On-device analytics · E2E-encrypted cloud backup · PRO(weight)/evidence export · re-engagement. */
+const CLOUD={ url:'https://uuscistqaqqaebjjwoml.supabase.co', anon:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1c2Npc3RxYXFxYWViamp3b21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwMTkzNzIsImV4cCI6MjA5NzU5NTM3Mn0.PVEQ0FFQe3_SL71Ah3cP-2wTBBX93d_wKuDYacwQsMs' };
+function cloudOn(){return !!(CLOUD.url&&CLOUD.anon);}
+let __sb=null,__sbLoading=null;
+function loadSupabase(){ if(__sb)return Promise.resolve(__sb); if(!cloudOn())return Promise.resolve(null); if(__sbLoading)return __sbLoading;
+  __sbLoading=new Promise((res)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=()=>{try{__sb=window.supabase.createClient(CLOUD.url,CLOUD.anon);}catch(e){__sb=null;}res(__sb);};s.onerror=()=>res(null);document.head.appendChild(s);}); return __sbLoading; }
+let _mSave=0;
+function recordEvent(ev,props){try{
+  if(!S.metrics)S.metrics={firstSeen:null,anonId:null,ev:[]};const m=S.metrics;
+  if(!m.firstSeen)m.firstSeen=new Date().toISOString();if(!m.anonId)m.anonId='q_'+Math.random().toString(36).slice(2,10);
+  let p=null;if(props){const k=props.type||props.r||props.id;if(k)p=String(k).slice(0,24);}
+  m.ev.push({e:String(ev).slice(0,40),t:Date.now(),p});if(m.ev.length>800)m.ev=m.ev.slice(-800);
+  const now=Date.now();if(now-_mSave>3500){_mSave=now;save();}
+}catch(e){}}
+function track(ev,props){recordEvent(ev,props);}
+window.track=track;
+function engagedDays(){const s=new Set();(S.logs||[]).forEach(l=>s.add(l.t.slice(0,10)));(S.weights||[]).forEach(x=>s.add((x.date||'').slice(0,10)));(S.waists||[]).forEach(x=>s.add((x.date||'').slice(0,10)));(S.journal||[]).forEach(x=>s.add((x.date||'').slice(0,10)));(S.water||[]).forEach(x=>s.add((x.date||'').slice(0,10)));(S.protein||[]).forEach(x=>s.add((x.date||'').slice(0,10)));s.delete('');return [...s].sort();}
+function daysSinceEngage(){const d=engagedDays();if(!d.length)return Infinity;return daysAgo(d[d.length-1]);}
+function recentBrokenStreak(){const set=new Set(engagedDays());if(set.has(todayKey()))return 0;let gap=0,i=0;for(i=0;i<7;i++){if(set.has(todayKey(new Date(Date.now()-i*864e5))))break;gap++;}if(i>=7||gap<1)return 0;let len=0;for(let j=i;j<i+400;j++){if(set.has(todayKey(new Date(Date.now()-j*864e5))))len++;else break;}return len;}
+function lastWeightDaysAgo(){const h=S.weights||[];if(!h.length)return Infinity;return daysAgo((h[h.length-1].date||todayKey()).slice(0,10));}
+function computeEngagement(){
+  const m=(S.metrics&&S.metrics.ev)?S.metrics:{firstSeen:null,ev:[]};const ev=m.ev||[];const now=Date.now();
+  const days=(S.seenDays||[]).slice().sort();const firstT=m.firstSeen?new Date(m.firstSeen).getTime():(days[0]?new Date(days[0]+'T00:00').getTime():now);
+  const firstKey=days[0]||todayKey(new Date(firstT));const daysSince=Math.max(0,Math.floor((now-firstT)/864e5));
+  const within=n=>days.filter(d=>(now-new Date(d+'T00:00').getTime())<n*864e5).length;
+  const retainedBy=n=>days.some(d=>Math.round((new Date(d+'T00:00')-new Date(firstKey+'T00:00'))/864e5)>=n);
+  const counts={};ev.forEach(x=>counts[x.e]=(counts[x.e]||0)+1);
+  const logTypes={};(S.logs||[]).forEach(l=>logTypes[l.type]=(logTypes[l.type]||0)+1);
+  const features={logging:(S.logs||[]).length>0,weights:(S.weights||[]).length>0,waist:(S.waists||[]).length>0,journal:(S.journal||[]).length>0,water:(S.water||[]).length>0,protein:(S.protein||[]).length>0,meds:(S.meds||[]).length>0,reminders:(S.reminders||[]).length>0,courses:Object.keys(S.courses||{}).length>0};
+  return {anonId:m.anonId||null,firstKey,daysSince,activeDays:(S.seenDays||[]).length,last7:within(7),last30:within(30),streak:(typeof streak==='function'?streak():0),weightCount:(S.weights||[]).length,logsTotal:(S.logs||[]).length,d1:retainedBy(1),d7:retainedBy(7),d30:retainedBy(30),evCount:ev.length,counts,logTypes,features};
+}
+window.exportEngagement=function(){const e=computeEngagement();const ar=isAr();
+  const payload={app:'qawam',schema:1,anonId:e.anonId,firstSeen:S.metrics&&S.metrics.firstSeen,daysSince:e.daysSince,activeDays:e.activeDays,activeLast7:e.last7,activeLast30:e.last30,currentStreak:e.streak,weightEntries:e.weightCount,logsTotal:e.logsTotal,retention:{d1:e.d1,d7:e.d7,d30:e.d30},featuresUsed:Object.keys(e.features).filter(k=>e.features[k]),eventCounts:e.counts,logTypeCounts:e.logTypes,exportedAt:new Date().toISOString()};
+  const txt=JSON.stringify(payload,null,2);try{navigator.clipboard&&navigator.clipboard.writeText(txt);}catch(x){}
+  try{const b=new Blob([txt],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='qawam-engagement-'+(e.anonId||'anon')+'.json';document.body.appendChild(a);a.click();a.remove();}catch(x){}
+  track('export_engagement');toast(ar?'✓ نُسخت المقاييس المجهولة':'✓ Anonymized metrics copied & downloaded');};
+route('engagement',(n)=>{const ar=isAr();const e=computeEngagement();
+  const FEAT=[['logging',['Logging','التسجيل']],['weights',['Weight','الوزن']],['waist',['Waist','الخصر']],['journal',['Journal','اليوميات']],['water',['Hydration','الترطيب']],['protein',['Protein','البروتين']],['meds',['Medications','الأدوية']],['courses',['Courses','الدورات']]];
+  const days14=lastNDays(14);const evByDay={};((S.metrics&&S.metrics.ev)||[]).forEach(x=>{const k=todayKey(new Date(x.t));evByDay[k]=(evByDay[k]||0)+1;});
+  const yn=b=>b?'<span style="color:var(--good);font-weight:800">✓</span>':'<span style="opacity:.5">—</span>';
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'التفاعل والمقاييس':'Engagement & KPIs'})}
+   <div class="content">
+    <div class="card" style="background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)"><b>${ar?'تحليلات على الجهاز':'On-device analytics'}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'مقاييس حقيقية لهذا الجهاز — بلا شبكة ولا بيانات شخصية':'Real metrics for this install — no network, no personal data'}</div></div>
+    <div class="grid3">
+      <div class="kpi"><div class="v">${e.daysSince}</div><div class="l">${ar?'يوم':'days'}</div></div>
+      <div class="kpi"><div class="v">${e.activeDays}</div><div class="l">${ar?'أيام نشطة':'active'}</div></div>
+      <div class="kpi"><div class="v">${e.streak}</div><div class="l">${ar?'سلسلة':'streak'}</div></div>
+      <div class="kpi"><div class="v">${e.last7}<span style="font-size:12px">/7</span></div><div class="l">${ar?'آخر ٧':'last 7d'}</div></div>
+      <div class="kpi"><div class="v">${e.weightCount}</div><div class="l">${ar?'أوزان':'weights'}</div></div>
+      <div class="kpi"><div class="v">${e.evCount}</div><div class="l">${ar?'أحداث':'events'}</div></div>
+    </div>
+    <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'الاحتفاظ':'Retention'}</div><div class="row" style="gap:10px;justify-content:space-around"><div class="center"><div style="font-size:20px">${e.d1?'✅':'⬜'}</div><div class="muted" style="font-size:12px">D1</div></div><div class="center"><div style="font-size:20px">${e.d7?'✅':'⬜'}</div><div class="muted" style="font-size:12px">D7</div></div><div class="center"><div style="font-size:20px">${e.d30?'✅':'⬜'}</div><div class="muted" style="font-size:12px">D30</div></div></div></div>
+    <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'نشاط آخر ١٤ يوم':'Activity — last 14 days'}</div>${barChart(days14.map(d=>evByDay[d]||0),days14.map(d=>d.slice(8)),'var(--accent)')}</div>
+    <div class="card"><div class="section-title" style="margin:0 0 8px">${ar?'تبنّي الميزات':'Feature adoption'}</div><div class="row" style="flex-wrap:wrap;gap:8px">${FEAT.map(([k,lab])=>`<span class="chip">${yn(e.features[k])} ${L(lab)}</span>`).join('')}</div></div>
+    <div class="card"><b style="font-size:14px">${ar?'تصدير مجهول':'Anonymized export'}</b><div class="muted" style="font-size:12px;margin-top:2px">${ar?'مقاييس مجمّعة فقط':'Aggregated metrics only'}</div><button class="btn btn-primary" style="margin-top:12px" onclick="exportEngagement()">${ar?'📤 تصدير':'📤 Export'}</button></div>
+   </div>`;});
+function cryptoReady(){return !!(window.crypto&&window.crypto.subtle);}
+function _sb64(buf){const b=new Uint8Array(buf);let s='';const CH=0x8000;for(let i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
+function _unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+function _pbBase(code){return crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey','deriveBits']);}
+async function deriveEncKey(code){const b=await _pbBase(code);return crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('qawam-sync-enc-v1'),iterations:120000,hash:'SHA-256'},b,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function deriveSyncId(code){const b=await _pbBase(code);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode('qawam-sync-id-v1'),iterations:120000,hash:'SHA-256'},b,256);return Array.from(new Uint8Array(bits)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function encBlob(obj,key){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));return _sb64(iv)+'.'+_sb64(ct);}
+async function decBlob(blob,key){const p=blob.split('.');const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:_unb64(p[0])},key,_unb64(p[1]));return JSON.parse(new TextDecoder().decode(pt));}
+function genRecoveryCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const out=[];for(let g=0;g<6;g++){let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];out.push(s);}return out.join('-');}
+function cloudSnapshot(){const c=Object.assign({},S);delete c.cloud;return c;}
+let _cloudTimer=null,_cloudBusy=false;
+async function cloudPush(silent){try{
+  if(!S.cloud||!S.cloud.enabled||!S.cloud.code||!cryptoReady()||!cloudOn())return false;if(_cloudBusy)return false;_cloudBusy=true;
+  const key=await deriveEncKey(S.cloud.code);const sid=S.cloud.syncId||await deriveSyncId(S.cloud.code);S.cloud.syncId=sid;
+  const blob=await encBlob(cloudSnapshot(),key);const sb=await loadSupabase();if(!sb){_cloudBusy=false;return false;}
+  const r=await sb.rpc('snapshot_put',{p_sync_id:sid,p_blob:blob,p_schema:1});_cloudBusy=false;
+  if(r&&r.error){if(!silent)toast(isAr()?'تعذّرت المزامنة':'Sync failed');return false;}
+  S.cloud.lastSync=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  if(!silent){toast(isAr()?'✓ تمّت المزامنة':'✓ Synced');if(CURRENT==='backup')render();}return true;
+}catch(e){_cloudBusy=false;return false;}}
+function cloudSchedulePush(){if(!S||!S.cloud||!S.cloud.enabled)return;clearTimeout(_cloudTimer);_cloudTimer=setTimeout(()=>cloudPush(true),6000);}
+async function cloudRestore(code){code=(code||'').trim().toUpperCase();if(!code)return toast(isAr()?'أدخل رمز الاسترداد':'Enter your recovery code');if(!cryptoReady()||!cloudOn())return toast(isAr()?'غير متاح':'Not available');
+  toast(isAr()?'جارٍ الاسترداد…':'Restoring…');try{const key=await deriveEncKey(code);const sid=await deriveSyncId(code);const sb=await loadSupabase();if(!sb)return toast(isAr()?'تعذّر الاتصال':'Could not connect');
+   const r=await sb.rpc('snapshot_get',{p_sync_id:sid});if(r&&r.error)return toast(isAr()?'تعذّر الاسترداد':'Restore failed');const data=r&&r.data;if(!data||!data.length)return toast(isAr()?'لا توجد نسخة لهذا الرمز':'No backup found for that code');
+   const obj=await decBlob(data[0].blob,key);S=deepMerge(S,obj);S.cloud=Object.assign({},S.cloud,{enabled:true,code:code,syncId:sid,lastSync:new Date().toISOString()});save();closeSheet();toast(isAr()?'✓ تمّ استرداد بياناتك':'✓ Your data was restored');navTab('today');
+  }catch(e){toast(isAr()?'رمز غير صحيح':'Invalid or corrupted code');}}
+window.enableBackup=async function(){if(!cryptoReady())return toast(isAr()?'التشفير غير مدعوم هنا':'Encryption not supported here');const code=genRecoveryCode();S.cloud={enabled:true,code:code,syncId:null,lastSync:null};save();await cloudPush(true);showRecoveryCode(code);track('cloud_enable');};
+window.showRecoveryCode=function(code){const ar=isAr();code=code||(S.cloud&&S.cloud.code)||'';openSheet(`<h2 style="margin:4px 0 6px">${ar?'رمز الاسترداد':'Your recovery code'}</h2><p class="muted" style="font-size:13px;margin:0 0 12px">${ar?'احفظه بأمان — هو المفتاح الوحيد لبياناتك المشفّرة. لا يمكننا استعادته إن فقدته.':'Save it safely — it is the only key to your encrypted data. We cannot recover it if you lose it.'}</p><div style="font-family:ui-monospace,monospace;font-size:18px;letter-spacing:1px;text-align:center;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px;word-break:break-all">${esc(code)}</div><button class="btn btn-primary" style="margin-top:14px" onclick="(navigator.clipboard&&navigator.clipboard.writeText('${code}'));toast('${ar?'نُسخ':'Copied'}')">${ar?'نسخ الرمز':'Copy code'}</button><button class="btn btn-ghost" style="margin-top:10px" onclick="closeSheet();render()">${ar?'حفظتُه':'I saved it'}</button>`);};
+window.disableBackup=function(){const ar=isAr();S.cloud={enabled:false,code:null,syncId:null,lastSync:null};save();toast(ar?'أُوقف النسخ السحابي':'Cloud backup turned off');render();};
+window.openRestore=function(){const ar=isAr();openSheet(`<h2 style="margin:4px 0 8px">${ar?'استرداد بياناتك':'Restore your data'}</h2><p class="muted" style="font-size:13px;margin:0 0 12px">${ar?'أدخل رمز الاسترداد.':'Enter your recovery code.'}</p><div class="field"><input class="input" id="rcCode" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" style="font-family:ui-monospace,monospace;text-transform:uppercase"></div><button class="btn btn-primary" onclick="cloudRestore(document.getElementById('rcCode').value)">${ar?'استرداد':'Restore'}</button>`);};
+window.cloudSyncNow=function(){cloudPush(false);};
+route('backup',(n)=>{const ar=isAr();const c=S.cloud||{};const on=!!c.enabled;
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'النسخ الاحتياطي السحابي':'Cloud backup'})}
+   <div class="content">
+    <div class="card" style="background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)"><div class="row" style="gap:12px"><span style="font-size:26px">${on?'🔒':'☁️'}</span><div style="flex:1"><b style="font-size:15px">${on?(ar?'مُفعّل · مشفّر من طرف إلى طرف':'On · end-to-end encrypted'):(ar?'غير مُفعّل':'Off')}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${on&&c.lastSync?(ar?'آخر مزامنة: ':'Last sync: ')+new Date(c.lastSync).toLocaleString(ar?'ar-SA':'en-GB'):(ar?'بياناتك على هذا الجهاز فقط':'Your data is on this device only')}</div></div></div></div>
+    <div class="card"><p style="font-size:13.5px;line-height:1.6;margin:0">${ar?'اختياري ومشفّر من طرف إلى طرف: تُشفَّر بياناتك على جهازك برمز لا نراه أبدًا. يتيح استعادتها على جهاز جديد.':'Optional and end-to-end encrypted: your data is encrypted on your device with a code we never see. Lets you restore on a new device.'}</p></div>
+    ${on?`<button class="btn btn-primary" onclick="cloudSyncNow()">🔄 ${ar?'مزامنة الآن':'Sync now'}</button><button class="btn btn-ghost" style="margin-top:10px" onclick="showRecoveryCode()">${ar?'إظهار رمز الاسترداد':'Show recovery code'}</button><button class="btn btn-ghost" style="margin-top:10px" onclick="disableBackup()">${ar?'إيقاف النسخ':'Turn off backup'}</button>`:`<button class="btn btn-primary" onclick="enableBackup()">${ar?'تفعيل النسخ المشفّر':'Enable encrypted backup'}</button><button class="btn btn-ghost" style="margin-top:10px" onclick="openRestore()">${ar?'استرداد على هذا الجهاز':'Restore on this device'}</button>`}
+    <p class="muted" style="font-size:11px;margin-top:14px">${ar?'إن فقدت الرمز تُفقد النسخة السحابية — بياناتك المحلية تبقى. يُخزَّن الرمز على هذا الجهاز؛ أوقف النسخ على الأجهزة المشتركة.':'If you lose the code, the cloud copy is unrecoverable — local data is unaffected. The code is stored on this device; turn backup off on shared devices.'}</p>
+   </div>`;});
+function ageBand(){const a=S.user&&S.user.age;if(!a)return null;if(a<18)return '<18';if(a<30)return '18-29';if(a<45)return '30-44';if(a<60)return '45-59';return '60+';}
+function buildEvidenceRecord(){const e=computeEngagement();const r=S.research||{};
+  return {schema:1,app:'qawam',participantId:r.pid||null,siteCode:r.siteCode||null,consentAt:r.consentAt||null,baselineAt:r.baselineAt||null,
+    demographics:{sex:(S.user&&S.user.sex)||null,ageBand:ageBand(),pathway:(S.user&&S.user.pathway)||null,focus:(S.user&&S.user.focus)||null,heightCm:(S.user&&S.user.heightCm)||null},
+    pro:{ weight:(S.weights||[]).map(x=>({date:x.date,kg:x.kg})), waist:(S.waists||[]).map(x=>({date:x.date,cm:x.cm})), labs:(S.labs||[]).map(x=>({date:x.date,key:x.key,val:x.val})), journalMood:(S.journal||[]).map(x=>({date:x.date,mood:x.mood})) },
+    summary:{ startWeight:(S.user&&S.user.startWeight)||null, latestWeight:latestWeight(), targetWeight:(S.user&&S.user.targetWeight)||null, bmi:(bmiVal()!=null?+bmiVal().toFixed(1):null), tbwlPct:(tbwl()!=null?+tbwl().toFixed(1):null), goalPct:(goalPct()!=null?Math.round(goalPct()):null) },
+    engagement:{firstSeen:S.metrics&&S.metrics.firstSeen,daysSince:e.daysSince,activeDays:e.activeDays,activeLast30:e.last30,currentStreak:e.streak,weightEntries:e.weightCount,logsTotal:e.logsTotal,retention:{d1:e.d1,d7:e.d7,d30:e.d30}},
+    exportedAt:new Date().toISOString()};}
+window.exportEvidence=function(){const ar=isAr();const rec=buildEvidenceRecord();if(!rec.participantId){toast(ar?'انضم أولًا':'Enrol first');return;}
+  const txt=JSON.stringify(rec,null,2);try{navigator.clipboard&&navigator.clipboard.writeText(txt);}catch(x){}
+  try{const b=new Blob([txt],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='qawam-evidence-'+rec.participantId+'.json';document.body.appendChild(a);a.click();a.remove();}catch(x){}
+  track('export_evidence');toast(ar?'✓ نُسخت بياناتك مجهولة الهوية':'✓ De-identified data copied & downloaded');};
+window.enrollResearch=function(){const ar=isAr();S.research=S.research||{};S.research.enrolled=true;S.research.pid=S.research.pid||('P-'+Math.random().toString(36).slice(2,8).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase());S.research.consentAt=new Date().toISOString();if(!S.research.baselineAt)S.research.baselineAt=S.research.consentAt;const sc=document.getElementById('siteCode');if(sc&&sc.value.trim())S.research.siteCode=sc.value.trim().toUpperCase();save();track('research_enroll');try{closeSheet();}catch(e){}toast(ar?'✓ شكرًا لمساهمتك':'✓ Thank you for contributing');render();};
+window.withdrawResearch=function(){const ar=isAr();S.research={enrolled:false,pid:null,consentAt:null,siteCode:null,baselineAt:null};save();track('research_withdraw');toast(ar?'تم الانسحاب':'Withdrawn');render();};
+window.openEnroll=function(){const ar=isAr();openSheet(`<h2 style="margin:4px 0 8px">${ar?'الانضمام لبرنامج التحسين':'Join the improvement programme'}</h2><p class="muted" style="font-size:13px;line-height:1.6;margin:0 0 12px">${ar?'برنامج اختياري لقياس ما إذا كان التطبيق يساعد. تُصدَّر بياناتك مجهولة الهوية (بلا اسم أو ملاحظات) وتشاركها أنت. تبقى على جهازك ما لم تشاركها.':'Optional programme to measure whether the app helps. Your data is exported de-identified (no name or notes) and you share it. It stays on your device unless you share it.'}</p><div class="field"><label>${ar?'رمز الموقع (اختياري)':'Site code (optional)'}</label><input class="input" id="siteCode" placeholder="${ar?'مثال: KSU':'e.g. KSU'}" style="text-transform:uppercase" value="${esc((S.research&&S.research.siteCode)||'')}"></div><button class="btn btn-primary" onclick="enrollResearch()">${ar?'أوافق وأنضم':'I consent & join'}</button><p class="muted" style="font-size:11px;margin-top:10px">${ar?'يمكنك الانسحاب في أي وقت. أداة غير طبية.':'You can withdraw anytime. Non-medical tool.'}</p>`);};
+route('research',(n)=>{const ar=isAr();const r=S.research||{};const on=!!r.enrolled;const rec=on?buildEvidenceRecord():null;
+  n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'البحث والأثر':'Research & evidence'})}
+   <div class="content">
+    <div class="card" style="background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)"><div class="row" style="gap:12px"><span style="font-size:26px">${on?'🔬':'📈'}</span><div style="flex:1"><b style="font-size:15px">${on?(ar?'مشارِك · ':'Enrolled · ')+esc(r.pid):(ar?'غير مشارِك':'Not enrolled')}</b><div class="muted" style="font-size:12.5px;margin-top:2px">${on?(ar?'شكرًا — مساهمتك تساعد على إثبات قيمة التطبيق.':'Thank you — your contribution helps prove the app’s value.'):(ar?'اختياري تمامًا.':'Completely optional.')}</div></div></div></div>
+    <div class="card"><p style="font-size:13.5px;line-height:1.6;margin:0">${ar?'يجمع البرنامج قياساتك عبر الوقت (الوزن، الخصر، التحاليل، الشعور) مع الاستخدام ويصدّرها مجهولة الهوية. تُدار الدراسة من الجمعية السعودية لأمراض الجهاز الهضمي وفق الموافقات الأخلاقية.':'The programme collects your measures over time (weight, waist, labs, wellbeing) with usage and exports them de-identified. The study is run by the Saudi Gastroenterology Association under ethics approval.'}</p></div>
+    ${on?`<div class="grid3"><div class="kpi"><div class="v">${rec.pro.weight.length}</div><div class="l">${ar?'أوزان':'weights'}</div></div><div class="kpi"><div class="v">${rec.summary.tbwlPct!=null?rec.summary.tbwlPct+'%':'—'}</div><div class="l">%TBWL</div></div><div class="kpi"><div class="v">${rec.engagement.daysSince}</div><div class="l">${ar?'أيام':'days'}</div></div></div>
+      <button class="btn btn-primary" onclick="openLog('weight')">${ar?'تسجيل وزني':'Log my weight'}</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="exportEvidence()">📤 ${ar?'تصدير بياناتي مجهولة الهوية':'Export my de-identified data'}</button>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="withdrawResearch()">${ar?'الانسحاب':'Withdraw'}</button>`
+    :`<button class="btn btn-primary" onclick="openEnroll()">${ar?'الانضمام (اختياري)':'Join (optional)'}</button>`}
+    <p class="muted" style="font-size:11px;margin-top:14px">${ar?'مجهول الهوية: لا اسم ولا ملاحظات. أنت من يشارك الملف.':'De-identified: no name or notes. You choose to share the file.'}</p>
+   </div>`;});
+function getNudge(){
+  if(S.prefs&&S.prefs.nudges===false)return null;
+  const today=todayKey();const dz=S.nudgeDismiss||{};const fresh=id=>dz[id]!==today;const cands=[];
+  const dsl=daysSinceEngage();
+  if(engagedDays().length>0&&dsl>=2&&dsl<400&&fresh('comeback'))cands.push({id:'comeback',icon:'👋',text:isAr()?('أهلًا بعودتك — مضت '+dsl+' أيام. تسجيل سريع يُكمل من حيث توقّفت.'):('Welcome back — it\'s been '+dsl+' days. A quick check-in picks up where you left off.'),action:"navTab('today')",pri:9});
+  const brk=recentBrokenStreak();
+  if(brk>=3&&dsl<7&&fresh('streakrec'))cands.push({id:'streakrec',icon:'🔥',text:isAr()?('توقّف تتابعك ('+brk+' أيام) — سجّل اليوم لتبدأ سلسلة جديدة.'):('Your '+brk+'-day streak paused — log today to start a fresh one.'),action:"navTab('today')",pri:8});
+  if(S.research&&S.research.enrolled&&lastWeightDaysAgo()>=14&&fresh('research'))cands.push({id:'research',icon:'🔬',text:isAr()?'حان وقت تسجيل وزنك للبرنامج — يساعد على إظهار ما إذا كان التطبيق يفيد.':'Time to log your weight for the programme — it helps show whether the app is helping.',action:"openLog('weight')",pri:7});
+  if(lastWeightDaysAgo()>=7&&!(S.research&&S.research.enrolled)&&fresh('weight'))cands.push({id:'weight',icon:'⚖️',text:isAr()?'مضى أسبوع على آخر وزن — تسجيل سريع يُبقي اتجاهك واضحًا.':'It\'s been a week since your last weigh-in — a quick log keeps your trend clear.',action:"openLog('weight')",pri:5});
+  if(!cands.length)return null;cands.sort((a,b)=>b.pri-a.pri);return cands[0];
+}
+function nudgeBanner(){const nd=getNudge();if(!nd)return '';
+  return `<div id="nudgeBan" class="card tap" style="display:flex;align-items:center;gap:11px;border-inline-start:3px solid var(--accent)"><span style="font-size:20px">${nd.icon}</span><div style="flex:1;font-size:13px" onclick="${nd.action}">${nd.text}</div><button onclick="dismissNudge('${nd.id}')" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer">✕</button></div>`;}
+window.dismissNudge=function(id){S.nudgeDismiss=S.nudgeDismiss||{};S.nudgeDismiss[id]=todayKey();save();render();};
+
 /* ---------- boot ---------- */
 window.navTab=navTab;window.go=go;window.goBack=goBack;window.closeSheet=closeSheet;
 applyDir();
 if(typeof Notification!=='undefined'&&Notification.permission==='granted')startReminderTick();
+try{track('app_open');}catch(e){}
 go('splash',{replace:true});
 </script>
 </body>
