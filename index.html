@@ -170,6 +170,8 @@ button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}
 .theme-card .tname{position:absolute;bottom:0;left:0;right:0;padding:8px 10px;font-size:12px;font-weight:700;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));color:#fff}
 .theme-card .tcheck{position:absolute;top:7px;inset-inline-end:7px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#04221d;display:none;align-items:center;justify-content:center;font-size:13px;font-weight:800}
 .theme-card.on .tcheck{display:flex}
+.card,.hero,.topbar,.tabbar,.kpi,.li{transition:background-color .35s ease,border-color .3s ease,color .25s ease}
+@media(prefers-reduced-motion:reduce){.card,.hero,.topbar,.tabbar,.kpi,.li{transition:none!important}}
 </style>
 </head>
 <body>
@@ -1299,6 +1301,7 @@ function applyTheme(){const th=THEMES.find(x=>x.id===(S.prefs.theme||'qawam'))||
   const r=document.documentElement;Object.entries(th.vars).forEach(([k,v])=>r.style.setProperty(k,v));
   const app=$('#app');if(app)app.style.background=wallCss(th);
   const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',th.vars['--bg']);
+  if(S.prefs&&S.prefs.accent){r.style.setProperty('--accent',S.prefs.accent);r.style.setProperty('--accent-d','color-mix(in srgb, '+S.prefs.accent+' 15%, var(--card))');}
   r.setAttribute('data-mode',th.mode);}
 function themePreview(th){const v=th.vars;
   return `<div class="tprev" style="background:${wallCss(th)}">
@@ -1314,10 +1317,25 @@ route('theme',(n)=>{const ar=isAr();
   const sections=CAT_ORDER.map(([cat,lab,ic])=>{const arr=THEMES.filter(th=>themeCat(th)===cat);if(!arr.length)return '';return `<div class="section-title">${ic} ${ar?lab[1]:lab[0]}</div>${grid(arr)}`;}).join('');
   n.innerHTML=`${topbar(null,null,{back:true,rawTitle:ar?'السمات والخلفية':'Themes & wallpaper'})}
    <div class="content">
+     ${accentRow()}
      ${sections}
      <div style="height:14px"></div>
    </div>`;
 });
+const ACCENTS=[['','',''],['#00E0B8','Teal','فيروزي'],['#19A0FF','Blue','أزرق'],['#9B7CFF','Purple','بنفسجي'],['#F0468A','Pink','وردي'],['#FF7A2E','Orange','برتقالي'],['#2BD67B','Green','أخضر'],['#FF5C72','Red','أحمر'],['#F5C24B','Gold','ذهبي']];
+window.setAccent=function(hex){if(hex){S.prefs.accent=hex;}else if(S.prefs){delete S.prefs.accent;}save();applyTheme();render();};
+window.surpriseTheme=function(){var th=THEMES[Math.floor(Math.random()*THEMES.length)];setTheme(th.id);};
+function accentRow(){var ar=isAr();var cur=(S.prefs&&S.prefs.accent)||'';
+  var sw=ACCENTS.map(function(a){var hex=a[0];var on=cur===hex;var isDef=!hex;
+    var bg=hex?('background:'+hex):('background:linear-gradient(135deg,var(--accent),var(--accent2))');
+    var border=on?'3px solid var(--txt)':'2px solid var(--line)';
+    var mark=isDef?'🎨':(on?'✓':'');
+    var arg=hex?("'"+hex+"'"):'null';
+    return '<button onclick="setAccent('+arg+')" aria-label="'+(isDef?(ar?'حسب السمة':'Theme default'):(ar?a[2]:a[1]))+'" style="width:34px;height:34px;border-radius:50%;'+bg+';border:'+border+';cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">'+mark+'</button>';
+  }).join('');
+  return '<div class="card"><div class="between" style="margin-bottom:8px"><b style="font-size:14.5px">'+(ar?'اجعلها لك':'Make it yours')+'</b><button onclick="surpriseTheme()" style="padding:7px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--txt);font-weight:700;cursor:pointer;font-size:12.5px">🎲 '+(ar?'فاجئني':'Surprise me')+'</button></div><div class="muted" style="font-size:12px;margin-bottom:10px">'+(ar?'لون مميّز يُطبّق فوق أي سمة':'A signature accent applied over any theme')+'</div><div class="row" style="gap:9px;flex-wrap:wrap">'+sw+'</div></div>';
+}
+
 window.setTheme=function(id){S.prefs.theme=id;save();applyTheme();render();toast(isAr()?'تم الحفظ':'Saved');};
 
 /* ---------- boot ---------- */
